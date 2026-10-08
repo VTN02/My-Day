@@ -1,0 +1,2 @@
+-- Supabase Initial Schema placeholder for optional cloud synchronization (Milestone 10)
+-- MVP operations remain 100% offline-first via local Drift SQLite.
