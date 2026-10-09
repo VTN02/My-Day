@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
+import 'notification_service.dart';
 
 /// Reminder Notification Service for scheduling and displaying comprehensive task alerts.
-/// Reminders display full task context (due time, priority, category, notes) so
-/// users do not need to open the app to know what needs to be done.
+/// Reminders display full task context (due time, priority, category, notes) as real
+/// mobile OS system notifications outside the app, plus an in-app banner when active.
 class ReminderService {
-  const ReminderService();
+  final NotificationService _systemNotifications = NotificationService();
+
+  ReminderService();
 
   String _getPriorityEmoji(String priority) {
     switch (priority.toLowerCase()) {
@@ -21,7 +24,43 @@ class ReminderService {
     }
   }
 
-  /// Displays an actionable full-context reminder notification banner.
+  /// Triggers a full task reminder:
+  /// 1. Sends a real Android system notification to the status bar and lock screen (outside the app)
+  /// 2. If the user is currently looking at the app, also displays an in-app banner.
+  Future<void> triggerTaskReminder({
+    BuildContext? context,
+    required String title,
+    required String priority,
+    String? dueTime,
+    String? category,
+    String? description,
+    VoidCallback? onComplete,
+  }) async {
+    // 1. Send native mobile OS notification outside the app
+    await _systemNotifications.showTaskReminderNotification(
+      id: title.hashCode.abs() % 100000,
+      title: title,
+      priority: priority,
+      category: category,
+      dueTime: dueTime,
+      description: description,
+    );
+
+    // 2. If context is provided and mounted, also show in-app banner
+    if (context != null && context.mounted) {
+      showNotificationBanner(
+        context: context,
+        title: title,
+        priority: priority,
+        dueTime: dueTime,
+        category: category,
+        description: description,
+        onComplete: onComplete,
+      );
+    }
+  }
+
+  /// Displays an actionable full-context reminder notification banner inside the app.
   void showNotificationBanner({
     required BuildContext context,
     required String title,
@@ -129,28 +168,20 @@ class ReminderService {
     );
   }
 
-  /// Sends a simulated high-priority reminder notification with all details visible.
-  void sendTestReminder(BuildContext context) {
-    showNotificationBanner(
+  /// Sends a simulated high-priority reminder notification to the mobile system
+  /// and displays the in-app banner.
+  Future<void> sendTestReminder(BuildContext context) async {
+    await triggerTaskReminder(
       context: context,
-      title: 'Review Project Architecture & Backups',
+      title: 'Review Project Architecture & Releases',
       priority: 'high',
       dueTime: '2:30 PM',
       category: 'Work',
       description: 'Double check SQLite migrations, JSON data exports, and offline sync tables before release.',
-      onComplete: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Task marked completed from notification!'),
-            backgroundColor: AppColors.successMint,
-          ),
-        );
-      },
     );
   }
 }
 
-/// Riverpod provider for ReminderService
 final reminderServiceProvider = Provider<ReminderService>((ref) {
-  return const ReminderService();
+  return ReminderService();
 });

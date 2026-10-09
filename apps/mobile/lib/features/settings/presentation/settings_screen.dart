@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/services/backup_service.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/reminder_service.dart';
 import '../../../core/services/update_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -117,6 +118,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showTestUpdateModal() {
+    // Send native mobile system notification outside the app
+    NotificationService().showAppUpdateNotification(
+      latestVersion: '1.0.1',
+      fileSize: '28 MB',
+      releaseNotes: const [
+        'New Rectangular Calendar with one-tap pop-up modal',
+        'Interactive Finance Donut & Cash Flow analysis charts',
+        'Full-context Reminder Notifications with Quick Actions',
+        'Profile Avatar Picker with custom DPs and gradients',
+        'Offline APK OTA Update system integrated',
+      ],
+    );
+
     UpdateService.showUpdateSheet(
       context: context,
       info: const AppUpdateInfo(

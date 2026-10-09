@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
+import 'notification_service.dart';
 
 /// App Version constants
 class AppVersion {
@@ -103,6 +104,13 @@ class UpdateService {
         final updateInfo = AppUpdateInfo.fromJson(data);
 
         if (updateInfo.versionCode > AppVersion.versionCode) {
+          // Trigger system notification to lock screen and status bar
+          NotificationService().showAppUpdateNotification(
+            latestVersion: updateInfo.latestVersion,
+            fileSize: updateInfo.fileSize,
+            releaseNotes: updateInfo.releaseNotes,
+          );
+
           return UpdateCheckResult(
             status: UpdateStatus.updateAvailable,
             updateInfo: updateInfo,
