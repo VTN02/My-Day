@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/services/backup_service.dart';
 import '../../../core/services/reminder_service.dart';
@@ -124,7 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         latestVersion: '1.0.1',
         versionCode: 2,
         apkDownloadUrl:
-            'https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h',
+            'https://github.com/VTN02/My-Day/releases/download/v1.0.1/myday-v1.0.1.apk',
         releaseDate: 'October 2026',
         fileSize: '28 MB',
         releaseNotes: [
@@ -950,18 +949,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          const url = 'https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h';
-                          final uri = Uri.parse(url);
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri, mode: LaunchMode.externalApplication);
-                          } else {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Could not open WhatsApp channel link.'),
-                                ),
-                              );
-                            }
+                          final success = await UpdateService.openWhatsAppCommunity();
+                          if (!success && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Could not open WhatsApp channel link.'),
+                              ),
+                            );
                           }
                         },
                       ),

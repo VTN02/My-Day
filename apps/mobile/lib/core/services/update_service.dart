@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
@@ -81,8 +83,9 @@ class UpdateCheckResult {
 }
 
 class UpdateService {
+  static const _installerChannel = MethodChannel('com.myday.app/installer');
+
   /// Checks remote server for the latest APK version.
-  /// Compares remote [versionCode] against local [AppVersion.versionCode].
   Future<UpdateCheckResult> checkForUpdates({String? customUrl}) async {
     final urlString = customUrl ?? AppVersion.defaultUpdateUrl;
 
@@ -126,21 +129,70 @@ class UpdateService {
     }
   }
 
-  /// Launches the APK download URL in the device's native browser / download manager.
-  /// When download finishes, Android asks the user to install over existing app.
-  static Future<bool> startApkDownload(String apkUrl) async {
-    if (apkUrl.isEmpty) return false;
-    final uri = Uri.parse(apkUrl);
-    return await launchUrl(uri, mode: LaunchMode.externalApplication);
+  /// Downloads the APK directly inside the app with byte-level progress,
+  /// and directly launches Android's native installer dialog without opening any browser.
+  static Future<void> downloadAndInstallApk({
+    required String apkUrl,
+    required void Function(double progress, int receivedBytes, int totalBytes)
+        onProgress,
+  }) async {
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/myday_update.apk');
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    final client = HttpClient();
+    final request = await client.getUrl(Uri.parse(apkUrl));
+    final response = await request.close();
+
+    if (response.statusCode != 200 && response.statusCode != 302) {
+      throw Exception('Failed to download APK (HTTP ${response.statusCode})');
+    }
+
+    final totalBytes = response.contentLength;
+    int receivedBytes = 0;
+
+    final sink = file.openWrite();
+    await for (final chunk in response) {
+      sink.add(chunk);
+      receivedBytes += chunk.length;
+      final progress = totalBytes > 0 ? receivedBytes / totalBytes : 0.0;
+      onProgress(progress, receivedBytes, totalBytes);
+    }
+    await sink.flush();
+    await sink.close();
+
+    // Trigger Native Android Package Installer
+    try {
+      final success = await _installerChannel.invokeMethod<bool>(
+        'installApk',
+        {'filePath': file.path},
+      );
+      if (success != true) {
+        // Fallback: Launch intent directly via url_launcher file URI
+        await launchUrl(Uri.file(file.path), mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      await launchUrl(Uri.file(file.path), mode: LaunchMode.externalApplication);
+    }
   }
 
-  /// Opens the WhatsApp Community Channel to grab the latest pinned APK.
+  /// Opens the WhatsApp Community Channel directly in WhatsApp app or browser.
   static Future<bool> openWhatsAppCommunity() async {
     final uri = Uri.parse(AppVersion.whatsAppUpdateUrl);
-    return await launchUrl(uri, mode: LaunchMode.externalApplication);
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        return await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+      return true;
+    } catch (_) {
+      return await launchUrl(uri, mode: LaunchMode.platformDefault);
+    }
   }
 
-  /// Shows the Update Available dialog/bottom sheet
+  /// Shows the Update Available bottom sheet
   static void showUpdateSheet({
     required BuildContext context,
     required AppUpdateInfo info,
@@ -148,16 +200,76 @@ class UpdateService {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      isDismissible: !info.isMandatory,
+      enableDrag: !info.isMandatory,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _UpdateModalContent(info: info),
     );
   }
 }
 
-class _UpdateModalContent extends StatelessWidget {
+class _UpdateModalContent extends StatefulWidget {
   final AppUpdateInfo info;
 
   const _UpdateModalContent({required this.info});
+
+  @override
+  State<_UpdateModalContent> createState() => _UpdateModalContentState();
+}
+
+class _UpdateModalContentState extends State<_UpdateModalContent> {
+  bool _isDownloading = false;
+  double _progress = 0.0;
+  String _statusText = '';
+  String? _errorMessage;
+
+  String _formatBytes(int bytes) {
+    if (bytes <= 0) return '0 MB';
+    final mb = bytes / (1024 * 1024);
+    return '${mb.toStringAsFixed(1)} MB';
+  }
+
+  Future<void> _startDownload() async {
+    setState(() {
+      _isDownloading = true;
+      _errorMessage = null;
+      _statusText = 'Starting download...';
+      _progress = 0.0;
+    });
+
+    try {
+      await UpdateService.downloadAndInstallApk(
+        apkUrl: widget.info.apkDownloadUrl,
+        onProgress: (progress, received, total) {
+          if (mounted) {
+            setState(() {
+              _progress = progress;
+              if (total > 0) {
+                _statusText =
+                    'Downloading update: ${(progress * 100).toInt()}% (${_formatBytes(received)} / ${_formatBytes(total)})';
+              } else {
+                _statusText = 'Downloading: ${_formatBytes(received)}';
+              }
+            });
+          }
+        },
+      );
+
+      if (mounted) {
+        setState(() {
+          _statusText = 'Opening Android installer...';
+          _progress = 1.0;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _errorMessage = 'Download failed: $e';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +342,7 @@ class _UpdateModalContent extends StatelessWidget {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              'v${info.latestVersion}',
+                              'v${widget.info.latestVersion}',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
@@ -242,7 +354,7 @@ class _UpdateModalContent extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'Installed: v${AppVersion.versionName} • Size: ${info.fileSize ?? "28 MB"}',
+                        'Installed: v${AppVersion.versionName} • Size: ${widget.info.fileSize ?? "28 MB"}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontSize: 12,
@@ -273,7 +385,7 @@ class _UpdateModalContent extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  if (info.releaseNotes.isEmpty)
+                  if (widget.info.releaseNotes.isEmpty)
                     Text(
                       '• Performance improvements and bug fixes.',
                       style: TextStyle(
@@ -283,7 +395,7 @@ class _UpdateModalContent extends StatelessWidget {
                       ),
                     )
                   else
-                    ...info.releaseNotes.map(
+                    ...widget.info.releaseNotes.map(
                       (note) => Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Row(
@@ -328,7 +440,7 @@ class _UpdateModalContent extends StatelessWidget {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Your data is 100% safe. Android will update the app without touching your existing tasks, habits, or money records.',
+                      'Your data is 100% safe. Android will install the update directly on top of your current app without touching your records.',
                       style: TextStyle(
                         color: Colors.amber,
                         fontSize: 11.5,
@@ -339,17 +451,81 @@ class _UpdateModalContent extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
+
+            // Live In-App Download Progress Indicator
+            if (_isDownloading) ...[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _statusText,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: primaryTextColor,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${(_progress * 100).toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryIndigo,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: _progress > 0 ? _progress : null,
+                      backgroundColor: borderColor,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.primaryIndigo,
+                      ),
+                      minHeight: 8,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
+            ],
+
+            if (_errorMessage != null) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: AppColors.errorCoral, fontSize: 12),
+                ),
+              ),
+            ],
+
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      UpdateService.startApkDownload(info.apkDownloadUrl);
-                    },
-                    icon: const Icon(Icons.download_rounded, size: 18),
-                    label: const Text('Download & Update APK'),
+                    onPressed: _isDownloading ? null : _startDownload,
+                    icon: _isDownloading
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.download_rounded, size: 18),
+                    label: Text(
+                      _isDownloading ? 'Downloading APK...' : 'Direct Install APK',
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryIndigo,
                       foregroundColor: Colors.white,
@@ -368,13 +544,14 @@ class _UpdateModalContent extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      UpdateService.openWhatsAppCommunity();
-                    },
+                    onPressed: _isDownloading
+                        ? null
+                        : () {
+                            UpdateService.openWhatsAppCommunity();
+                          },
                     icon: const Icon(Icons.chat_rounded,
                         size: 16, color: Color(0xFF25D366)),
-                    label: const Text('Get from WhatsApp Channel'),
+                    label: const Text('Open WhatsApp Channel'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: secondaryTextColor,
                       side: BorderSide(color: borderColor),
@@ -385,7 +562,7 @@ class _UpdateModalContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (!info.isMandatory) ...[
+                if (!widget.info.isMandatory && !_isDownloading) ...[
                   const SizedBox(width: 10),
                   TextButton(
                     onPressed: () => Navigator.pop(context),
