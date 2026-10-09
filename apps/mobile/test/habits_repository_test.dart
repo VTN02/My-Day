@@ -26,7 +26,10 @@ void main() {
       );
 
       final habits = await repo.watchActiveHabits().first;
-      expect(habits.any((h) => h.id == habitId && h.title == 'Morning Run'), isTrue);
+      expect(
+        habits.any((h) => h.id == habitId && h.title == 'Morning Run'),
+        isTrue,
+      );
     });
 
     test('toggles habit completion for today and calculates streak', () async {

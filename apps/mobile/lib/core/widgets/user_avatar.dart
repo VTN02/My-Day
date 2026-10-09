@@ -23,10 +23,7 @@ class UserAvatar extends StatelessWidget {
     Widget avatarContent = _buildContent();
 
     if (onTap != null) {
-      avatarContent = GestureDetector(
-        onTap: onTap,
-        child: avatarContent,
-      );
+      avatarContent = GestureDetector(onTap: onTap, child: avatarContent);
     }
 
     if (!showEditBadge) return avatarContent;
@@ -100,7 +97,9 @@ class UserAvatar extends StatelessWidget {
     if (path.startsWith('gradient:')) {
       final colorKey = path.substring(9);
       final gradient = _resolveGradient(colorKey);
-      final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
+      final initial = displayName.isNotEmpty
+          ? displayName[0].toUpperCase()
+          : 'U';
       return Container(
         width: size,
         height: size,
@@ -134,7 +133,10 @@ class UserAvatar extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: AppColors.primaryIndigo.withValues(alpha: 0.5), width: 2),
+        border: Border.all(
+          color: AppColors.primaryIndigo.withValues(alpha: 0.5),
+          width: 2,
+        ),
       ),
       child: Center(
         child: Text(

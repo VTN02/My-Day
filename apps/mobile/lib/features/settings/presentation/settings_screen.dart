@@ -78,8 +78,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle_rounded,
-                    color: Colors.white, size: 20),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -215,7 +218,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       : AppColors.lightBackground,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
                   ),
                 ),
                 child: SingleChildScrollView(
@@ -238,7 +243,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   Navigator.of(ctx).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Backup JSON copied to clipboard! Keep it safe.'),
+                      content: Text(
+                        'Backup JSON copied to clipboard! Keep it safe.',
+                      ),
                       backgroundColor: AppColors.successMint,
                     ),
                   );
@@ -361,8 +368,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor =
-        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+    final surfaceColor = isDark
+        ? AppColors.darkCardSurface
+        : AppColors.lightCardSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final profileAsync = ref.watch(userProfileStreamProvider);
@@ -372,8 +380,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final profileSubtitle = org != null && org.isNotEmpty
         ? '$displayName • $org'
         : (profile?.bio != null && profile!.bio!.isNotEmpty
-            ? '$displayName • ${profile.bio}'
-            : '$displayName • Tap to edit profile');
+              ? '$displayName • ${profile.bio}'
+              : '$displayName • Tap to edit profile');
 
     return Scaffold(
       body: CustomScrollView(
@@ -717,7 +725,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     color: isDark ? AppColors.darkCardSurface : Colors.white,
                     borderRadius: AppRadius.cardRadius,
                     border: Border.all(
-                      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
                     ),
                   ),
                   padding: const EdgeInsets.all(16),
@@ -729,7 +739,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryIndigo.withValues(alpha: 0.12),
+                              color: AppColors.primaryIndigo.withValues(
+                                alpha: 0.12,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Icon(
@@ -758,9 +770,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     const SizedBox(width: 6),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.successMint.withValues(alpha: 0.15),
+                                        color: AppColors.successMint.withValues(
+                                          alpha: 0.15,
+                                        ),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: const Text(
@@ -805,7 +821,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed: _isCheckingUpdate ? null : _checkAppUpdates,
+                              onPressed: _isCheckingUpdate
+                                  ? null
+                                  : _checkAppUpdates,
                               icon: _isCheckingUpdate
                                   ? const SizedBox(
                                       width: 14,
@@ -820,7 +838,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 _isCheckingUpdate
                                     ? 'Checking...'
                                     : 'Check for Updates',
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primaryIndigo,
@@ -829,7 +849,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   borderRadius: AppRadius.buttonRadius,
                                 ),
                                 elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                               ),
                             ),
                           ),
@@ -849,13 +871,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 borderRadius: AppRadius.buttonRadius,
                               ),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 12),
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
                             ),
                             child: const Tooltip(
-                              message: 'Preview how the update prompt appears to users',
+                              message:
+                                  'Preview how the update prompt appears to users',
                               child: Text(
                                 'Preview',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -873,7 +901,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     gradient: LinearGradient(
                       colors: isDark
                           ? [const Color(0xFF064E3B), const Color(0xFF065F46)]
-                          : [const Color(0xFF25D366).withValues(alpha: 0.12), const Color(0xFF128C7E).withValues(alpha: 0.08)],
+                          : [
+                              const Color(0xFF25D366).withValues(alpha: 0.12),
+                              const Color(0xFF128C7E).withValues(alpha: 0.08),
+                            ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -958,11 +989,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          final success = await UpdateService.openWhatsAppCommunity();
+                          final success =
+                              await UpdateService.openWhatsAppCommunity();
                           if (!success && context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Could not open WhatsApp channel link.'),
+                                content: Text(
+                                  'Could not open WhatsApp channel link.',
+                                ),
                               ),
                             );
                           }
@@ -989,7 +1023,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primaryIndigo.withValues(alpha: 0.3),
+                              color: AppColors.primaryIndigo.withValues(
+                                alpha: 0.3,
+                              ),
                               blurRadius: 10,
                               offset: const Offset(0, 3),
                             ),

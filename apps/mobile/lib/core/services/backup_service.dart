@@ -74,7 +74,9 @@ class BackupService {
     await _db.transaction(() async {
       // 1. Restore User Profile
       if (data['userProfile'] != null) {
-        final profileMap = Map<String, dynamic>.from(data['userProfile'] as Map);
+        final profileMap = Map<String, dynamic>.from(
+          data['userProfile'] as Map,
+        );
         final profile = UserProfileEntry.fromJson(profileMap);
         await _db.into(_db.userProfileTable).insertOnConflictUpdate(profile);
       }
@@ -82,8 +84,9 @@ class BackupService {
       // 2. Restore Financial Accounts
       if (data['financialAccounts'] is List) {
         for (final item in data['financialAccounts'] as List) {
-          final account =
-              FinancialAccountEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final account = FinancialAccountEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db
               .into(_db.financialAccountsTable)
               .insertOnConflictUpdate(account);
@@ -109,15 +112,18 @@ class BackupService {
           final budget = MonthlyBudgetEntry.fromJson(
             Map<String, dynamic>.from(item as Map),
           );
-          await _db.into(_db.monthlyBudgetsTable).insertOnConflictUpdate(budget);
+          await _db
+              .into(_db.monthlyBudgetsTable)
+              .insertOnConflictUpdate(budget);
         }
       }
 
       // 5. Restore Tasks
       if (data['tasks'] is List) {
         for (final item in data['tasks'] as List) {
-          final task =
-              TaskEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final task = TaskEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db.into(_db.tasksTable).insertOnConflictUpdate(task);
           restoredTasks++;
         }
@@ -126,8 +132,9 @@ class BackupService {
       // 6. Restore Notes
       if (data['notes'] is List) {
         for (final item in data['notes'] as List) {
-          final note =
-              NoteEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final note = NoteEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db.into(_db.notesTable).insertOnConflictUpdate(note);
           restoredNotes++;
         }
@@ -146,8 +153,9 @@ class BackupService {
       // 8. Restore App Settings
       if (data['appSettings'] is List) {
         for (final item in data['appSettings'] as List) {
-          final setting =
-              AppSettingEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final setting = AppSettingEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db.into(_db.appSettingsTable).insertOnConflictUpdate(setting);
         }
       }
@@ -155,8 +163,9 @@ class BackupService {
       // 9. Restore Habits
       if (data['habits'] is List) {
         for (final item in data['habits'] as List) {
-          final habit =
-              HabitEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final habit = HabitEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db.into(_db.habitsTable).insertOnConflictUpdate(habit);
         }
       }
@@ -164,8 +173,9 @@ class BackupService {
       // 10. Restore Habit Logs
       if (data['habitLogs'] is List) {
         for (final item in data['habitLogs'] as List) {
-          final log =
-              HabitLogEntry.fromJson(Map<String, dynamic>.from(item as Map));
+          final log = HabitLogEntry.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          );
           await _db.into(_db.habitLogsTable).insertOnConflictUpdate(log);
         }
       }

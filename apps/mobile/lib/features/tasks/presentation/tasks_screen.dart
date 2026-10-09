@@ -88,8 +88,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           color: isSelected
               ? AppColors.primaryIndigo
               : (isDark
-                  ? AppColors.darkCardSurface
-                  : AppColors.lightBackground),
+                    ? AppColors.darkCardSurface
+                    : AppColors.lightBackground),
           borderRadius: AppRadius.pillRadius,
           border: Border.all(
             color: isSelected
@@ -105,8 +105,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             color: isSelected
                 ? Colors.white
                 : (isDark
-                    ? AppColors.darkPrimaryText
-                    : AppColors.lightPrimaryText),
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText),
           ),
         ),
       ),
@@ -116,8 +116,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   void _showAddTaskSheet() {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
-    String selectedCategory =
-        _selectedCategory == 'All' ? 'Work' : _selectedCategory;
+    String selectedCategory = _selectedCategory == 'All'
+        ? 'Work'
+        : _selectedCategory;
     String selectedPriority = 'medium';
     DateTime? selectedDate = DateTime.now();
     TimeOfDay? selectedTime;
@@ -128,12 +129,15 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        final surfaceColor =
-            isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
-        final borderColor =
-            isDark ? AppColors.darkBorder : AppColors.lightBorder;
-        final secondaryTextColor =
-            isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText;
+        final surfaceColor = isDark
+            ? AppColors.darkCardSurface
+            : AppColors.lightCardSurface;
+        final borderColor = isDark
+            ? AppColors.darkBorder
+            : AppColors.lightBorder;
+        final secondaryTextColor = isDark
+            ? AppColors.darkSecondaryText
+            : AppColors.lightSecondaryText;
 
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -210,18 +214,21 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                     vertical: 8,
                                   ),
                                 ),
-                                items: [
-                                  'Work',
-                                  'Personal',
-                                  'Study',
-                                  'Health',
-                                  'General',
-                                ].map(
-                                  (c) => DropdownMenuItem(
-                                    value: c,
-                                    child: Text(c),
-                                  ),
-                                ).toList(),
+                                items:
+                                    [
+                                          'Work',
+                                          'Personal',
+                                          'Study',
+                                          'Health',
+                                          'General',
+                                        ]
+                                        .map(
+                                          (c) => DropdownMenuItem(
+                                            value: c,
+                                            child: Text(c),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setModalState(() => selectedCategory = v);
@@ -252,12 +259,14 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                     vertical: 8,
                                   ),
                                 ),
-                                items: ['low', 'medium', 'high'].map(
-                                  (p) => DropdownMenuItem(
-                                    value: p,
-                                    child: Text(p.toUpperCase()),
-                                  ),
-                                ).toList(),
+                                items: ['low', 'medium', 'high']
+                                    .map(
+                                      (p) => DropdownMenuItem(
+                                        value: p,
+                                        child: Text(p.toUpperCase()),
+                                      ),
+                                    )
+                                    .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setModalState(() => selectedPriority = v);
@@ -284,7 +293,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       children: [
                         _buildQuickDateChip(
                           label: 'Today',
-                          isSelected: selectedDate != null &&
+                          isSelected:
+                              selectedDate != null &&
                               DateUtils.isSameDay(selectedDate, DateTime.now()),
                           onTap: () {
                             setModalState(() => selectedDate = DateTime.now());
@@ -294,7 +304,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         const SizedBox(width: 8),
                         _buildQuickDateChip(
                           label: 'Tomorrow',
-                          isSelected: selectedDate != null &&
+                          isSelected:
+                              selectedDate != null &&
                               DateUtils.isSameDay(
                                 selectedDate,
                                 DateTime.now().add(const Duration(days: 1)),
@@ -334,7 +345,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               final picked = await showDatePicker(
                                 context: ctx,
                                 initialDate: selectedDate ?? now,
-                                firstDate: now.subtract(const Duration(days: 365)),
+                                firstDate: now.subtract(
+                                  const Duration(days: 365),
+                                ),
                                 lastDate: now.add(const Duration(days: 3650)),
                               );
                               if (picked != null) {
@@ -352,7 +365,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: selectedDate != null
-                                      ? AppColors.primaryIndigo.withValues(alpha: 0.5)
+                                      ? AppColors.primaryIndigo.withValues(
+                                          alpha: 0.5,
+                                        )
                                       : borderColor,
                                 ),
                               ),
@@ -374,8 +389,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                         fontWeight: FontWeight.w600,
                                         color: selectedDate != null
                                             ? (isDark
-                                                ? AppColors.darkPrimaryText
-                                                : AppColors.lightPrimaryText)
+                                                  ? AppColors.darkPrimaryText
+                                                  : AppColors.lightPrimaryText)
                                             : secondaryTextColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -410,7 +425,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: selectedTime != null
-                                      ? AppColors.primaryIndigo.withValues(alpha: 0.5)
+                                      ? AppColors.primaryIndigo.withValues(
+                                          alpha: 0.5,
+                                        )
                                       : borderColor,
                                 ),
                               ),
@@ -436,8 +453,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                             : FontWeight.w400,
                                         color: selectedTime != null
                                             ? (isDark
-                                                ? AppColors.darkPrimaryText
-                                                : AppColors.lightPrimaryText)
+                                                  ? AppColors.darkPrimaryText
+                                                  : AppColors.lightPrimaryText)
                                             : secondaryTextColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -446,7 +463,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                   if (selectedTime != null)
                                     GestureDetector(
                                       onTap: () {
-                                        setModalState(() => selectedTime = null);
+                                        setModalState(
+                                          () => selectedTime = null,
+                                        );
                                       },
                                       child: Icon(
                                         Icons.close_rounded,
@@ -487,7 +506,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           finalDueTime = _formatTimeLabel(selectedTime!);
                         }
 
-                        await ref.read(tasksRepositoryProvider).createTask(
+                        await ref
+                            .read(tasksRepositoryProvider)
+                            .createTask(
                               title: title,
                               description: desc.isNotEmpty ? desc : null,
                               category: selectedCategory,
@@ -579,7 +600,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             data: (tasks) {
               final query = _searchController.text.toLowerCase().trim();
               final filteredTasks = tasks.where((t) {
-                final matchesCategory = _selectedCategory == 'All' ||
+                final matchesCategory =
+                    _selectedCategory == 'All' ||
                     t.category.toLowerCase() == _selectedCategory.toLowerCase();
                 final matchesSearch =
                     query.isEmpty || t.title.toLowerCase().contains(query);

@@ -112,20 +112,21 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                           DropdownButton<String>(
                             value: selectedCategory,
                             underline: const SizedBox.shrink(),
-                            items: [
-                              'Personal',
-                              'Study',
-                              'Ideas',
-                              'Work',
-                              'General',
-                            ]
-                                .map(
-                                  (c) => DropdownMenuItem(
-                                    value: c,
-                                    child: Text(c),
-                                  ),
-                                )
-                                .toList(),
+                            items:
+                                [
+                                      'Personal',
+                                      'Study',
+                                      'Ideas',
+                                      'Work',
+                                      'General',
+                                    ]
+                                    .map(
+                                      (c) => DropdownMenuItem(
+                                        value: c,
+                                        child: Text(c),
+                                      ),
+                                    )
+                                    .toList(),
                             onChanged: (v) {
                               if (v != null) {
                                 setModalState(() => selectedCategory = v);
@@ -135,7 +136,10 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                         ],
                       ),
                       FilterChip(
-                        label: const Text('Pin to Top', style: TextStyle(fontSize: 12)),
+                        label: const Text(
+                          'Pin to Top',
+                          style: TextStyle(fontSize: 12),
+                        ),
                         selected: isPinned,
                         selectedColor: AppColors.primaryIndigo.withAlpha(50),
                         checkmarkColor: AppColors.primaryIndigo,
@@ -260,19 +264,22 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                       ChoiceChip(
                         label: const Text('Document'),
                         selected: fileType == 'doc',
-                        onSelected: (_) => setModalState(() => fileType = 'doc'),
+                        onSelected: (_) =>
+                            setModalState(() => fileType = 'doc'),
                       ),
                       const SizedBox(width: 8),
                       ChoiceChip(
                         label: const Text('Image'),
                         selected: fileType == 'image',
-                        onSelected: (_) => setModalState(() => fileType = 'image'),
+                        onSelected: (_) =>
+                            setModalState(() => fileType = 'image'),
                       ),
                       const SizedBox(width: 8),
                       ChoiceChip(
                         label: const Text('Link'),
                         selected: fileType == 'link',
-                        onSelected: (_) => setModalState(() => fileType = 'link'),
+                        onSelected: (_) =>
+                            setModalState(() => fileType = 'link'),
                       ),
                     ],
                   ),
@@ -286,7 +293,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                       final path = pathController.text.trim();
                       if (name.isEmpty) return;
 
-                      await ref.read(notesRepositoryProvider).addAttachment(
+                      await ref
+                          .read(notesRepositoryProvider)
+                          .addAttachment(
                             noteId: noteId,
                             fileName: name,
                             filePath: path.isEmpty ? name : path,
@@ -394,20 +403,15 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                         DropdownButton<String>(
                           value: selectedCategory,
                           underline: const SizedBox.shrink(),
-                          items: [
-                            'Personal',
-                            'Study',
-                            'Ideas',
-                            'Work',
-                            'General',
-                          ]
-                              .map(
-                                (c) => DropdownMenuItem(
-                                  value: c,
-                                  child: Text(c),
-                                ),
-                              )
-                              .toList(),
+                          items:
+                              ['Personal', 'Study', 'Ideas', 'Work', 'General']
+                                  .map(
+                                    (c) => DropdownMenuItem(
+                                      value: c,
+                                      child: Text(c),
+                                    ),
+                                  )
+                                  .toList(),
                           onChanged: (v) {
                             if (v != null) {
                               setModalState(() => selectedCategory = v);
@@ -437,7 +441,8 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                           ),
                         ),
                         TextButton.icon(
-                          onPressed: () => _showAddAttachmentSheet(ctx, note.id),
+                          onPressed: () =>
+                              _showAddAttachmentSheet(ctx, note.id),
                           icon: const Icon(Icons.add, size: 16),
                           label: const Text('Add File'),
                         ),
@@ -445,8 +450,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                     ),
                     Consumer(
                       builder: (context, consumerRef, _) {
-                        final attachmentsAsync =
-                            consumerRef.watch(noteAttachmentsStreamProvider(note.id));
+                        final attachmentsAsync = consumerRef.watch(
+                          noteAttachmentsStreamProvider(note.id),
+                        );
 
                         return attachmentsAsync.when(
                           loading: () => const Center(
@@ -462,7 +468,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                           data: (attachments) {
                             if (attachments.isEmpty) {
                               return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                ),
                                 child: Text(
                                   'No attachments added yet.',
                                   style: TextStyle(
@@ -490,7 +498,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                 }
 
                                 return Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
                                     vertical: 8,
@@ -508,7 +518,11 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(icon, size: 18, color: AppColors.accentCyan),
+                                      Icon(
+                                        icon,
+                                        size: 18,
+                                        color: AppColors.accentCyan,
+                                      ),
                                       const SizedBox(width: 10),
                                       Expanded(
                                         child: Column(
@@ -522,7 +536,8 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                                 fontWeight: FontWeight.w600,
                                                 color: isDark
                                                     ? AppColors.darkPrimaryText
-                                                    : AppColors.lightPrimaryText,
+                                                    : AppColors
+                                                          .lightPrimaryText,
                                               ),
                                             ),
                                             if (att.filePath != att.fileName)
@@ -531,8 +546,10 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                                                 style: TextStyle(
                                                   fontSize: 11,
                                                   color: isDark
-                                                      ? AppColors.darkSecondaryText
-                                                      : AppColors.lightSecondaryText,
+                                                      ? AppColors
+                                                            .darkSecondaryText
+                                                      : AppColors
+                                                            .lightSecondaryText,
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
@@ -572,7 +589,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.errorCoral,
-                              side: const BorderSide(color: AppColors.errorCoral),
+                              side: const BorderSide(
+                                color: AppColors.errorCoral,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text('Delete Note'),
@@ -716,7 +735,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                       isPinned: note.isPinned,
                       date: '${note.updatedAt.month}/${note.updatedAt.day}',
                       onTap: () => _showNoteDetailSheet(note),
-                      onPinToggle: () => ref.read(notesRepositoryProvider).updateNote(
+                      onPinToggle: () => ref
+                          .read(notesRepositoryProvider)
+                          .updateNote(
                             note.copyWith(
                               isPinned: !note.isPinned,
                               updatedAt: DateTime.now(),

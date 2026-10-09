@@ -8,8 +8,10 @@ import '../../../core/widgets/section_header.dart';
 import 'habit_create_sheet.dart';
 
 /// Provider family for fetching dynamic streak count for a habit
-final habitStreakFutureProvider =
-    FutureProvider.family<int, String>((ref, habitId) async {
+final habitStreakFutureProvider = FutureProvider.family<int, String>((
+  ref,
+  habitId,
+) async {
   // Re-fetch when today's habit logs change
   ref.watch(todayHabitLogsStreamProvider);
   return ref.watch(habitsRepositoryProvider).getStreakForHabit(habitId);
@@ -85,12 +87,19 @@ class DailyHabitsSection extends ConsumerWidget {
             if (habits.isEmpty) {
               return Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
+                  color: isDark
+                      ? AppColors.darkCardSurface
+                      : AppColors.lightCardSurface,
                   borderRadius: AppRadius.mdRadius,
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
                   ),
                 ),
                 child: Column(
@@ -106,7 +115,9 @@ class DailyHabitsSection extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                        color: isDark
+                            ? AppColors.darkPrimaryText
+                            : AppColors.lightPrimaryText,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -115,7 +126,9 @@ class DailyHabitsSection extends ConsumerWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                        color: isDark
+                            ? AppColors.darkSecondaryText
+                            : AppColors.lightSecondaryText,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -123,7 +136,9 @@ class DailyHabitsSection extends ConsumerWidget {
                       icon: const Icon(Icons.add, size: 16),
                       label: const Text('Add First Habit'),
                       style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: AppRadius.smRadius),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppRadius.smRadius,
+                        ),
                       ),
                       onPressed: () => showHabitCreateSheet(context, ref),
                     ),
@@ -146,7 +161,9 @@ class DailyHabitsSection extends ConsumerWidget {
                 final habit = habits[index];
                 final isCompletedToday = completedHabitIds.contains(habit.id);
                 final habitColor = _resolveColor(habit.color);
-                final streakAsync = ref.watch(habitStreakFutureProvider(habit.id));
+                final streakAsync = ref.watch(
+                  habitStreakFutureProvider(habit.id),
+                );
                 final streakCount = streakAsync.value ?? 0;
 
                 return _HabitCard(
@@ -175,7 +192,9 @@ class DailyHabitsSection extends ConsumerWidget {
                             child: const Text('Cancel'),
                           ),
                           TextButton(
-                            style: TextButton.styleFrom(foregroundColor: AppColors.errorCoral),
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.errorCoral,
+                            ),
                             onPressed: () => Navigator.pop(ctx, true),
                             child: const Text('Delete'),
                           ),
@@ -183,7 +202,9 @@ class DailyHabitsSection extends ConsumerWidget {
                       ),
                     );
                     if (confirm == true) {
-                      await ref.read(habitsRepositoryProvider).deleteHabit(habit.id);
+                      await ref
+                          .read(habitsRepositoryProvider)
+                          .deleteHabit(habit.id);
                     }
                   },
                 );
@@ -196,9 +217,7 @@ class DailyHabitsSection extends ConsumerWidget {
               child: CircularProgressIndicator(),
             ),
           ),
-          error: (err, _) => Center(
-            child: Text('Error loading habits: $err'),
-          ),
+          error: (err, _) => Center(child: Text('Error loading habits: $err')),
         ),
       ],
     );
@@ -247,7 +266,7 @@ class _HabitCard extends StatelessWidget {
                   color: habitColor.withValues(alpha: 0.12),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
-                )
+                ),
               ]
             : null,
       ),
@@ -263,7 +282,9 @@ class _HabitCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isCompletedToday
                     ? habitColor
-                    : (isDark ? AppColors.darkBackground : AppColors.lightBackground),
+                    : (isDark
+                          ? AppColors.darkBackground
+                          : AppColors.lightBackground),
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isCompletedToday
@@ -293,13 +314,18 @@ class _HabitCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.5,
                     fontWeight: FontWeight.w700,
-                    decoration: isCompletedToday ? TextDecoration.lineThrough : null,
+                    decoration: isCompletedToday
+                        ? TextDecoration.lineThrough
+                        : null,
                     color: isCompletedToday
                         ? (isDark ? Colors.white54 : Colors.black45)
-                        : (isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText),
+                        : (isDark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.lightPrimaryText),
                   ),
                 ),
-                if (habit.description != null && habit.description!.isNotEmpty) ...[
+                if (habit.description != null &&
+                    habit.description!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     habit.description!,
@@ -307,7 +333,9 @@ class _HabitCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 11.5,
-                      color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                      color: isDark
+                          ? AppColors.darkSecondaryText
+                          : AppColors.lightSecondaryText,
                     ),
                   ),
                 ],
@@ -316,7 +344,10 @@ class _HabitCard extends StatelessWidget {
                   children: [
                     // Category Badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: habitColor.withValues(alpha: 0.12),
                         borderRadius: AppRadius.pillRadius,
@@ -324,11 +355,7 @@ class _HabitCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            categoryIcon,
-                            size: 11,
-                            color: habitColor,
-                          ),
+                          Icon(categoryIcon, size: 11, color: habitColor),
                           const SizedBox(width: 4),
                           Text(
                             habit.category,
@@ -345,7 +372,10 @@ class _HabitCard extends StatelessWidget {
 
                     // Streak Badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: streakCount > 0
                             ? AppColors.warningAmber.withValues(alpha: 0.15)
@@ -395,11 +425,18 @@ class _HabitCard extends StatelessWidget {
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline_rounded, color: AppColors.errorCoral, size: 18),
+                    Icon(
+                      Icons.delete_outline_rounded,
+                      color: AppColors.errorCoral,
+                      size: 18,
+                    ),
                     SizedBox(width: 8),
                     Text(
                       'Delete Habit',
-                      style: TextStyle(color: AppColors.errorCoral, fontSize: 13),
+                      style: TextStyle(
+                        color: AppColors.errorCoral,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),

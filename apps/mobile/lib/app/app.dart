@@ -11,8 +11,7 @@ class MyDayApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode =
-        ref.watch(appThemeModeProvider).value ?? ThemeMode.system;
+    final themeMode = ref.watch(appThemeModeProvider).value ?? ThemeMode.system;
     final locale = ref.watch(appLocaleProvider).value;
 
     return MaterialApp.router(

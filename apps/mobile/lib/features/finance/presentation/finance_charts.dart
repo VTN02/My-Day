@@ -42,7 +42,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
+          color: isDark
+              ? AppColors.darkCardSurface
+              : AppColors.lightCardSurface,
           borderRadius: AppRadius.cardRadius,
           border: Border.all(
             color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -53,7 +55,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
             'No expense data to chart yet.',
             style: TextStyle(
               fontSize: 13,
-              color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+              color: isDark
+                  ? AppColors.darkSecondaryText
+                  : AppColors.lightSecondaryText,
             ),
           ),
         ),
@@ -82,7 +86,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText,
                 ),
               ),
               Container(
@@ -127,7 +133,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                          color: isDark
+                              ? AppColors.darkSecondaryText
+                              : AppColors.lightSecondaryText,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -136,7 +144,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                          color: isDark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.lightPrimaryText,
                         ),
                       ),
                     ],
@@ -156,12 +166,19 @@ class FinanceExpenseDonutChart extends StatelessWidget {
               final color = _getCategoryColor(i);
 
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+                  color: isDark
+                      ? AppColors.darkBackground
+                      : AppColors.lightBackground,
                   borderRadius: AppRadius.pillRadius,
                   border: Border.all(
-                    color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
                   ),
                 ),
                 child: Row(
@@ -181,7 +198,9 @@ class FinanceExpenseDonutChart extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                        color: isDark
+                            ? AppColors.darkPrimaryText
+                            : AppColors.lightPrimaryText,
                       ),
                     ),
                   ],
@@ -288,7 +307,9 @@ class FinanceCashFlowBarChart extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText,
                 ),
               ),
               Row(
@@ -340,7 +361,9 @@ class FinanceCashFlowBarChart extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+              color: isDark
+                  ? AppColors.darkBackground
+                  : AppColors.lightBackground,
               borderRadius: AppRadius.mdRadius,
             ),
             child: Row(
@@ -351,7 +374,9 @@ class FinanceCashFlowBarChart extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                    color: isDark
+                        ? AppColors.darkSecondaryText
+                        : AppColors.lightSecondaryText,
                   ),
                 ),
                 Text(
@@ -387,7 +412,9 @@ class FinanceCashFlowBarChart extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+            color: isDark
+                ? AppColors.darkSecondaryText
+                : AppColors.lightSecondaryText,
           ),
         ),
       ],
@@ -437,7 +464,9 @@ class FinanceCashFlowBarChart extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+            color: isDark
+                ? AppColors.darkPrimaryText
+                : AppColors.lightPrimaryText,
           ),
         ),
       ],

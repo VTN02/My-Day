@@ -111,11 +111,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     border: Border.all(
                       color: _selectedAvatarPath == 'logo'
                           ? AppColors.primaryIndigo
-                          : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                          : (isDark
+                                ? AppColors.darkBorder
+                                : AppColors.lightBorder),
                       width: _selectedAvatarPath == 'logo' ? 2 : 1,
                     ),
                     borderRadius: AppRadius.mdRadius,
-                    color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+                    color: isDark
+                        ? AppColors.darkBackground
+                        : AppColors.lightBackground,
                   ),
                   child: const Row(
                     children: [
@@ -161,13 +165,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  'indigo',
-                  'violet',
-                  'teal',
-                  'amber',
-                  'coral',
-                ].map((g) {
+                children: ['indigo', 'violet', 'teal', 'amber', 'coral'].map((
+                  g,
+                ) {
                   final key = 'gradient:$g';
                   final isSel = _selectedAvatarPath == key;
                   return GestureDetector(
@@ -180,7 +180,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSel ? AppColors.primaryIndigo : Colors.transparent,
+                          color: isSel
+                              ? AppColors.primaryIndigo
+                              : Colors.transparent,
                           width: 2.5,
                         ),
                       ),
@@ -207,38 +209,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  'developer',
-                  'designer',
-                  'fitness',
-                  'mind',
-                  'rocket',
-                  'star',
-                ].map((iconKey) {
-                  final key = 'icon:$iconKey';
-                  final isSel = _selectedAvatarPath == key;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => _selectedAvatarPath = key);
-                      Navigator.pop(ctx);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSel ? AppColors.primaryIndigo : Colors.transparent,
-                          width: 2.5,
+                children:
+                    [
+                      'developer',
+                      'designer',
+                      'fitness',
+                      'mind',
+                      'rocket',
+                      'star',
+                    ].map((iconKey) {
+                      final key = 'icon:$iconKey';
+                      final isSel = _selectedAvatarPath == key;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() => _selectedAvatarPath = key);
+                          Navigator.pop(ctx);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSel
+                                  ? AppColors.primaryIndigo
+                                  : Colors.transparent,
+                              width: 2.5,
+                            ),
+                          ),
+                          child: UserAvatar(
+                            avatarPath: key,
+                            displayName: _nameController.text,
+                            size: 40,
+                          ),
                         ),
-                      ),
-                      child: UserAvatar(
-                        avatarPath: key,
-                        displayName: _nameController.text,
-                        size: 40,
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
               ),
             ],
           ),

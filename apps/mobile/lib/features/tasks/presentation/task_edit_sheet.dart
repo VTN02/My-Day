@@ -27,10 +27,7 @@ class _TaskEditSheetContent extends StatefulWidget {
   final TaskEntry task;
   final WidgetRef ref;
 
-  const _TaskEditSheetContent({
-    required this.task,
-    required this.ref,
-  });
+  const _TaskEditSheetContent({required this.task, required this.ref});
 
   @override
   State<_TaskEditSheetContent> createState() => _TaskEditSheetContentState();
@@ -125,8 +122,8 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
           color: isSelected
               ? AppColors.primaryIndigo
               : (isDark
-                  ? AppColors.darkCardSurface
-                  : AppColors.lightBackground),
+                    ? AppColors.darkCardSurface
+                    : AppColors.lightBackground),
           borderRadius: AppRadius.pillRadius,
           border: Border.all(
             color: isSelected
@@ -142,8 +139,8 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
             color: isSelected
                 ? Colors.white
                 : (isDark
-                    ? AppColors.darkPrimaryText
-                    : AppColors.lightPrimaryText),
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText),
           ),
         ),
       ),
@@ -179,10 +176,7 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
             Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color,
-              ),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: color),
             ),
             const SizedBox(width: 6),
             Text(
@@ -192,11 +186,11 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
                     ? (isDark
-                        ? AppColors.darkPrimaryText
-                        : AppColors.lightPrimaryText)
+                          ? AppColors.darkPrimaryText
+                          : AppColors.lightPrimaryText)
                     : (isDark
-                        ? AppColors.darkSecondaryText
-                        : AppColors.lightSecondaryText),
+                          ? AppColors.darkSecondaryText
+                          : AppColors.lightSecondaryText),
               ),
             ),
           ],
@@ -208,12 +202,13 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor =
-        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
-    final borderColor =
-        isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final secondaryTextColor =
-        isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText;
+    final surfaceColor = isDark
+        ? AppColors.darkCardSurface
+        : AppColors.lightCardSurface;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final secondaryTextColor = isDark
+        ? AppColors.darkSecondaryText
+        : AppColors.lightSecondaryText;
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -222,9 +217,7 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
     return Container(
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(24),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.fromLTRB(
         20,
@@ -253,7 +246,10 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.delete_outline, color: AppColors.errorCoral),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.errorCoral,
+                      ),
                       tooltip: 'Delete Task',
                       onPressed: () async {
                         await widget.ref
@@ -306,18 +302,18 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                             vertical: 8,
                           ),
                         ),
-                        items: [
-                          'Work',
-                          'Personal',
-                          'Study',
-                          'Health',
-                          'General',
-                        ].map(
-                          (c) => DropdownMenuItem(
-                            value: c,
-                            child: Text(c, style: const TextStyle(fontSize: 13)),
-                          ),
-                        ).toList(),
+                        items:
+                            ['Work', 'Personal', 'Study', 'Health', 'General']
+                                .map(
+                                  (c) => DropdownMenuItem(
+                                    value: c,
+                                    child: Text(
+                                      c,
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                         onChanged: (val) {
                           if (val != null) {
                             setState(() => _selectedCategory = val);
@@ -368,10 +364,7 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
             const SizedBox(height: 16),
             const Text(
               'Due Date',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             SingleChildScrollView(
@@ -380,7 +373,8 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                 children: [
                   _buildQuickDateChip(
                     label: 'Today',
-                    isSelected: _selectedDate != null &&
+                    isSelected:
+                        _selectedDate != null &&
                         _selectedDate!.year == today.year &&
                         _selectedDate!.month == today.month &&
                         _selectedDate!.day == today.day,
@@ -390,7 +384,8 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                   const SizedBox(width: 8),
                   _buildQuickDateChip(
                     label: 'Tomorrow',
-                    isSelected: _selectedDate != null &&
+                    isSelected:
+                        _selectedDate != null &&
                         _selectedDate!.year == tomorrow.year &&
                         _selectedDate!.month == tomorrow.month &&
                         _selectedDate!.day == tomorrow.day,
@@ -485,7 +480,8 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                       onPressed: () async {
                         final picked = await showTimePicker(
                           context: context,
-                          initialTime: _selectedTime ??
+                          initialTime:
+                              _selectedTime ??
                               const TimeOfDay(hour: 9, minute: 0),
                         );
                         if (picked != null) {

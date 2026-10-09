@@ -73,7 +73,6 @@ final tasksForDateStreamProvider =
       return ref.watch(tasksRepositoryProvider).watchTasksForDate(date);
     });
 
-
 final financialAccountsStreamProvider =
     StreamProvider<List<FinancialAccountEntry>>((ref) {
       return ref.watch(financeRepositoryProvider).watchAccounts();
@@ -91,13 +90,14 @@ final allTransactionsStreamProvider =
       return ref.watch(financeRepositoryProvider).watchAllTransactions();
     });
 
-final currentMonthBudgetStreamProvider =
-    StreamProvider<MonthlyBudgetEntry?>((ref) {
-      final now = DateTime.now();
-      return ref
-          .watch(financeRepositoryProvider)
-          .watchBudgetForMonth(now.year, now.month);
-    });
+final currentMonthBudgetStreamProvider = StreamProvider<MonthlyBudgetEntry?>((
+  ref,
+) {
+  final now = DateTime.now();
+  return ref
+      .watch(financeRepositoryProvider)
+      .watchBudgetForMonth(now.year, now.month);
+});
 
 final allNotesStreamProvider = StreamProvider<List<NoteEntry>>((ref) {
   return ref.watch(notesRepositoryProvider).watchAllNotes();
@@ -108,39 +108,36 @@ final noteAttachmentsStreamProvider =
       return ref.watch(notesRepositoryProvider).watchAttachmentsForNote(noteId);
     });
 
-
 final userProfileStreamProvider = StreamProvider<UserProfileEntry?>((ref) {
   return ref.watch(profileRepositoryProvider).watchProfile();
 });
 
 /// Reactive ThemeMode provider synced to SQLite app_settings
 final appThemeModeProvider = StreamProvider<ThemeMode>((ref) {
-  return ref
-      .watch(settingsRepositoryProvider)
-      .watchSetting('theme_mode')
-      .map((val) {
-        switch (val) {
-          case 'light':
-            return ThemeMode.light;
-          case 'dark':
-            return ThemeMode.dark;
-          default:
-            return ThemeMode.system;
-        }
-      });
+  return ref.watch(settingsRepositoryProvider).watchSetting('theme_mode').map((
+    val,
+  ) {
+    switch (val) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  });
 });
 
 /// Reactive App Locale provider synced to SQLite app_settings
 final appLocaleProvider = StreamProvider<Locale?>((ref) {
-  return ref
-      .watch(settingsRepositoryProvider)
-      .watchSetting('language')
-      .map((val) {
-        if (val == 'ta') return const Locale('ta');
-        if (val == 'si') return const Locale('si');
-        if (val == 'en') return const Locale('en');
-        return null; // System default
-      });
+  return ref.watch(settingsRepositoryProvider).watchSetting('language').map((
+    val,
+  ) {
+    if (val == 'ta') return const Locale('ta');
+    if (val == 'si') return const Locale('si');
+    if (val == 'en') return const Locale('en');
+    return null; // System default
+  });
 });
 
 /// Reactive Currency provider synced to SQLite app_settings
@@ -150,4 +147,3 @@ final appCurrencyProvider = StreamProvider<String>((ref) {
       .watchSetting('currency')
       .map((val) => val ?? 'LKR');
 });
-

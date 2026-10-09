@@ -29,7 +29,9 @@ class DriftHabitsRepository implements HabitsRepository {
   Stream<List<HabitEntry>> watchActiveHabits() {
     final query = _db.select(_db.habitsTable)
       ..where((h) => h.isArchived.equals(false))
-      ..orderBy([(h) => OrderingTerm(expression: h.createdAt, mode: OrderingMode.asc)]);
+      ..orderBy([
+        (h) => OrderingTerm(expression: h.createdAt, mode: OrderingMode.asc),
+      ]);
     return query.watch();
   }
 
@@ -53,30 +55,34 @@ class DriftHabitsRepository implements HabitsRepository {
   @override
   Future<void> toggleHabitForDate(String habitId, DateTime date) async {
     final normalized = _normalizeDate(date);
-    final existing = await (_db.select(_db.habitLogsTable)
-          ..where((l) => l.habitId.equals(habitId) & l.logDate.equals(normalized)))
-        .getSingleOrNull();
+    final existing =
+        await (_db.select(_db.habitLogsTable)..where(
+              (l) => l.habitId.equals(habitId) & l.logDate.equals(normalized),
+            ))
+            .getSingleOrNull();
 
     if (existing != null) {
       if (existing.isCompleted) {
-        await (_db.delete(_db.habitLogsTable)
-              ..where((l) => l.id.equals(existing.id)))
-            .go();
+        await (_db.delete(
+          _db.habitLogsTable,
+        )..where((l) => l.id.equals(existing.id))).go();
       } else {
         await (_db.update(_db.habitLogsTable)
               ..where((l) => l.id.equals(existing.id)))
             .write(const HabitLogsTableCompanion(isCompleted: Value(true)));
       }
     } else {
-      await _db.into(_db.habitLogsTable).insert(
-        HabitLogsTableCompanion.insert(
-          id: _uuid.v4(),
-          habitId: habitId,
-          logDate: normalized,
-          isCompleted: const Value(true),
-          createdAt: Value(DateTime.now()),
-        ),
-      );
+      await _db
+          .into(_db.habitLogsTable)
+          .insert(
+            HabitLogsTableCompanion.insert(
+              id: _uuid.v4(),
+              habitId: habitId,
+              logDate: normalized,
+              isCompleted: const Value(true),
+              createdAt: Value(DateTime.now()),
+            ),
+          );
     }
   }
 
@@ -90,44 +96,61 @@ class DriftHabitsRepository implements HabitsRepository {
   }) async {
     final id = _uuid.v4();
     final now = DateTime.now();
-    await _db.into(_db.habitsTable).insert(
-      HabitsTableCompanion.insert(
-        id: id,
-        title: title,
-        description: Value(description),
-        category: Value(category),
-        frequency: Value(frequency),
-        color: Value(color),
-        createdAt: Value(now),
-        updatedAt: Value(now),
-      ),
-    );
+    await _db
+        .into(_db.habitsTable)
+        .insert(
+          HabitsTableCompanion.insert(
+            id: id,
+            title: title,
+            description: Value(description),
+            category: Value(category),
+            frequency: Value(frequency),
+            color: Value(color),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
     return id;
   }
 
   @override
   Future<void> archiveHabit(String habitId) async {
-    await (_db.update(_db.habitsTable)..where((h) => h.id.equals(habitId)))
-        .write(HabitsTableCompanion(
-          isArchived: const Value(true),
-          updatedAt: Value(DateTime.now()),
-        ));
+    await (_db.update(
+      _db.habitsTable,
+    )..where((h) => h.id.equals(habitId))).write(
+      HabitsTableCompanion(
+        isArchived: const Value(true),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
   }
 
   @override
   Future<void> deleteHabit(String habitId) async {
     await _db.transaction(() async {
-      await (_db.delete(_db.habitLogsTable)..where((l) => l.habitId.equals(habitId))).go();
-      await (_db.delete(_db.habitsTable)..where((h) => h.id.equals(habitId))).go();
+      await (_db.delete(
+        _db.habitLogsTable,
+      )..where((l) => l.habitId.equals(habitId))).go();
+      await (_db.delete(
+        _db.habitsTable,
+      )..where((h) => h.id.equals(habitId))).go();
     });
   }
 
   @override
   Future<int> getStreakForHabit(String habitId) async {
-    final logs = await (_db.select(_db.habitLogsTable)
-          ..where((l) => l.habitId.equals(habitId) & l.isCompleted.equals(true))
-          ..orderBy([(l) => OrderingTerm(expression: l.logDate, mode: OrderingMode.desc)]))
-        .get();
+    final logs =
+        await (_db.select(_db.habitLogsTable)
+              ..where(
+                (l) => l.habitId.equals(habitId) & l.isCompleted.equals(true),
+              )
+              ..orderBy([
+                (l) => OrderingTerm(
+                  expression: l.logDate,
+                  mode: OrderingMode.desc,
+                ),
+              ]))
+            .get();
 
     if (logs.isEmpty) return 0;
 

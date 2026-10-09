@@ -104,9 +104,27 @@ class AppDatabase extends _$AppDatabase {
 
     // 4. Seed Default Habits
     final defaultHabits = [
-      ('habit_1', 'Morning Stretch & Mobility', 'Health', 'indigo', '10 mins of gentle stretching and breathing'),
-      ('habit_2', 'Drink 2L Water', 'Health', 'teal', 'Track daily hydration intake'),
-      ('habit_3', 'Read 15 Pages', 'Personal', 'violet', 'Read a non-fiction or educational book'),
+      (
+        'habit_1',
+        'Morning Stretch & Mobility',
+        'Health',
+        'indigo',
+        '10 mins of gentle stretching and breathing',
+      ),
+      (
+        'habit_2',
+        'Drink 2L Water',
+        'Health',
+        'teal',
+        'Track daily hydration intake',
+      ),
+      (
+        'habit_3',
+        'Read 15 Pages',
+        'Personal',
+        'violet',
+        'Read a non-fiction or educational book',
+      ),
     ];
 
     for (final h in defaultHabits) {

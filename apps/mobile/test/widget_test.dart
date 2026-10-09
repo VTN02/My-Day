@@ -114,13 +114,21 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            appThemeModeProvider.overrideWith((ref) => Stream.value(ThemeMode.system)),
-            appLocaleProvider.overrideWith((ref) => Stream.value(const Locale('en'))),
+            appThemeModeProvider.overrideWith(
+              (ref) => Stream.value(ThemeMode.system),
+            ),
+            appLocaleProvider.overrideWith(
+              (ref) => Stream.value(const Locale('en')),
+            ),
             userProfileStreamProvider.overrideWith((ref) => Stream.value(null)),
             todayTasksStreamProvider.overrideWith((ref) => Stream.value([])),
-            financialAccountsStreamProvider.overrideWith((ref) => Stream.value([])),
+            financialAccountsStreamProvider.overrideWith(
+              (ref) => Stream.value([]),
+            ),
             activeHabitsStreamProvider.overrideWith((ref) => Stream.value([])),
-            todayHabitLogsStreamProvider.overrideWith((ref) => Stream.value([])),
+            todayHabitLogsStreamProvider.overrideWith(
+              (ref) => Stream.value([]),
+            ),
           ],
           child: const MyDayApp(),
         ),

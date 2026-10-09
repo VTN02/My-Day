@@ -45,7 +45,9 @@ class GradientHeader extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppGradients.primaryBrand.colors.first.withValues(alpha: 0.25),
+              color: AppGradients.primaryBrand.colors.first.withValues(
+                alpha: 0.25,
+              ),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -60,10 +62,7 @@ class GradientHeader extends StatelessWidget {
             if (leading != null) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  leading!,
-                  ?trailing,
-                ],
+                children: [leading!, ?trailing],
               ),
               const SizedBox(height: 12),
             ],

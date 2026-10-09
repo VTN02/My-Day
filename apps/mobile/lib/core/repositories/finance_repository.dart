@@ -232,22 +232,25 @@ class DriftFinanceRepository implements FinanceRepository {
     int month,
     int totalBudgetCents,
   ) async {
-    final existing = await (_db.select(_db.monthlyBudgetsTable)
-          ..where((b) => b.year.equals(year) & b.month.equals(month)))
-        .getSingleOrNull();
+    final existing =
+        await (_db.select(_db.monthlyBudgetsTable)
+              ..where((b) => b.year.equals(year) & b.month.equals(month)))
+            .getSingleOrNull();
 
     final now = DateTime.now();
     if (existing != null) {
-      await (_db.update(_db.monthlyBudgetsTable)
-            ..where((b) => b.id.equals(existing.id)))
-          .write(
+      await (_db.update(
+        _db.monthlyBudgetsTable,
+      )..where((b) => b.id.equals(existing.id))).write(
         MonthlyBudgetsTableCompanion(
           totalBudgetCents: Value(totalBudgetCents),
           updatedAt: Value(now),
         ),
       );
     } else {
-      await _db.into(_db.monthlyBudgetsTable).insert(
+      await _db
+          .into(_db.monthlyBudgetsTable)
+          .insert(
             MonthlyBudgetsTableCompanion.insert(
               id: _uuid.v4(),
               year: year,

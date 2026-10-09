@@ -53,7 +53,8 @@ class AppUpdateInfo {
       apkDownloadUrl: json['apk_download_url'] as String? ?? '',
       directMirrorUrl: json['mirror_url'] as String?,
       releaseDate: json['release_date'] as String? ?? '',
-      releaseNotes: (json['release_notes'] as List<dynamic>?)
+      releaseNotes:
+          (json['release_notes'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
@@ -63,13 +64,7 @@ class AppUpdateInfo {
   }
 }
 
-enum UpdateStatus {
-  idle,
-  checking,
-  upToDate,
-  updateAvailable,
-  error,
-}
+enum UpdateStatus { idle, checking, upToDate, updateAvailable, error }
 
 class UpdateCheckResult {
   final UpdateStatus status;
@@ -142,7 +137,7 @@ class UpdateService {
   static Future<void> downloadAndInstallApk({
     required String apkUrl,
     required void Function(double progress, int receivedBytes, int totalBytes)
-        onProgress,
+    onProgress,
   }) async {
     final tempDir = await getTemporaryDirectory();
     final file = File('${tempDir.path}/myday_update.apk');
@@ -173,16 +168,21 @@ class UpdateService {
 
     // Trigger Native Android Package Installer
     try {
-      final success = await _installerChannel.invokeMethod<bool>(
-        'installApk',
-        {'filePath': file.path},
-      );
+      final success = await _installerChannel.invokeMethod<bool>('installApk', {
+        'filePath': file.path,
+      });
       if (success != true) {
         // Fallback: Launch intent directly via url_launcher file URI
-        await launchUrl(Uri.file(file.path), mode: LaunchMode.externalApplication);
+        await launchUrl(
+          Uri.file(file.path),
+          mode: LaunchMode.externalApplication,
+        );
       }
     } catch (_) {
-      await launchUrl(Uri.file(file.path), mode: LaunchMode.externalApplication);
+      await launchUrl(
+        Uri.file(file.path),
+        mode: LaunchMode.externalApplication,
+      );
     }
   }
 
@@ -190,7 +190,10 @@ class UpdateService {
   static Future<bool> openWhatsAppCommunity() async {
     final uri = Uri.parse(AppVersion.whatsAppUpdateUrl);
     try {
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
       if (!launched) {
         return await launchUrl(uri, mode: LaunchMode.platformDefault);
       }
@@ -283,9 +286,15 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bgColor = isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
-    final primaryTextColor = isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText;
-    final secondaryTextColor = isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText;
+    final bgColor = isDark
+        ? AppColors.darkCardSurface
+        : AppColors.lightCardSurface;
+    final primaryTextColor = isDark
+        ? AppColors.darkPrimaryText
+        : AppColors.lightPrimaryText;
+    final secondaryTextColor = isDark
+        ? AppColors.darkSecondaryText
+        : AppColors.lightSecondaryText;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     return Container(
@@ -344,7 +353,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 2),
+                              horizontal: 7,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primaryIndigo,
                               borderRadius: BorderRadius.circular(6),
@@ -377,7 +388,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F1524) : const Color(0xFFF8FAFC),
+                color: isDark
+                    ? const Color(0xFF0F1524)
+                    : const Color(0xFFF8FAFC),
                 borderRadius: AppRadius.cardRadius,
                 border: Border.all(color: borderColor),
               ),
@@ -443,8 +456,11 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.info_outline_rounded,
-                      color: Colors.amber, size: 18),
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: Colors.amber,
+                    size: 18,
+                  ),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -511,7 +527,10 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
                   _errorMessage!,
-                  style: const TextStyle(color: AppColors.errorCoral, fontSize: 12),
+                  style: const TextStyle(
+                    color: AppColors.errorCoral,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],
@@ -532,7 +551,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                           )
                         : const Icon(Icons.download_rounded, size: 18),
                     label: Text(
-                      _isDownloading ? 'Downloading APK...' : 'Direct Install APK',
+                      _isDownloading
+                          ? 'Downloading APK...'
+                          : 'Direct Install APK',
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryIndigo,
@@ -557,8 +578,11 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                         : () {
                             UpdateService.openWhatsAppCommunity();
                           },
-                    icon: const Icon(Icons.chat_rounded,
-                        size: 16, color: Color(0xFF25D366)),
+                    icon: const Icon(
+                      Icons.chat_rounded,
+                      size: 16,
+                      color: Color(0xFF25D366),
+                    ),
                     label: const Text('Open WhatsApp Channel'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: secondaryTextColor,

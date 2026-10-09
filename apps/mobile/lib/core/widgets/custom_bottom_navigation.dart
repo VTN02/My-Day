@@ -34,9 +34,7 @@ class CustomBottomNavigation extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bottomInset = MediaQuery.paddingOf(context).bottom;
 
-    final bgColor = isDark
-        ? const Color(0xF2121829)
-        : const Color(0xF8FFFFFF);
+    final bgColor = isDark ? const Color(0xF2121829) : const Color(0xF8FFFFFF);
 
     final borderColor = isDark
         ? AppColors.darkBorder.withValues(alpha: 0.8)
@@ -50,15 +48,14 @@ class CustomBottomNavigation extends StatelessWidget {
       value: SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
       ),
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
-          border: Border(
-            top: BorderSide(color: borderColor, width: 1),
-          ),
+          border: Border(top: BorderSide(color: borderColor, width: 1)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
@@ -103,8 +100,12 @@ class CustomBottomNavigation extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? (isDark
-                                    ? AppColors.primaryIndigo.withValues(alpha: 0.22)
-                                    : AppColors.primaryIndigo.withValues(alpha: 0.12))
+                                      ? AppColors.primaryIndigo.withValues(
+                                          alpha: 0.22,
+                                        )
+                                      : AppColors.primaryIndigo.withValues(
+                                          alpha: 0.12,
+                                        ))
                                 : Colors.transparent,
                             borderRadius: AppRadius.pillRadius,
                           ),

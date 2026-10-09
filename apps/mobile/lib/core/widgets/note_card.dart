@@ -43,10 +43,7 @@ class NoteCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: AppRadius.cardRadius,
-        border: Border.all(
-          color: borderColor,
-          width: isPinned ? 1.5 : 1.0,
-        ),
+        border: Border.all(color: borderColor, width: isPinned ? 1.5 : 1.0),
         boxShadow: isDark ? AppShadows.cardDark : AppShadows.cardLight,
       ),
       child: Material(

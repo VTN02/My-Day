@@ -103,17 +103,23 @@ class ReminderService {
                     style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
-                      color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                      color: isDark
+                          ? AppColors.darkPrimaryText
+                          : AppColors.lightPrimaryText,
                     ),
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: (priority.toLowerCase() == 'high'
-                            ? AppColors.errorCoral
-                            : AppColors.warningAmber)
-                        .withValues(alpha: 0.15),
+                    color:
+                        (priority.toLowerCase() == 'high'
+                                ? AppColors.errorCoral
+                                : AppColors.warningAmber)
+                            .withValues(alpha: 0.15),
                     borderRadius: AppRadius.pillRadius,
                   ),
                   child: Text(
@@ -134,7 +140,9 @@ class ReminderService {
               '${dueTime != null ? "Time: $dueTime • " : ""}${category != null ? "Category: $category • " : ""}${description != null && description.isNotEmpty ? description : "Scheduled reminder"}',
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                color: isDark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.lightSecondaryText,
                 height: 1.3,
               ),
             ),
@@ -177,7 +185,8 @@ class ReminderService {
       priority: 'high',
       dueTime: '2:30 PM',
       category: 'Work',
-      description: 'Double check SQLite migrations, JSON data exports, and offline sync tables before release.',
+      description:
+          'Double check SQLite migrations, JSON data exports, and offline sync tables before release.',
     );
   }
 }

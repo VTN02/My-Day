@@ -190,14 +190,18 @@ class TodayScreen extends ConsumerWidget {
                     if (accounts.isEmpty) {
                       return const SizedBox.shrink();
                     }
-                    final cash = accounts.cast<FinancialAccountEntry?>().firstWhere(
-                      (a) => a?.id == 'account_cash',
-                      orElse: () => accounts.first,
-                    );
-                    final card = accounts.cast<FinancialAccountEntry?>().firstWhere(
-                      (a) => a?.id == 'account_card',
-                      orElse: () => accounts.last,
-                    );
+                    final cash = accounts
+                        .cast<FinancialAccountEntry?>()
+                        .firstWhere(
+                          (a) => a?.id == 'account_cash',
+                          orElse: () => accounts.first,
+                        );
+                    final card = accounts
+                        .cast<FinancialAccountEntry?>()
+                        .firstWhere(
+                          (a) => a?.id == 'account_card',
+                          orElse: () => accounts.last,
+                        );
                     final cashBalance = cash?.currentBalanceCents ?? 0;
                     final cardBalance = card?.currentBalanceCents ?? 0;
 

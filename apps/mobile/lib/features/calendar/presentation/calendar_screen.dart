@@ -236,9 +236,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           child: CircularProgressIndicator(),
                         ),
                       ),
-                      error: (err, _) => Center(
-                        child: Text('Error loading tasks: $err'),
-                      ),
+                      error: (err, _) =>
+                          Center(child: Text('Error loading tasks: $err')),
                     ),
                   ),
                 ],
@@ -264,12 +263,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        final surfaceColor =
-            isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
-        final borderColor =
-            isDark ? AppColors.darkBorder : AppColors.lightBorder;
-        final secondaryTextColor =
-            isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText;
+        final surfaceColor = isDark
+            ? AppColors.darkCardSurface
+            : AppColors.lightCardSurface;
+        final borderColor = isDark
+            ? AppColors.darkBorder
+            : AppColors.lightBorder;
+        final secondaryTextColor = isDark
+            ? AppColors.darkSecondaryText
+            : AppColors.lightSecondaryText;
 
         return StatefulBuilder(
           builder: (context, setModalState) {
@@ -346,18 +348,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     vertical: 8,
                                   ),
                                 ),
-                                items: [
-                                  'Work',
-                                  'Personal',
-                                  'Study',
-                                  'Health',
-                                  'General',
-                                ].map(
-                                  (c) => DropdownMenuItem(
-                                    value: c,
-                                    child: Text(c),
-                                  ),
-                                ).toList(),
+                                items:
+                                    [
+                                          'Work',
+                                          'Personal',
+                                          'Study',
+                                          'Health',
+                                          'General',
+                                        ]
+                                        .map(
+                                          (c) => DropdownMenuItem(
+                                            value: c,
+                                            child: Text(c),
+                                          ),
+                                        )
+                                        .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setModalState(() => selectedCategory = v);
@@ -388,12 +393,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     vertical: 8,
                                   ),
                                 ),
-                                items: ['low', 'medium', 'high'].map(
-                                  (p) => DropdownMenuItem(
-                                    value: p,
-                                    child: Text(p.toUpperCase()),
-                                  ),
-                                ).toList(),
+                                items: ['low', 'medium', 'high']
+                                    .map(
+                                      (p) => DropdownMenuItem(
+                                        value: p,
+                                        child: Text(p.toUpperCase()),
+                                      ),
+                                    )
+                                    .toList(),
                                 onChanged: (v) {
                                   if (v != null) {
                                     setModalState(() => selectedPriority = v);
@@ -424,7 +431,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               final picked = await showDatePicker(
                                 context: ctx,
                                 initialDate: selectedDate,
-                                firstDate: now.subtract(const Duration(days: 365)),
+                                firstDate: now.subtract(
+                                  const Duration(days: 365),
+                                ),
                                 lastDate: now.add(const Duration(days: 3650)),
                               );
                               if (picked != null) {
@@ -441,7 +450,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                 color: surfaceColor,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: AppColors.primaryIndigo.withValues(alpha: 0.5),
+                                  color: AppColors.primaryIndigo.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
                               ),
                               child: Row(
@@ -454,7 +465,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      DateFormat('EEE, MMM d').format(selectedDate),
+                                      DateFormat(
+                                        'EEE, MMM d',
+                                      ).format(selectedDate),
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -494,7 +507,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: selectedTime != null
-                                      ? AppColors.primaryIndigo.withValues(alpha: 0.5)
+                                      ? AppColors.primaryIndigo.withValues(
+                                          alpha: 0.5,
+                                        )
                                       : borderColor,
                                 ),
                               ),
@@ -520,8 +535,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                             : FontWeight.w400,
                                         color: selectedTime != null
                                             ? (isDark
-                                                ? AppColors.darkPrimaryText
-                                                : AppColors.lightPrimaryText)
+                                                  ? AppColors.darkPrimaryText
+                                                  : AppColors.lightPrimaryText)
                                             : secondaryTextColor,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -530,7 +545,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                   if (selectedTime != null)
                                     GestureDetector(
                                       onTap: () {
-                                        setModalState(() => selectedTime = null);
+                                        setModalState(
+                                          () => selectedTime = null,
+                                        );
                                       },
                                       child: Icon(
                                         Icons.close_rounded,
@@ -568,7 +585,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           finalDueTime = _formatTimeLabel(selectedTime!);
                         }
 
-                        await ref.read(tasksRepositoryProvider).createTask(
+                        await ref
+                            .read(tasksRepositoryProvider)
+                            .createTask(
                               title: title,
                               description: desc.isNotEmpty ? desc : null,
                               category: selectedCategory,
@@ -593,8 +612,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor =
-        isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface;
+    final surfaceColor = isDark
+        ? AppColors.darkCardSurface
+        : AppColors.lightCardSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
     final firstDayOfMonth = DateTime(
@@ -642,7 +662,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.chevron_left_rounded, size: 24),
+                          icon: const Icon(
+                            Icons.chevron_left_rounded,
+                            size: 24,
+                          ),
                           tooltip: 'Previous month',
                           onPressed: _previousMonth,
                         ),
@@ -658,7 +681,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.chevron_right_rounded, size: 24),
+                          icon: const Icon(
+                            Icons.chevron_right_rounded,
+                            size: 24,
+                          ),
                           tooltip: 'Next month',
                           onPressed: _nextMonth,
                         ),
@@ -693,11 +719,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        mainAxisSpacing: 6,
-                        crossAxisSpacing: 6,
-                        childAspectRatio: 1.18, // Rectangle day cells
-                      ),
+                            crossAxisCount: 7,
+                            mainAxisSpacing: 6,
+                            crossAxisSpacing: 6,
+                            childAspectRatio: 1.18, // Rectangle day cells
+                          ),
                       itemCount: startingWeekday + daysInMonth,
                       itemBuilder: (context, index) {
                         if (index < startingWeekday) {
@@ -706,7 +732,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                         final dayNumber = index - startingWeekday + 1;
                         final isSelected = dayNumber == _selectedDay;
-                        final isToday = dayNumber == DateTime.now().day &&
+                        final isToday =
+                            dayNumber == DateTime.now().day &&
                             _currentMonth.month == DateTime.now().month &&
                             _currentMonth.year == DateTime.now().year;
                         final cellDate = DateTime(
@@ -728,21 +755,24 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               color: isSelected
                                   ? AppColors.primaryIndigo
                                   : (isToday
-                                      ? (isDark
-                                          ? AppColors.darkSoftIndigo
-                                          : AppColors.lightSoftIndigo)
-                                      : (isDark
-                                          ? Colors.white.withValues(alpha: 0.03)
-                                          : AppColors.lightBackground)),
+                                        ? (isDark
+                                              ? AppColors.darkSoftIndigo
+                                              : AppColors.lightSoftIndigo)
+                                        : (isDark
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.03,
+                                                )
+                                              : AppColors.lightBackground)),
                               borderRadius: AppRadius.smRadius,
                               border: Border.all(
                                 color: isSelected
                                     ? AppColors.primaryIndigo
                                     : (isToday
-                                        ? AppColors.primaryIndigo
-                                        : (isDark
-                                            ? AppColors.darkBorder.withValues(alpha: 0.6)
-                                            : AppColors.lightBorder)),
+                                          ? AppColors.primaryIndigo
+                                          : (isDark
+                                                ? AppColors.darkBorder
+                                                      .withValues(alpha: 0.6)
+                                                : AppColors.lightBorder)),
                                 width: isSelected || isToday ? 1.5 : 1,
                               ),
                             ),
@@ -759,8 +789,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                                     color: isSelected
                                         ? Colors.white
                                         : (isDark
-                                            ? AppColors.darkPrimaryText
-                                            : AppColors.lightPrimaryText),
+                                              ? AppColors.darkPrimaryText
+                                              : AppColors.lightPrimaryText),
                                   ),
                                 ),
                               ],
@@ -784,65 +814,65 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ),
             ),
           ),
-          ref.watch(tasksForDateStreamProvider(selectedDate)).when(
-            loading: () => const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(32),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            ),
-            error: (err, _) => SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: Text(
-                    'Error loading tasks: $err',
-                    style: const TextStyle(color: AppColors.errorCoral),
+          ref
+              .watch(tasksForDateStreamProvider(selectedDate))
+              .when(
+                loading: () => const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
                 ),
-              ),
-            ),
-            data: (tasks) {
-              if (tasks.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: EmptyState(
-                    icon: Icons.event_note_outlined,
-                    title: 'No tasks scheduled',
-                    message:
-                        'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
-                    actionLabel: 'Schedule Task',
-                    onActionPressed: () => _showAddTaskSheet(selectedDate),
+                error: (err, _) => SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        'Error loading tasks: $err',
+                        style: const TextStyle(color: AppColors.errorCoral),
+                      ),
+                    ),
                   ),
-                );
-              }
-
-              return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final task = tasks[index];
-                    return TaskCard(
-                      key: ValueKey(task.id),
-                      title: task.title,
-                      category: task.category,
-                      dueTime: task.dueTime,
-                      priority: task.priority,
-                      isCompleted: task.isCompleted,
-                      onTap: () => showTaskEditSheet(context, ref, task),
-                      onToggle: (_) => ref
-                          .read(tasksRepositoryProvider)
-                          .toggleTaskCompletion(task.id),
-                      onDelete: () => ref
-                          .read(tasksRepositoryProvider)
-                          .deleteTask(task.id),
+                ),
+                data: (tasks) {
+                  if (tasks.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: EmptyState(
+                        icon: Icons.event_note_outlined,
+                        title: 'No tasks scheduled',
+                        message:
+                            'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
+                        actionLabel: 'Schedule Task',
+                        onActionPressed: () => _showAddTaskSheet(selectedDate),
+                      ),
                     );
-                  }, childCount: tasks.length),
-                ),
-              );
-            },
-          ),
+                  }
+
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final task = tasks[index];
+                        return TaskCard(
+                          key: ValueKey(task.id),
+                          title: task.title,
+                          category: task.category,
+                          dueTime: task.dueTime,
+                          priority: task.priority,
+                          isCompleted: task.isCompleted,
+                          onTap: () => showTaskEditSheet(context, ref, task),
+                          onToggle: (_) => ref
+                              .read(tasksRepositoryProvider)
+                              .toggleTaskCompletion(task.id),
+                          onDelete: () => ref
+                              .read(tasksRepositoryProvider)
+                              .deleteTask(task.id),
+                        );
+                      }, childCount: tasks.length),
+                    ),
+                  );
+                },
+              ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

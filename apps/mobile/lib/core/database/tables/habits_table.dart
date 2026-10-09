@@ -28,7 +28,8 @@ class HabitLogsTable extends Table {
 
   TextColumn get id => text()();
   TextColumn get habitId => text()(); // References HabitsTable.id
-  DateTimeColumn get logDate => dateTime()(); // Normalized to midnight YYYY-MM-DD
+  DateTimeColumn get logDate =>
+      dateTime()(); // Normalized to midnight YYYY-MM-DD
   BoolColumn get isCompleted => boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 

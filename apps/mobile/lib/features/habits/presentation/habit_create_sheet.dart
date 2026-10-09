@@ -22,7 +22,8 @@ class _HabitCreateSheetContent extends StatefulWidget {
   const _HabitCreateSheetContent({required this.ref});
 
   @override
-  State<_HabitCreateSheetContent> createState() => _HabitCreateSheetContentState();
+  State<_HabitCreateSheetContent> createState() =>
+      _HabitCreateSheetContentState();
 }
 
 class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
@@ -69,12 +70,16 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
 
     setState(() => _isSaving = true);
     try {
-      await widget.ref.read(habitsRepositoryProvider).createHabit(
-        title: title,
-        description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
-        category: _selectedCategory,
-        color: _selectedColor,
-      );
+      await widget.ref
+          .read(habitsRepositoryProvider)
+          .createHabit(
+            title: title,
+            description: _descController.text.trim().isEmpty
+                ? null
+                : _descController.text.trim(),
+            category: _selectedCategory,
+            color: _selectedColor,
+          );
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -135,7 +140,9 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                    color: isDark
+                        ? AppColors.darkPrimaryText
+                        : AppColors.lightPrimaryText,
                   ),
                 ),
                 IconButton(
@@ -172,7 +179,9 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                color: isDark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.lightSecondaryText,
               ),
             ),
             const SizedBox(height: 8),
@@ -190,7 +199,9 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
                         size: 15,
                         color: isSelected
                             ? Colors.white
-                            : (isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText),
+                            : (isDark
+                                  ? AppColors.darkSecondaryText
+                                  : AppColors.lightSecondaryText),
                       ),
                       const SizedBox(width: 6),
                       Text(cat.$1),
@@ -199,11 +210,15 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
                   selected: isSelected,
                   selectedColor: AppColors.primaryIndigo,
                   labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? Colors.white70 : Colors.black87),
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     fontSize: 12.5,
                   ),
-                  backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+                  backgroundColor: isDark
+                      ? AppColors.darkBackground
+                      : AppColors.lightBackground,
                   onSelected: (val) {
                     if (val) setState(() => _selectedCategory = cat.$1);
                   },
@@ -218,7 +233,9 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                color: isDark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.lightSecondaryText,
               ),
             ),
             const SizedBox(height: 8),
@@ -244,12 +261,16 @@ class _HabitCreateSheetContentState extends State<_HabitCreateSheetContent> {
                                 color: c.$2.withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 spreadRadius: 1,
-                              )
+                              ),
                             ]
                           : null,
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                        ? const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          )
                         : null,
                   ),
                 );

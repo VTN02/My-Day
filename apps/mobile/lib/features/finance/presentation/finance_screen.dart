@@ -432,9 +432,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
         return Container(
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkCardSurface : Colors.white,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(
             20,
@@ -629,7 +627,10 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                   OutlinedButton.icon(
                     onPressed: () => _showSetBudgetDialog(targetBudgetCents),
                     icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text('Edit Target', style: TextStyle(fontSize: 12)),
+                    label: const Text(
+                      'Edit Target',
+                      style: TextStyle(fontSize: 12),
+                    ),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -649,7 +650,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                       ? AppColors.darkBorder
                       : AppColors.lightBorder,
                   valueColor: AlwaysStoppedAnimation(
-                    isOverBudget ? AppColors.errorCoral : AppColors.primaryIndigo,
+                    isOverBudget
+                        ? AppColors.errorCoral
+                        : AppColors.primaryIndigo,
                   ),
                 ),
               ),
@@ -692,7 +695,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           EmptyState(
             icon: Icons.pie_chart_outline_rounded,
             title: 'No expenses this month',
-            message: 'Record expenses to track your category budget consumption.',
+            message:
+                'Record expenses to track your category budget consumption.',
             actionLabel: 'Record Expense',
             onActionPressed: () => _showAddTransactionDialog(isIncome: false),
           )
@@ -826,11 +830,11 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                     : AppColors.errorCoral,
                 iconBackgroundColor: netSavings >= 0
                     ? (isDark
-                        ? AppColors.darkSoftMint
-                        : AppColors.lightSoftMint)
+                          ? AppColors.darkSoftMint
+                          : AppColors.lightSoftMint)
                     : (isDark
-                        ? AppColors.darkSoftCoral
-                        : AppColors.lightSoftCoral),
+                          ? AppColors.darkSoftCoral
+                          : AppColors.lightSoftCoral),
               ),
             ),
             const SizedBox(width: 12),
@@ -1046,11 +1050,11 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                     : AppColors.errorCoral,
                 iconBackgroundColor: expVariancePct <= 0
                     ? (isDark
-                        ? AppColors.darkSoftMint
-                        : AppColors.lightSoftMint)
+                          ? AppColors.darkSoftMint
+                          : AppColors.lightSoftMint)
                     : (isDark
-                        ? AppColors.darkSoftCoral
-                        : AppColors.lightSoftCoral),
+                          ? AppColors.darkSoftCoral
+                          : AppColors.lightSoftCoral),
               ),
             ),
             const SizedBox(width: 12),
@@ -1069,11 +1073,11 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                     : AppColors.errorCoral,
                 iconBackgroundColor: incVariancePct >= 0
                     ? (isDark
-                        ? AppColors.darkSoftMint
-                        : AppColors.lightSoftMint)
+                          ? AppColors.darkSoftMint
+                          : AppColors.lightSoftMint)
                     : (isDark
-                        ? AppColors.darkSoftCoral
-                        : AppColors.lightSoftCoral),
+                          ? AppColors.darkSoftCoral
+                          : AppColors.lightSoftCoral),
               ),
             ),
           ],
@@ -1085,8 +1089,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           subtitle:
               'Current net (${_formatCents(currNet)}) vs Previous net (${_formatCents(prevNet)})',
           icon: Icons.compare_arrows_rounded,
-          iconColor:
-              netDiff >= 0 ? AppColors.successMint : AppColors.errorCoral,
+          iconColor: netDiff >= 0
+              ? AppColors.successMint
+              : AppColors.errorCoral,
         ),
         const SizedBox(height: 16),
         Container(
@@ -1113,8 +1118,8 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                   expVariancePct > 10
                       ? 'Expense alert: Spending has increased by over 10% compared to last month. Review discretionary spending to stay on target.'
                       : expVariancePct < 0
-                          ? 'Great discipline! Expenses are lower than last month, increasing your net savings.'
-                          : 'Spending pace is consistent with last month.',
+                      ? 'Great discipline! Expenses are lower than last month, increasing your net savings.'
+                      : 'Spending pace is consistent with last month.',
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark

@@ -35,12 +35,11 @@ class NotificationService {
     tz.initializeTimeZones();
 
     // Android settings with MyDay monogram launcher icon
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const initSettings = InitializationSettings(
-      android: androidSettings,
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
     );
+
+    const initSettings = InitializationSettings(android: androidSettings);
 
     await _notificationsPlugin.initialize(
       settings: initSettings,
@@ -52,7 +51,8 @@ class NotificationService {
     // Create high-importance Android Notification Channels
     final androidImplementation = _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
       // 1. Task Reminders Channel
@@ -102,11 +102,16 @@ class NotificationService {
     await initialize();
 
     final priorityEmoji = _getPriorityEmoji(priority);
-    final categoryLabel = category != null && category.isNotEmpty ? ' • $category' : '';
-    final timeLabel = dueTime != null && dueTime.isNotEmpty ? 'Due: $dueTime' : 'Today';
+    final categoryLabel = category != null && category.isNotEmpty
+        ? ' • $category'
+        : '';
+    final timeLabel = dueTime != null && dueTime.isNotEmpty
+        ? 'Due: $dueTime'
+        : 'Today';
 
     final summaryText = '$priorityEmoji$categoryLabel';
-    final expandedBody = '$timeLabel\n${description != null && description.isNotEmpty ? description : "Scheduled Task"}';
+    final expandedBody =
+        '$timeLabel\n${description != null && description.isNotEmpty ? description : "Scheduled Task"}';
 
     final androidDetails = AndroidNotificationDetails(
       taskChannelId,
@@ -196,8 +201,10 @@ class NotificationService {
     if (scheduledDate.isBefore(now)) return;
 
     final priorityEmoji = _getPriorityEmoji(priority);
-    final summaryText = '$priorityEmoji${category != null ? " • $category" : ""}';
-    final expandedBody = '${dueTime != null ? "Due at $dueTime\n" : ""}${description ?? "Scheduled Task"}';
+    final summaryText =
+        '$priorityEmoji${category != null ? " • $category" : ""}';
+    final expandedBody =
+        '${dueTime != null ? "Due at $dueTime\n" : ""}${description ?? "Scheduled Task"}';
 
     final androidDetails = AndroidNotificationDetails(
       taskChannelId,
