@@ -10,8 +10,10 @@ class NoteCard extends StatelessWidget {
   final String category;
   final String date;
   final String? attachmentName;
+  final bool isPinned;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onPinToggle;
 
   const NoteCard({
     super.key,
@@ -20,8 +22,10 @@ class NoteCard extends StatelessWidget {
     required this.category,
     required this.date,
     this.attachmentName,
+    this.isPinned = false,
     this.onTap,
     this.onDelete,
+    this.onPinToggle,
   });
 
   @override
@@ -30,14 +34,19 @@ class NoteCard extends StatelessWidget {
     final surfaceColor = isDark
         ? AppColors.darkCardSurface
         : AppColors.lightCardSurface;
-    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final borderColor = isPinned
+        ? AppColors.primaryIndigo.withAlpha(120)
+        : (isDark ? AppColors.darkBorder : AppColors.lightBorder);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: AppRadius.cardRadius,
-        border: Border.all(color: borderColor),
+        border: Border.all(
+          color: borderColor,
+          width: isPinned ? 1.5 : 1.0,
+        ),
         boxShadow: isDark ? AppShadows.cardDark : AppShadows.cardLight,
       ),
       child: Material(
@@ -54,6 +63,14 @@ class NoteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    if (isPinned) ...[
+                      const Icon(
+                        Icons.push_pin_rounded,
+                        size: 16,
+                        color: AppColors.primaryIndigo,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                     Expanded(
                       child: Text(
                         title,
@@ -69,17 +86,40 @@ class NoteCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (onDelete != null)
-                      GestureDetector(
-                        onTap: onDelete,
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 18,
-                          color: isDark
-                              ? AppColors.darkSecondaryText
-                              : AppColors.lightSecondaryText,
-                        ),
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (onPinToggle != null)
+                          GestureDetector(
+                            onTap: onPinToggle,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                isPinned
+                                    ? Icons.push_pin_rounded
+                                    : Icons.push_pin_outlined,
+                                size: 18,
+                                color: isPinned
+                                    ? AppColors.primaryIndigo
+                                    : (isDark
+                                          ? AppColors.darkSecondaryText
+                                          : AppColors.lightSecondaryText),
+                              ),
+                            ),
+                          ),
+                        if (onDelete != null)
+                          GestureDetector(
+                            onTap: onDelete,
+                            child: Icon(
+                              Icons.delete_outline,
+                              size: 18,
+                              color: isDark
+                                  ? AppColors.darkSecondaryText
+                                  : AppColors.lightSecondaryText,
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),

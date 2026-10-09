@@ -38,21 +38,28 @@ dependencies:
   go_router: ^17.5.0
   google_fonts: ^8.2.1
   intl: ^0.20.2
+  drift: ^2.35.2
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  sqlite3_flutter_libs: ^0.6.0+eol
+  uuid: ^4.6.0
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  drift_dev: ^2.35.1
+  build_runner: ^2.15.1
 
 flutter:
   generate: true
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/icons/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

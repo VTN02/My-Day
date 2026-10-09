@@ -31,8 +31,11 @@ class AppColors {
   static const Color darkSoftMint = Color(0xFF064E3B);
   static const Color darkSoftCoral = Color(0xFF4C0519);
 
-  // Priority Colors
+  // Priority & Warning Colors
   static const Color priorityHigh = Color(0xFFEF4444);
   static const Color priorityMedium = Color(0xFFF59E0B);
   static const Color priorityLow = Color(0xFF10B981);
+  static const Color warningAmber = Color(0xFFF59E0B);
+  static const Color lightSoftAmber = Color(0xFFFFFBEB);
+  static const Color darkSoftAmber = Color(0xFF451A03);
 }

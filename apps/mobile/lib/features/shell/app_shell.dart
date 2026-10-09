@@ -2,18 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/custom_bottom_navigation.dart';
 
-/// AppShell hosting the persistent bottom navigation and swipe navigation across primary screens.
-class AppShell extends StatefulWidget {
+/// AppShell hosting the persistent bottom navigation and branch routing.
+class AppShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const AppShell({super.key, required this.navigationShell});
-
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> {
-  late final PageController _pageController;
 
   static const List<BottomNavItem> _navItems = [
     BottomNavItem(
@@ -43,44 +36,23 @@ class _AppShellState extends State<AppShell> {
     ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(
-      initialPage: widget.navigationShell.currentIndex,
-    );
-  }
-
-  @override
-  void didUpdateWidget(covariant AppShell oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.navigationShell.currentIndex != _pageController.page?.round()) {
-      _pageController.jumpToPage(widget.navigationShell.currentIndex);
-    }
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
   void _onTabTapped(int index) {
-    widget.navigationShell.goBranch(
+    navigationShell.goBranch(
       index,
-      initialLocation: index == widget.navigationShell.currentIndex,
+      initialLocation: index == navigationShell.currentIndex,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.navigationShell,
+      body: navigationShell,
       bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: widget.navigationShell.currentIndex,
+        currentIndex: navigationShell.currentIndex,
         onTap: _onTabTapped,
         items: _navItems,
       ),
     );
   }
 }
+
