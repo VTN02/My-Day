@@ -272,18 +272,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: GradientHeader(
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => context.pop(),
+              ),
               eyebrow: 'Personal Identity',
               title: 'User Profile',
               subtitle:
                   'Your personal data stays 100% on this device in SQLite',
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                  size: 22,
-                ),
-                onPressed: () => context.pop(),
-              ),
             ),
           ),
           SliverPadding(

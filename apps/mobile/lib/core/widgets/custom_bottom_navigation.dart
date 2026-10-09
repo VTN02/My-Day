@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 
@@ -15,7 +16,7 @@ class BottomNavItem {
   });
 }
 
-/// Custom Bottom Navigation Bar for MyDay.
+/// Modern Edge-to-Edge Bottom Navigation Dock matching flagship mobile OS patterns.
 class CustomBottomNavigation extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -31,25 +32,47 @@ class CustomBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.darkCardSurface : Colors.white;
-    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border(top: BorderSide(color: borderColor, width: 1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
-        ],
+    final bgColor = isDark
+        ? const Color(0xF2121829)
+        : const Color(0xF8FFFFFF);
+
+    final borderColor = isDark
+        ? AppColors.darkBorder.withValues(alpha: 0.8)
+        : AppColors.lightBorder.withValues(alpha: 0.9);
+
+    final unselectedColor = isDark
+        ? const Color(0xFF64748B)
+        : const Color(0xFF94A3B8);
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
       ),
-      child: SafeArea(
-        top: false,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border(
+            top: BorderSide(color: borderColor, width: 1),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
+              blurRadius: 18,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.only(
+          bottom: bottomInset > 0 ? bottomInset : 8,
+          top: 6,
+        ),
         child: SizedBox(
-          height: 64,
+          height: 56,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(items.length, (index) {
@@ -57,54 +80,60 @@ class CustomBottomNavigation extends StatelessWidget {
               final isSelected = currentIndex == index;
 
               return Expanded(
-                child: InkWell(
-                  onTap: () => onTap(index),
-                  splashColor: AppColors.primaryIndigo.withValues(alpha: 0.1),
-                  highlightColor: Colors.transparent,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 4,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onTap(index);
+                    },
+                    splashColor: AppColors.primaryIndigo.withValues(alpha: 0.1),
+                    highlightColor: Colors.transparent,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? (isDark
+                                    ? AppColors.primaryIndigo.withValues(alpha: 0.22)
+                                    : AppColors.primaryIndigo.withValues(alpha: 0.12))
+                                : Colors.transparent,
+                            borderRadius: AppRadius.pillRadius,
+                          ),
+                          child: Icon(
+                            isSelected ? item.activeIcon : item.icon,
+                            size: 22,
+                            color: isSelected
+                                ? AppColors.primaryIndigo
+                                : unselectedColor,
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? (isDark
-                                    ? AppColors.darkSoftIndigo
-                                    : AppColors.lightSoftIndigo)
-                              : Colors.transparent,
-                          borderRadius: AppRadius.pillRadius,
+                        const SizedBox(height: 3),
+                        Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            letterSpacing: -0.1,
+                            color: isSelected
+                                ? AppColors.primaryIndigo
+                                : unselectedColor,
+                          ),
                         ),
-                        child: Icon(
-                          isSelected ? item.activeIcon : item.icon,
-                          size: 22,
-                          color: isSelected
-                              ? AppColors.primaryIndigo
-                              : (isDark
-                                    ? AppColors.darkSecondaryText
-                                    : AppColors.lightSecondaryText),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.label,
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: isSelected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                          color: isSelected
-                              ? AppColors.primaryIndigo
-                              : (isDark
-                                    ? AppColors.darkSecondaryText
-                                    : AppColors.lightSecondaryText),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );

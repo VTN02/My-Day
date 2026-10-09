@@ -366,24 +366,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         slivers: [
           SliverToBoxAdapter(
             child: GradientHeader(
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => context.pop(),
+              ),
               eyebrow: 'Make It Yours',
               title: 'Settings',
               subtitle: 'Personalize your preferences and data',
-              trailing: IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: AppRadius.smRadius,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-                onPressed: () => context.pop(),
-              ),
             ),
           ),
           SliverPadding(
