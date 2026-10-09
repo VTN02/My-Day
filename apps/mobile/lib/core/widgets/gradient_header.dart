@@ -54,14 +54,28 @@ class GradientHeader extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.18),
                         borderRadius: AppRadius.pillRadius,
                       ),
-                      child: Text(
-                        eyebrow.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: Image.asset(
+                              'assets/images/app_logo.png',
+                              width: 14,
+                              height: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            eyebrow.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),
