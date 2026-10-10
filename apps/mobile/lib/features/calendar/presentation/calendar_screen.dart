@@ -646,239 +646,250 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           Expanded(
             child: CustomScrollView(
               slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: AppRadius.cardRadius,
-                  border: Border.all(color: borderColor),
-                ),
-                child: Column(
-                  children: [
-                    // Month Navigation Inside the Calendar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.chevron_left_rounded,
-                            size: 24,
-                          ),
-                          tooltip: 'Previous month',
-                          onPressed: _previousMonth,
-                        ),
-                        Text(
-                          '${_monthName(_currentMonth.month)} ${_currentMonth.year}',
-                          style: TextStyle(
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                            color: isDark
-                                ? AppColors.darkPrimaryText
-                                : AppColors.lightPrimaryText,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.chevron_right_rounded,
-                            size: 24,
-                          ),
-                          tooltip: 'Next month',
-                          onPressed: _nextMonth,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-
-                    // Weekday Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: _weekdays.map((day) {
-                        return Expanded(
-                          child: Text(
-                            day,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: isDark
-                                  ? AppColors.darkSecondaryText
-                                  : AppColors.lightSecondaryText,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Rectangle Calendar Days Grid
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            mainAxisSpacing: 6,
-                            crossAxisSpacing: 6,
-                            childAspectRatio: 1.18, // Rectangle day cells
-                          ),
-                      itemCount: startingWeekday + daysInMonth,
-                      itemBuilder: (context, index) {
-                        if (index < startingWeekday) {
-                          return const SizedBox.shrink();
-                        }
-
-                        final dayNumber = index - startingWeekday + 1;
-                        final isSelected = dayNumber == _selectedDay;
-                        final isToday =
-                            dayNumber == DateTime.now().day &&
-                            _currentMonth.month == DateTime.now().month &&
-                            _currentMonth.year == DateTime.now().year;
-                        final cellDate = DateTime(
-                          _currentMonth.year,
-                          _currentMonth.month,
-                          dayNumber,
-                        );
-
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedDay = dayNumber;
-                            });
-                            _showDateDetailsSheet(cellDate);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.primaryIndigo
-                                  : (isToday
-                                        ? (isDark
-                                              ? AppColors.darkSoftIndigo
-                                              : AppColors.lightSoftIndigo)
-                                        : (isDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.03,
-                                                )
-                                              : AppColors.lightBackground)),
-                              borderRadius: AppRadius.smRadius,
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.primaryIndigo
-                                    : (isToday
-                                          ? AppColors.primaryIndigo
-                                          : (isDark
-                                                ? AppColors.darkBorder
-                                                      .withValues(alpha: 0.6)
-                                                : AppColors.lightBorder)),
-                                width: isSelected || isToday ? 1.5 : 1,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: surfaceColor,
+                        borderRadius: AppRadius.cardRadius,
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Column(
+                        children: [
+                          // Month Navigation Inside the Calendar
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chevron_left_rounded,
+                                  size: 24,
+                                ),
+                                tooltip: 'Previous month',
+                                onPressed: _previousMonth,
                               ),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '$dayNumber',
+                              Text(
+                                '${_monthName(_currentMonth.month)} ${_currentMonth.year}',
+                                style: TextStyle(
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.3,
+                                  color: isDark
+                                      ? AppColors.darkPrimaryText
+                                      : AppColors.lightPrimaryText,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.chevron_right_rounded,
+                                  size: 24,
+                                ),
+                                tooltip: 'Next month',
+                                onPressed: _nextMonth,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Weekday Header
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: _weekdays.map((day) {
+                              return Expanded(
+                                child: Text(
+                                  day,
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isSelected || isToday
-                                        ? FontWeight.w800
-                                        : FontWeight.w600,
-                                    color: isSelected
-                                        ? Colors.white
-                                        : (isDark
-                                              ? AppColors.darkPrimaryText
-                                              : AppColors.lightPrimaryText),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark
+                                        ? AppColors.darkSecondaryText
+                                        : AppColors.lightSecondaryText,
                                   ),
                                 ),
-                              ],
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 10),
+
+                          // Rectangle Calendar Days Grid
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 7,
+                                  mainAxisSpacing: 6,
+                                  crossAxisSpacing: 6,
+                                  childAspectRatio: 1.18, // Rectangle day cells
+                                ),
+                            itemCount: startingWeekday + daysInMonth,
+                            itemBuilder: (context, index) {
+                              if (index < startingWeekday) {
+                                return const SizedBox.shrink();
+                              }
+
+                              final dayNumber = index - startingWeekday + 1;
+                              final isSelected = dayNumber == _selectedDay;
+                              final isToday =
+                                  dayNumber == DateTime.now().day &&
+                                  _currentMonth.month == DateTime.now().month &&
+                                  _currentMonth.year == DateTime.now().year;
+                              final cellDate = DateTime(
+                                _currentMonth.year,
+                                _currentMonth.month,
+                                dayNumber,
+                              );
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedDay = dayNumber;
+                                  });
+                                  _showDateDetailsSheet(cellDate);
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primaryIndigo
+                                        : (isToday
+                                              ? (isDark
+                                                    ? AppColors.darkSoftIndigo
+                                                    : AppColors.lightSoftIndigo)
+                                              : (isDark
+                                                    ? Colors.white.withValues(
+                                                        alpha: 0.03,
+                                                      )
+                                                    : AppColors
+                                                          .lightBackground)),
+                                    borderRadius: AppRadius.smRadius,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? AppColors.primaryIndigo
+                                          : (isToday
+                                                ? AppColors.primaryIndigo
+                                                : (isDark
+                                                      ? AppColors.darkBorder
+                                                            .withValues(
+                                                              alpha: 0.6,
+                                                            )
+                                                      : AppColors.lightBorder)),
+                                      width: isSelected || isToday ? 1.5 : 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '$dayNumber',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSelected || isToday
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : (isDark
+                                                    ? AppColors.darkPrimaryText
+                                                    : AppColors
+                                                          .lightPrimaryText),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SectionHeader(
+                      title:
+                          'Tasks for ${_monthName(_currentMonth.month)} $_selectedDay',
+                      subtitle: 'Scheduled events and to-dos for this day',
+                    ),
+                  ),
+                ),
+                ref
+                    .watch(tasksForDateStreamProvider(selectedDate))
+                    .when(
+                      loading: () => const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(32),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                      ),
+                      error: (err, _) => SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              'Error loading tasks: $err',
+                              style: const TextStyle(
+                                color: AppColors.errorCoral,
+                              ),
                             ),
+                          ),
+                        ),
+                      ),
+                      data: (tasks) {
+                        if (tasks.isEmpty) {
+                          return SliverToBoxAdapter(
+                            child: EmptyState(
+                              icon: Icons.event_note_outlined,
+                              title: 'No tasks scheduled',
+                              message:
+                                  'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
+                              actionLabel: 'Schedule Task',
+                              onActionPressed: () =>
+                                  _showAddTaskSheet(selectedDate),
+                            ),
+                          );
+                        }
+
+                        return SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final task = tasks[index];
+                              return TaskCard(
+                                key: ValueKey(task.id),
+                                title: task.title,
+                                category: task.category,
+                                dueTime: task.dueTime,
+                                priority: task.priority,
+                                isCompleted: task.isCompleted,
+                                onTap: () =>
+                                    showTaskEditSheet(context, ref, task),
+                                onToggle: (_) => ref
+                                    .read(tasksRepositoryProvider)
+                                    .toggleTaskCompletion(task.id),
+                                onDelete: () => ref
+                                    .read(tasksRepositoryProvider)
+                                    .deleteTask(task.id),
+                              );
+                            }, childCount: tasks.length),
                           ),
                         );
                       },
                     ),
-                  ],
-                ),
-              ),
+              ],
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SectionHeader(
-                title:
-                    'Tasks for ${_monthName(_currentMonth.month)} $_selectedDay',
-                subtitle: 'Scheduled events and to-dos for this day',
-              ),
-            ),
-          ),
-          ref
-              .watch(tasksForDateStreamProvider(selectedDate))
-              .when(
-                loading: () => const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                ),
-                error: (err, _) => SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Center(
-                      child: Text(
-                        'Error loading tasks: $err',
-                        style: const TextStyle(color: AppColors.errorCoral),
-                      ),
-                    ),
-                  ),
-                ),
-                data: (tasks) {
-                  if (tasks.isEmpty) {
-                    return SliverToBoxAdapter(
-                      child: EmptyState(
-                        icon: Icons.event_note_outlined,
-                        title: 'No tasks scheduled',
-                        message:
-                            'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
-                        actionLabel: 'Schedule Task',
-                        onActionPressed: () => _showAddTaskSheet(selectedDate),
-                      ),
-                    );
-                  }
-
-                  return SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final task = tasks[index];
-                        return TaskCard(
-                          key: ValueKey(task.id),
-                          title: task.title,
-                          category: task.category,
-                          dueTime: task.dueTime,
-                          priority: task.priority,
-                          isCompleted: task.isCompleted,
-                          onTap: () => showTaskEditSheet(context, ref, task),
-                          onToggle: (_) => ref
-                              .read(tasksRepositoryProvider)
-                              .toggleTaskCompletion(task.id),
-                          onDelete: () => ref
-                              .read(tasksRepositoryProvider)
-                              .deleteTask(task.id),
-                        );
-                      }, childCount: tasks.length),
-                    ),
-                  );
-                },
-              ),
         ],
       ),
-    ),
-  ],
-),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

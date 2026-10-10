@@ -1154,99 +1154,110 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           Expanded(
             child: CustomScrollView(
               slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(_tabs.length, (index) {
-                    final isSelected = _currentTab == index;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(_tabs[index]),
-                        selected: isSelected,
-                        selectedColor: AppColors.accentCyan,
-                        backgroundColor: isDark
-                            ? AppColors.darkCardSurface
-                            : const Color(0xFFEFF2FA),
-                        labelStyle: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : (isDark
-                                    ? AppColors.darkPrimaryText
-                                    : AppColors.lightPrimaryText),
-                          fontWeight: isSelected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                        ),
-                        onSelected: (_) => setState(() => _currentTab = index),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List.generate(_tabs.length, (index) {
+                          final isSelected = _currentTab == index;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(_tabs[index]),
+                              selected: isSelected,
+                              selectedColor: AppColors.accentCyan,
+                              backgroundColor: isDark
+                                  ? AppColors.darkCardSurface
+                                  : const Color(0xFFEFF2FA),
+                              labelStyle: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : (isDark
+                                          ? AppColors.darkPrimaryText
+                                          : AppColors.lightPrimaryText),
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                              ),
+                              onSelected: (_) =>
+                                  setState(() => _currentTab = index),
+                            ),
+                          );
+                        }),
                       ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-          ),
-          accountsAsync.when(
-            loading: () => const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(40),
-                child: LoadingState(message: 'Loading financial records...'),
-              ),
-            ),
-            error: (err, _) => SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Center(child: Text('Error loading accounts: $err')),
-              ),
-            ),
-            data: (accounts) {
-              return transactionsAsync.when(
-                loading: () => const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(40),
-                    child: LoadingState(message: 'Loading transactions...'),
-                  ),
-                ),
-                error: (err, _) => SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Center(
-                      child: Text('Error loading transactions: $err'),
                     ),
                   ),
                 ),
-                data: (transactions) {
-                  return SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        if (_currentTab == 0)
-                          _buildOverviewTab(isDark, accounts, transactions),
-                        if (_currentTab == 1)
-                          _buildPlanTab(
-                            isDark,
-                            transactions,
-                            budgetAsync.value,
+                accountsAsync.when(
+                  loading: () => const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: LoadingState(
+                        message: 'Loading financial records...',
+                      ),
+                    ),
+                  ),
+                  error: (err, _) => SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Center(
+                        child: Text('Error loading accounts: $err'),
+                      ),
+                    ),
+                  ),
+                  data: (accounts) {
+                    return transactionsAsync.when(
+                      loading: () => const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.all(40),
+                          child: LoadingState(
+                            message: 'Loading transactions...',
                           ),
-                        if (_currentTab == 2)
-                          _buildAnalyticsTab(isDark, transactions),
-                        if (_currentTab == 3)
-                          _buildCompareTab(isDark, transactions),
-                      ]),
-                    ),
-                  );
-                },
-              );
-            },
+                        ),
+                      ),
+                      error: (err, _) => SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Center(
+                            child: Text('Error loading transactions: $err'),
+                          ),
+                        ),
+                      ),
+                      data: (transactions) {
+                        return SliverPadding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                          sliver: SliverList(
+                            delegate: SliverChildListDelegate([
+                              if (_currentTab == 0)
+                                _buildOverviewTab(
+                                  isDark,
+                                  accounts,
+                                  transactions,
+                                ),
+                              if (_currentTab == 1)
+                                _buildPlanTab(
+                                  isDark,
+                                  transactions,
+                                  budgetAsync.value,
+                                ),
+                              if (_currentTab == 2)
+                                _buildAnalyticsTab(isDark, transactions),
+                              if (_currentTab == 3)
+                                _buildCompareTab(isDark, transactions),
+                            ]),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
-    ),
-  ],
-),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

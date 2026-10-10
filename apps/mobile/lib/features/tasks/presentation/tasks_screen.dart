@@ -545,115 +545,120 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           Expanded(
             child: CustomScrollView(
               slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Search Bar
-                  AppTextField(
-                    hint: 'Search tasks...',
-                    controller: _searchController,
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-                  // Category Filter Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _categories.map((cat) {
-                        final isSelected = _selectedCategory == cat;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: StatusChip(
-                            label: cat,
-                            isSelected: isSelected,
-                            onTap: () {
-                              setState(() {
-                                _selectedCategory = cat;
-                              });
-                            },
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Search Bar
+                        AppTextField(
+                          hint: 'Search tasks...',
+                          controller: _searchController,
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        const SizedBox(height: 12),
+                        // Category Filter Chips
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _categories.map((cat) {
+                              final isSelected = _selectedCategory == cat;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: StatusChip(
+                                  label: cat,
+                                  isSelected: isSelected,
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedCategory = cat;
+                                    });
+                                  },
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          tasksAsync.when(
-            loading: () => const SliverFillRemaining(
-              child: Center(
-                child: LoadingState(message: 'Loading tasks from database...'),
-              ),
-            ),
-            error: (err, _) => SliverFillRemaining(
-              child: Center(
-                child: Text(
-                  'Error loading tasks: $err',
-                  style: const TextStyle(color: AppColors.errorCoral),
                 ),
-              ),
-            ),
-            data: (tasks) {
-              final query = _searchController.text.toLowerCase().trim();
-              final filteredTasks = tasks.where((t) {
-                final matchesCategory =
-                    _selectedCategory == 'All' ||
-                    t.category.toLowerCase() == _selectedCategory.toLowerCase();
-                final matchesSearch =
-                    query.isEmpty || t.title.toLowerCase().contains(query);
-                return matchesCategory && matchesSearch;
-              }).toList();
-
-              if (filteredTasks.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: EmptyState(
-                    icon: Icons.check_circle_outline,
-                    title: 'No tasks found',
-                    message: _selectedCategory == 'All'
-                        ? 'Stay organized by adding your first task.'
-                        : 'No tasks found in category "$_selectedCategory".',
-                    actionLabel: 'Add Task',
-                    onActionPressed: _showAddTaskSheet,
+                tasksAsync.when(
+                  loading: () => const SliverFillRemaining(
+                    child: Center(
+                      child: LoadingState(
+                        message: 'Loading tasks from database...',
+                      ),
+                    ),
                   ),
-                );
-              }
+                  error: (err, _) => SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'Error loading tasks: $err',
+                        style: const TextStyle(color: AppColors.errorCoral),
+                      ),
+                    ),
+                  ),
+                  data: (tasks) {
+                    final query = _searchController.text.toLowerCase().trim();
+                    final filteredTasks = tasks.where((t) {
+                      final matchesCategory =
+                          _selectedCategory == 'All' ||
+                          t.category.toLowerCase() ==
+                              _selectedCategory.toLowerCase();
+                      final matchesSearch =
+                          query.isEmpty ||
+                          t.title.toLowerCase().contains(query);
+                      return matchesCategory && matchesSearch;
+                    }).toList();
 
-              return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final task = filteredTasks[index];
-                    return TaskCard(
-                      key: ValueKey(task.id),
-                      title: task.title,
-                      category: task.category,
-                      dueDate: _formatDateLabel(task.dueDate),
-                      dueTime: task.dueTime,
-                      priority: task.priority,
-                      isCompleted: task.isCompleted,
-                      isOverdue: _isTaskOverdue(task),
-                      onTap: () => showTaskEditSheet(context, ref, task),
-                      onToggle: (_) => ref
-                          .read(tasksRepositoryProvider)
-                          .toggleTaskCompletion(task.id),
-                      onDelete: () =>
-                          ref.read(tasksRepositoryProvider).deleteTask(task.id),
+                    if (filteredTasks.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: EmptyState(
+                          icon: Icons.check_circle_outline,
+                          title: 'No tasks found',
+                          message: _selectedCategory == 'All'
+                              ? 'Stay organized by adding your first task.'
+                              : 'No tasks found in category "$_selectedCategory".',
+                          actionLabel: 'Add Task',
+                          onActionPressed: _showAddTaskSheet,
+                        ),
+                      );
+                    }
+
+                    return SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final task = filteredTasks[index];
+                          return TaskCard(
+                            key: ValueKey(task.id),
+                            title: task.title,
+                            category: task.category,
+                            dueDate: _formatDateLabel(task.dueDate),
+                            dueTime: task.dueTime,
+                            priority: task.priority,
+                            isCompleted: task.isCompleted,
+                            isOverdue: _isTaskOverdue(task),
+                            onTap: () => showTaskEditSheet(context, ref, task),
+                            onToggle: (_) => ref
+                                .read(tasksRepositoryProvider)
+                                .toggleTaskCompletion(task.id),
+                            onDelete: () => ref
+                                .read(tasksRepositoryProvider)
+                                .deleteTask(task.id),
+                          );
+                        }, childCount: filteredTasks.length),
+                      ),
                     );
-                  }, childCount: filteredTasks.length),
+                  },
                 ),
-              );
-            },
+              ],
+            ),
           ),
         ],
       ),
-    ),
-  ],
-),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

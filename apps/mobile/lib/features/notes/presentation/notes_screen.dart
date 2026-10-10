@@ -650,113 +650,119 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
           Expanded(
             child: CustomScrollView(
               slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Column(
-                children: [
-                  AppTextField(
-                    hint: 'Search notes by keyword or tag...',
-                    controller: _searchController,
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    onChanged: (_) => setState(() {}),
-                  ),
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _categories.map((category) {
-                        final isSelected = _selectedCategory == category;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: StatusChip(
-                            label: category,
-                            isSelected: isSelected,
-                            onTap: () =>
-                                setState(() => _selectedCategory = category),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          hint: 'Search notes by keyword or tag...',
+                          controller: _searchController,
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        const SizedBox(height: 12),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _categories.map((category) {
+                              final isSelected = _selectedCategory == category;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: StatusChip(
+                                  label: category,
+                                  isSelected: isSelected,
+                                  onTap: () => setState(
+                                    () => _selectedCategory = category,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          notesAsync.when(
-            loading: () => const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(40),
-                child: LoadingState(message: 'Loading notes from SQLite...'),
-              ),
-            ),
-            error: (err, _) => SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Center(child: Text('Error loading notes: $err')),
-              ),
-            ),
-            data: (notes) {
-              final query = _searchController.text.toLowerCase().trim();
-              final filteredNotes = notes.where((n) {
-                final matchesCategory =
-                    _selectedCategory == 'All' ||
-                    n.category.toLowerCase() == _selectedCategory.toLowerCase();
-                final matchesSearch =
-                    query.isEmpty ||
-                    n.title.toLowerCase().contains(query) ||
-                    n.body.toLowerCase().contains(query);
-                return matchesCategory && matchesSearch;
-              }).toList();
-
-              if (filteredNotes.isEmpty) {
-                return SliverToBoxAdapter(
-                  child: EmptyState(
-                    icon: Icons.sticky_note_2_outlined,
-                    title: 'No notes found',
-                    message: _selectedCategory == 'All'
-                        ? 'Keep your study notes, reflections, and ideas organized.'
-                        : 'No notes found in category "$_selectedCategory".',
-                    actionLabel: 'New Note',
-                    onActionPressed: _showAddNoteSheet,
-                  ),
-                );
-              }
-
-              return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    final note = filteredNotes[index];
-                    return NoteCard(
-                      key: ValueKey(note.id),
-                      title: note.title,
-                      body: note.body,
-                      category: note.category,
-                      isPinned: note.isPinned,
-                      date: '${note.updatedAt.month}/${note.updatedAt.day}',
-                      onTap: () => _showNoteDetailSheet(note),
-                      onPinToggle: () => ref
-                          .read(notesRepositoryProvider)
-                          .updateNote(
-                            note.copyWith(
-                              isPinned: !note.isPinned,
-                              updatedAt: DateTime.now(),
-                            ),
-                          ),
-                      onDelete: () =>
-                          ref.read(notesRepositoryProvider).deleteNote(note.id),
-                    );
-                  }, childCount: filteredNotes.length),
                 ),
-              );
-            },
+                notesAsync.when(
+                  loading: () => const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(40),
+                      child: LoadingState(
+                        message: 'Loading notes from SQLite...',
+                      ),
+                    ),
+                  ),
+                  error: (err, _) => SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Center(child: Text('Error loading notes: $err')),
+                    ),
+                  ),
+                  data: (notes) {
+                    final query = _searchController.text.toLowerCase().trim();
+                    final filteredNotes = notes.where((n) {
+                      final matchesCategory =
+                          _selectedCategory == 'All' ||
+                          n.category.toLowerCase() ==
+                              _selectedCategory.toLowerCase();
+                      final matchesSearch =
+                          query.isEmpty ||
+                          n.title.toLowerCase().contains(query) ||
+                          n.body.toLowerCase().contains(query);
+                      return matchesCategory && matchesSearch;
+                    }).toList();
+
+                    if (filteredNotes.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: EmptyState(
+                          icon: Icons.sticky_note_2_outlined,
+                          title: 'No notes found',
+                          message: _selectedCategory == 'All'
+                              ? 'Keep your study notes, reflections, and ideas organized.'
+                              : 'No notes found in category "$_selectedCategory".',
+                          actionLabel: 'New Note',
+                          onActionPressed: _showAddNoteSheet,
+                        ),
+                      );
+                    }
+
+                    return SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final note = filteredNotes[index];
+                          return NoteCard(
+                            key: ValueKey(note.id),
+                            title: note.title,
+                            body: note.body,
+                            category: note.category,
+                            isPinned: note.isPinned,
+                            date:
+                                '${note.updatedAt.month}/${note.updatedAt.day}',
+                            onTap: () => _showNoteDetailSheet(note),
+                            onPinToggle: () => ref
+                                .read(notesRepositoryProvider)
+                                .updateNote(
+                                  note.copyWith(
+                                    isPinned: !note.isPinned,
+                                    updatedAt: DateTime.now(),
+                                  ),
+                                ),
+                            onDelete: () => ref
+                                .read(notesRepositoryProvider)
+                                .deleteNote(note.id),
+                          );
+                        }, childCount: filteredNotes.length),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
-    ),
-  ],
-),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,
