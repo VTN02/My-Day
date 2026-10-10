@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/providers/database_providers.dart';
 import '../../core/services/update_service.dart';
 import '../../core/widgets/custom_bottom_navigation.dart';
 
@@ -66,19 +67,46 @@ class _AppShellState extends ConsumerState<AppShell> {
     _updateTimer = Timer(const Duration(milliseconds: 1500), () async {
       if (!mounted) return;
       try {
+        final settingsRepo = ref.read(settingsRepositoryProvider);
+        final now = DateTime.now();
+        final todayKey =
+            '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+
+        final lastPromptDate =
+            await settingsRepo.getSetting('last_update_prompt_date');
+        final lastPromptVersion =
+            await settingsRepo.getSetting('last_update_prompt_version');
+
         final updateService = ref.read(updateServiceProvider);
         final result = await updateService.checkForUpdates();
         if (mounted) {
           ref.read(appUpdateCheckResultProvider.notifier).set(result);
         }
+
         if (result.status == UpdateStatus.updateAvailable &&
             result.updateInfo != null &&
             mounted) {
-          UpdateService.showUpdateSheet(
-            context: context,
-            info: result.updateInfo!,
-            installedVersion: result.installedVersion,
-          );
+          final isMandatory = result.updateInfo!.isMandatory;
+          final isNewDay = lastPromptDate != todayKey;
+          final isNewerVersionThanPrompted =
+              lastPromptVersion != result.updateInfo!.latestVersion;
+
+          // Display update sheet only ONCE per day (or if a brand-new release is published or mandatory)
+          if (isMandatory || isNewDay || isNewerVersionThanPrompted) {
+            await settingsRepo.setSetting('last_update_prompt_date', todayKey);
+            await settingsRepo.setSetting(
+              'last_update_prompt_version',
+              result.updateInfo!.latestVersion,
+            );
+
+            if (mounted) {
+              UpdateService.showUpdateSheet(
+                context: context,
+                info: result.updateInfo!,
+                installedVersion: result.installedVersion,
+              );
+            }
+          }
         }
       } catch (_) {
         // Ignore background network/silently

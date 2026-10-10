@@ -260,7 +260,10 @@ class UpdateService {
   /// 1. Queries GitHub Releases API directly so ANY new GitHub release immediately triggers updates.
   /// 2. Seamlessly falls back to version.json if GitHub API is unreachable or rate-limited.
   /// 3. Compares semantic versioning dynamically against the installed app version.
-  Future<UpdateCheckResult> checkForUpdates({String? customUrl}) async {
+  Future<UpdateCheckResult> checkForUpdates({
+    String? customUrl,
+    bool triggerNotification = false,
+  }) async {
     // 1. Resolve currently installed app version
     const currentVersion = AppVersion.versionName;
     const currentBuildCode = AppVersion.versionCode;
@@ -298,14 +301,16 @@ class UpdateService {
     );
 
     if (isNewer) {
-      // Trigger system notification to lock screen and status bar
-      try {
-        NotificationService().showAppUpdateNotification(
-          latestVersion: updateInfo.latestVersion,
-          fileSize: updateInfo.fileSize,
-          releaseNotes: updateInfo.releaseNotes,
-        );
-      } catch (_) {}
+      // Trigger system notification to lock screen and status bar only when requested
+      if (triggerNotification) {
+        try {
+          NotificationService().showAppUpdateNotification(
+            latestVersion: updateInfo.latestVersion,
+            fileSize: updateInfo.fileSize,
+            releaseNotes: updateInfo.releaseNotes,
+          );
+        } catch (_) {}
+      }
 
       return UpdateCheckResult(
         status: UpdateStatus.updateAvailable,
