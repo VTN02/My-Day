@@ -1,5 +1,3 @@
-import '../models/split_type.dart';
-
 /// Pure domain service responsible for integer-based financial splitting
 /// and deterministic remainder allocation without floating-point precision loss.
 class ExpenseSplittingService {

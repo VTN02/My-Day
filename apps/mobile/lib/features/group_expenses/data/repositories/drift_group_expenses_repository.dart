@@ -13,11 +13,9 @@ class DriftGroupExpensesRepository implements GroupExpensesRepository {
 
   DriftGroupExpensesRepository(
     this._db, {
-    SettlementCalculatorService calculator =
-        const SettlementCalculatorService(),
-    Uuid uuid = const Uuid(),
-  }) : _calculator = calculator,
-       _uuid = uuid;
+    this._calculator = const SettlementCalculatorService(),
+    this._uuid = const Uuid(),
+  });
 
   // --- Outings ---
 
@@ -319,8 +317,6 @@ class DriftGroupExpensesRepository implements GroupExpensesRepository {
               )
               ..orderBy([(tbl) => OrderingTerm.desc(tbl.expenseDate)]))
             .watch();
-
-    final membersStream = watchMembers(outingId);
 
     return expensesStream.asyncMap((expenses) async {
       if (expenses.isEmpty) return const [];

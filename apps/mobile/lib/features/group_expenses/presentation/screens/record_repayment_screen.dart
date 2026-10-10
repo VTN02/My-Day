@@ -182,7 +182,7 @@ class _RecordRepaymentScreenState extends ConsumerState<RecordRepaymentScreen> {
 
                 // From (Payer)
                 DropdownButtonFormField<String>(
-                  value: _fromMemberId,
+                  initialValue: _fromMemberId,
                   decoration: const InputDecoration(
                     labelText: 'Paid By (Friend returning money) *',
                     prefixIcon: Icon(Icons.person_outline),
@@ -199,7 +199,7 @@ class _RecordRepaymentScreenState extends ConsumerState<RecordRepaymentScreen> {
 
                 // To (Receiver)
                 DropdownButtonFormField<String>(
-                  value: _toMemberId,
+                  initialValue: _toMemberId,
                   decoration: const InputDecoration(
                     labelText: 'Received By (Friend receiving money) *',
                     prefixIcon: Icon(Icons.person_pin_outlined),
@@ -265,7 +265,7 @@ class _RecordRepaymentScreenState extends ConsumerState<RecordRepaymentScreen> {
 
                 // Payment Method
                 DropdownButtonFormField<String>(
-                  value: _paymentMethod,
+                  initialValue: _paymentMethod,
                   decoration: const InputDecoration(
                     labelText: 'Payment Method',
                     prefixIcon: Icon(Icons.account_balance_outlined),

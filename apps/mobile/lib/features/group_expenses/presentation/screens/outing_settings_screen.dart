@@ -228,28 +228,64 @@ class _StatusRadioTile extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isSelected = value == groupValue;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkCardSurface : AppColors.lightCardSurface,
-        borderRadius: AppRadius.cardRadius,
-        border: Border.all(
-          color: isSelected
-              ? AppColors.primaryIndigo
-              : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-          width: isSelected ? 1.5 : 1.0,
+    return InkWell(
+      onTap: () => onChanged(value),
+      borderRadius: AppRadius.cardRadius,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.darkCardSurface
+              : AppColors.lightCardSurface,
+          borderRadius: AppRadius.cardRadius,
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryIndigo
+                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+            width: isSelected ? 1.5 : 1.0,
+          ),
         ),
-      ),
-      child: RadioListTile<String>(
-        value: value,
-        groupValue: groupValue,
-        onChanged: onChanged,
-        activeColor: AppColors.primaryIndigo,
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_unchecked_rounded,
+              color: isSelected
+                  ? AppColors.primaryIndigo
+                  : (isDark
+                        ? AppColors.darkSecondaryText
+                        : AppColors.lightSecondaryText),
+              size: 22,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? AppColors.darkSecondaryText
+                          : AppColors.lightSecondaryText,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
       ),
     );
   }

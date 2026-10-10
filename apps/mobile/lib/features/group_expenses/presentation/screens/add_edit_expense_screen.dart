@@ -272,7 +272,7 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
 
                 // Paid By Dropdown
                 DropdownButtonFormField<String>(
-                  value: _selectedPayerId,
+                  initialValue: _selectedPayerId,
                   decoration: const InputDecoration(
                     labelText: 'Paid By',
                     prefixIcon: Icon(Icons.account_circle_outlined),

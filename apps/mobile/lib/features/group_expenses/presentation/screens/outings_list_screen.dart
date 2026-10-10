@@ -34,11 +34,6 @@ class _OutingsListScreenState extends ConsumerState<OutingsListScreen>
     super.dispose();
   }
 
-  String _formatAmount(int minor) {
-    final val = minor / 100.0;
-    return 'Rs. ${val.toStringAsFixed(minor % 100 == 0 ? 0 : 2)}';
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -150,14 +145,8 @@ class _OutingListTab extends ConsumerWidget {
 
   const _OutingListTab({required this.status, required this.searchQuery});
 
-  String _formatAmount(int minor) {
-    final val = minor / 100.0;
-    return 'Rs. ${val.toStringAsFixed(minor % 100 == 0 ? 0 : 2)}';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final outingsAsync = ref.watch(outingsByStatusStreamProvider(status));
 
     return outingsAsync.when(
@@ -309,7 +298,7 @@ class _OutingListItem extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (err, stack) => const SizedBox.shrink(),
     );
   }
 }

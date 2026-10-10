@@ -10,14 +10,8 @@ import '../providers/group_expenses_providers.dart';
 class OutingGradientCard extends ConsumerWidget {
   const OutingGradientCard({super.key});
 
-  String _formatAmount(int minor) {
-    final val = minor / 100.0;
-    return 'Rs. ${val.toStringAsFixed(minor % 100 == 0 ? 0 : 2)}';
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeOutingsAsync = ref.watch(activeOutingsStreamProvider);
 
     return Column(
@@ -154,7 +148,7 @@ class OutingGradientCard extends ConsumerWidget {
             );
           },
           loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (err, stack) => const SizedBox.shrink(),
         ),
       ],
     );
@@ -294,7 +288,7 @@ class _ActiveOutingPreviewCard extends ConsumerWidget {
         );
       },
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (err, stack) => const SizedBox.shrink(),
     );
   }
 }

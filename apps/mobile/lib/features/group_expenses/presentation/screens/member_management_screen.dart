@@ -116,6 +116,8 @@ class _MemberManagementScreenState
       return;
     }
 
+    if (!mounted) return;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

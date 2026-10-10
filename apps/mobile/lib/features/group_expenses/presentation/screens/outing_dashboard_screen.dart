@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/gradient_header.dart';
@@ -35,13 +34,8 @@ class _OutingDashboardScreenState extends ConsumerState<OutingDashboardScreen>
   }
 
   @override
-  void disposeValidate() {
-    _tabController.dispose();
-  }
-
-  @override
   void dispose() {
-    disposeValidate();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -772,11 +766,11 @@ class _ActivityTab extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const SizedBox.shrink(),
+              error: (err, stack) => const SizedBox.shrink(),
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (err, stack) => const SizedBox.shrink(),
         ),
       ],
     );
