@@ -32,6 +32,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   void initState() {
     super.initState();
     _loadSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAppUpdates(isSilent: true);
+    });
   }
 
   Future<void> _loadSettings() async {
@@ -58,7 +61,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await ref.read(settingsRepositoryProvider).setSetting(key, value);
   }
 
-  Future<void> _checkAppUpdates() async {
+  Future<void> _checkAppUpdates({bool isSilent = false}) async {
     setState(() => _isCheckingUpdate = true);
 
     try {
@@ -70,35 +73,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
       if (result.status == UpdateStatus.updateAvailable &&
           result.updateInfo != null) {
-        UpdateService.showUpdateSheet(
-          context: context,
-          info: result.updateInfo!,
-          installedVersion: result.installedVersion,
-        );
+        if (!isSilent) {
+          UpdateService.showUpdateSheet(
+            context: context,
+            info: result.updateInfo!,
+            installedVersion: result.installedVersion,
+          );
+        }
       } else if (result.status == UpdateStatus.upToDate) {
-        final version = result.installedVersion ?? AppVersion.versionName;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.check_circle_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'You are on the latest version of MyDay (v$version)!',
+        if (!isSilent) {
+          final version = result.installedVersion ?? AppVersion.versionName;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.white,
+                    size: 20,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'You are on the latest version of MyDay (v$version)!',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.successMint,
+              behavior: SnackBarBehavior.floating,
             ),
-            backgroundColor: AppColors.successMint,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      } else {
+          );
+        }
+      } else if (!isSilent) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -112,13 +119,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isCheckingUpdate = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error checking for updates: $e'),
-            backgroundColor: AppColors.errorCoral,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (!isSilent) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error checking for updates: $e'),
+              backgroundColor: AppColors.errorCoral,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     }
   }
@@ -830,21 +839,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       ],
                                     ),
                                     Text(
-                                      hasUpdate &&
-                                              updateState?.updateInfo != null
-                                          ? 'New version v${updateState!.updateInfo!.latestVersion} is ready to install'
-                                          : 'Build ${AppVersion.versionCode} • Installed Locally',
+                                      'Installed: v$displayVersion (Build ${AppVersion.versionCode})',
                                       style: TextStyle(
                                         fontSize: 12,
-                                        fontWeight: hasUpdate
-                                            ? FontWeight.w600
-                                            : FontWeight.normal,
-                                        color: hasUpdate
-                                            ? AppColors.primaryIndigo
-                                            : (isDark
-                                                  ? AppColors.darkSecondaryText
-                                                  : AppColors
-                                                        .lightSecondaryText),
+                                        color: isDark
+                                            ? AppColors.darkSecondaryText
+                                            : AppColors.lightSecondaryText,
                                       ),
                                     ),
                                   ],
@@ -853,6 +853,71 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             },
                           ),
                         ],
+                      ),
+                      Builder(
+                        builder: (context) {
+                          final updateState = ref.watch(
+                            appUpdateCheckResultProvider,
+                          );
+                          final hasUpdate =
+                              updateState?.status ==
+                                  UpdateStatus.updateAvailable &&
+                              updateState?.updateInfo != null;
+
+                          if (!hasUpdate) return const SizedBox.shrink();
+
+                          return Container(
+                            margin: const EdgeInsets.only(top: 14),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryIndigo.withValues(
+                                alpha: 0.12,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.primaryIndigo.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.stars_rounded,
+                                  color: AppColors.primaryIndigo,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'New Release: v${updateState!.updateInfo!.latestVersion} Available!',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: AppColors.primaryIndigo,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Size: ${updateState.updateInfo!.fileSize ?? "72 MB"} • ${updateState.updateInfo!.releaseDate}',
+                                        style: TextStyle(
+                                          fontSize: 11.5,
+                                          color: isDark
+                                              ? AppColors.darkSecondaryText
+                                              : AppColors.lightSecondaryText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       Text(
