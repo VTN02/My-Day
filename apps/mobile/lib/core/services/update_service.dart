@@ -3,17 +3,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import 'notification_service.dart';
 
-/// App Version constants
+/// App Version constants (fallback when dynamic PackageInfo is unavailable)
 class AppVersion {
   static const String versionName = '1.1.0';
   static const int versionCode = 3;
   static const String releaseDate = 'October 2026';
+
+  /// Primary GitHub latest release endpoint for automatic release discovery:
+  static const String gitHubLatestReleaseUrl =
+      'https://api.github.com/repos/VTN02/My-Day/releases/latest';
 
   /// Default remote version check URL from the official GitHub repo:
   static const String defaultUpdateUrl =
@@ -46,6 +51,7 @@ class AppUpdateInfo {
     this.fileSize,
   });
 
+  /// Factory from raw version.json format
   factory AppUpdateInfo.fromJson(Map<String, dynamic> json) {
     return AppUpdateInfo(
       latestVersion: json['latest_version'] as String? ?? '1.0.0',
@@ -62,6 +68,137 @@ class AppUpdateInfo {
       fileSize: json['file_size'] as String? ?? '28 MB',
     );
   }
+
+  /// Factory from GitHub Releases API (/repos/{owner}/{repo}/releases/latest)
+  factory AppUpdateInfo.fromGitHubRelease(Map<String, dynamic> json) {
+    final rawTag = (json['tag_name'] as String? ?? '').trim();
+    final cleanVersion = rawTag.replaceAll(RegExp(r'^[vV]'), '');
+
+    // Parse version code from tag if present (e.g. v1.1.1+4) or synthesize
+    int versionCode = 0;
+    if (rawTag.contains('+')) {
+      final parts = rawTag.split('+');
+      versionCode = int.tryParse(parts.last) ?? 0;
+    }
+    if (versionCode == 0) {
+      final parts = cleanVersion
+          .split('.')
+          .map((e) => int.tryParse(e) ?? 0)
+          .toList();
+      if (parts.isNotEmpty) {
+        versionCode =
+            (parts.isNotEmpty ? parts[0] * 10000 : 0) +
+            (parts.length > 1 ? parts[1] * 100 : 0) +
+            (parts.length > 2 ? parts[2] : 0);
+      }
+    }
+
+    final assets = (json['assets'] as List<dynamic>?) ?? [];
+    Map<String, dynamic>? apkAsset;
+    for (final a in assets) {
+      if (a is Map<String, dynamic>) {
+        final name = (a['name'] as String? ?? '').toLowerCase();
+        if (name.endsWith('.apk')) {
+          apkAsset = a;
+          if (name.contains('universal')) break;
+        }
+      }
+    }
+
+    final htmlUrl = json['html_url'] as String? ?? '';
+    final apkDownloadUrl =
+        apkAsset?['browser_download_url'] as String? ?? htmlUrl;
+
+    String? fileSize;
+    if (apkAsset != null && apkAsset['size'] is num) {
+      final bytes = apkAsset['size'] as num;
+      final mb = bytes / (1024 * 1024);
+      fileSize = '${mb.toStringAsFixed(0)} MB';
+    }
+
+    String releaseDate = '';
+    final publishedAt = json['published_at'] as String?;
+    if (publishedAt != null) {
+      try {
+        final dt = DateTime.parse(publishedAt);
+        const months = [
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ];
+        releaseDate = '${months[dt.month - 1]} ${dt.year}';
+      } catch (_) {
+        releaseDate = 'Recent Release';
+      }
+    }
+
+    final rawBody = json['body'] as String? ?? '';
+    final releaseNotes = _parseMarkdownNotes(rawBody);
+
+    return AppUpdateInfo(
+      latestVersion: cleanVersion.isEmpty ? '1.0.0' : cleanVersion,
+      versionCode: versionCode,
+      apkDownloadUrl: apkDownloadUrl,
+      directMirrorUrl: htmlUrl.isNotEmpty
+          ? htmlUrl
+          : AppVersion.whatsAppUpdateUrl,
+      releaseDate: releaseDate.isEmpty ? 'October 2026' : releaseDate,
+      releaseNotes: releaseNotes,
+      isMandatory: rawBody.toLowerCase().contains('[mandatory]'),
+      fileSize: fileSize ?? '72 MB',
+    );
+  }
+
+  static List<String> _parseMarkdownNotes(String body) {
+    if (body.trim().isEmpty) {
+      return ['Performance improvements, stability fixes, and UI refinements.'];
+    }
+
+    final lines = body.split(RegExp(r'\r?\n'));
+    final notes = <String>[];
+
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.startsWith('- ') ||
+          line.startsWith('* ') ||
+          line.startsWith('• ')) {
+        var clean = line.substring(2).trim();
+        clean = clean.replaceAll(RegExp(r'\*\*|\*|__|_'), '').trim();
+        if (clean.isNotEmpty) {
+          notes.add(clean);
+        }
+      }
+    }
+
+    if (notes.isEmpty) {
+      for (final rawLine in lines) {
+        final line = rawLine.trim();
+        if (line.isNotEmpty &&
+            !line.startsWith('#') &&
+            !line.startsWith('---') &&
+            !line.startsWith('```')) {
+          var clean = line.replaceAll(RegExp(r'\*\*|\*|__|_'), '').trim();
+          if (clean.isNotEmpty) {
+            notes.add(clean);
+            if (notes.length >= 6) break;
+          }
+        }
+      }
+    }
+
+    return notes.isEmpty
+        ? ['Performance improvements, stability fixes, and UI refinements.']
+        : notes;
+  }
 }
 
 enum UpdateStatus { idle, checking, upToDate, updateAvailable, error }
@@ -69,11 +206,13 @@ enum UpdateStatus { idle, checking, upToDate, updateAvailable, error }
 class UpdateCheckResult {
   final UpdateStatus status;
   final AppUpdateInfo? updateInfo;
+  final String? installedVersion;
   final String? errorMessage;
 
   const UpdateCheckResult({
     required this.status,
     this.updateInfo,
+    this.installedVersion,
     this.errorMessage,
   });
 }
@@ -81,55 +220,169 @@ class UpdateCheckResult {
 class UpdateService {
   static const _installerChannel = MethodChannel('com.myday.app/installer');
 
-  /// Checks remote server for the latest APK version.
-  Future<UpdateCheckResult> checkForUpdates({String? customUrl}) async {
-    final urlString = customUrl ?? AppVersion.defaultUpdateUrl;
+  String _currentInstalledVersion = AppVersion.versionName;
+  int _currentInstalledBuildCode = AppVersion.versionCode;
 
+  String get currentInstalledVersion => _currentInstalledVersion;
+  int get currentInstalledBuildCode => _currentInstalledBuildCode;
+
+  /// Compares two Semantic Version strings (e.g. "1.1.1" vs "1.1.0").
+  /// Returns:
+  /// > 0 if v1 > v2
+  /// < 0 if v1 < v2
+  /// 0 if v1 == v2
+  static int compareVersions(String v1, String v2) {
+    final clean1 = v1.replaceAll(RegExp(r'[^0-9.]'), '');
+    final clean2 = v2.replaceAll(RegExp(r'[^0-9.]'), '');
+    final p1 = clean1.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final p2 = clean2.split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final maxLen = p1.length > p2.length ? p1.length : p2.length;
+    for (var i = 0; i < maxLen; i++) {
+      final n1 = i < p1.length ? p1[i] : 0;
+      final n2 = i < p2.length ? p2[i] : 0;
+      if (n1 > n2) return 1;
+      if (n1 < n2) return -1;
+    }
+    return 0;
+  }
+
+  /// Evaluates whether remoteVersion or remoteBuildCode is strictly newer than current.
+  static bool isVersionNewer({
+    required String remoteVersion,
+    required int remoteBuildCode,
+    required String currentVersion,
+    required int currentBuildCode,
+  }) {
+    final comp = compareVersions(remoteVersion, currentVersion);
+    if (comp > 0) return true;
+    if (comp < 0) return false;
+    return remoteBuildCode > currentBuildCode;
+  }
+
+  /// Automatically checks for new releases:
+  /// 1. Queries GitHub Releases API directly so ANY new GitHub release immediately triggers updates.
+  /// 2. Seamlessly falls back to version.json if GitHub API is unreachable or rate-limited.
+  /// 3. Compares semantic versioning dynamically against the installed app version.
+  Future<UpdateCheckResult> checkForUpdates({String? customUrl}) async {
+    // 1. Resolve currently installed app version dynamically from platform
+    String currentVersion = AppVersion.versionName;
+    int currentBuildCode = AppVersion.versionCode;
     try {
-      final uri = Uri.parse(urlString);
+      final packageInfo = await PackageInfo.fromPlatform();
+      if (packageInfo.version.isNotEmpty) {
+        currentVersion = packageInfo.version;
+      }
+      final parsedBuild = int.tryParse(packageInfo.buildNumber);
+      if (parsedBuild != null && parsedBuild > 0) {
+        currentBuildCode = parsedBuild;
+      }
+    } catch (_) {
+      // Platform channel or testing fallback
+    }
+
+    _currentInstalledVersion = currentVersion;
+    _currentInstalledBuildCode = currentBuildCode;
+
+    AppUpdateInfo? updateInfo;
+
+    // 2. Fetch remote update information
+    if (customUrl != null) {
+      updateInfo = await _fetchFromUrl(customUrl);
+    } else {
+      // Primary: GitHub Releases API (Instant detection of new releases)
+      updateInfo = await _fetchFromGitHubRelease();
+      // Fallback: Raw version.json
+      updateInfo ??= await _fetchFromVersionJson();
+    }
+
+    if (updateInfo == null) {
+      return UpdateCheckResult(
+        status: UpdateStatus.error,
+        installedVersion: currentVersion,
+        errorMessage:
+            'Unable to check for updates. Please check your internet connection.',
+      );
+    }
+
+    // 3. Compare with installed version
+    final isNewer = isVersionNewer(
+      remoteVersion: updateInfo.latestVersion,
+      remoteBuildCode: updateInfo.versionCode,
+      currentVersion: currentVersion,
+      currentBuildCode: currentBuildCode,
+    );
+
+    if (isNewer) {
+      // Trigger system notification to lock screen and status bar
+      try {
+        NotificationService().showAppUpdateNotification(
+          latestVersion: updateInfo.latestVersion,
+          fileSize: updateInfo.fileSize,
+          releaseNotes: updateInfo.releaseNotes,
+        );
+      } catch (_) {}
+
+      return UpdateCheckResult(
+        status: UpdateStatus.updateAvailable,
+        updateInfo: updateInfo,
+        installedVersion: currentVersion,
+      );
+    } else {
+      return UpdateCheckResult(
+        status: UpdateStatus.upToDate,
+        installedVersion: currentVersion,
+      );
+    }
+  }
+
+  Future<AppUpdateInfo?> _fetchFromGitHubRelease() async {
+    try {
+      final uri = Uri.parse(AppVersion.gitHubLatestReleaseUrl);
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 7);
 
       final request = await client.getUrl(uri);
+      request.headers.set('User-Agent', 'MyDay-App');
+      request.headers.set('Accept', 'application/vnd.github.v3+json');
       final response = await request.close();
 
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
         final data = jsonDecode(body) as Map<String, dynamic>;
-        final updateInfo = AppUpdateInfo.fromJson(data);
-
-        if (updateInfo.versionCode > AppVersion.versionCode) {
-          // Trigger system notification to lock screen and status bar
-          NotificationService().showAppUpdateNotification(
-            latestVersion: updateInfo.latestVersion,
-            fileSize: updateInfo.fileSize,
-            releaseNotes: updateInfo.releaseNotes,
-          );
-
-          return UpdateCheckResult(
-            status: UpdateStatus.updateAvailable,
-            updateInfo: updateInfo,
-          );
-        } else {
-          return const UpdateCheckResult(status: UpdateStatus.upToDate);
-        }
-      } else {
-        return UpdateCheckResult(
-          status: UpdateStatus.error,
-          errorMessage: 'Server returned HTTP ${response.statusCode}',
-        );
+        return AppUpdateInfo.fromGitHubRelease(data);
       }
-    } on SocketException {
-      return const UpdateCheckResult(
-        status: UpdateStatus.error,
-        errorMessage: 'No internet connection to check for updates.',
-      );
-    } catch (e) {
-      return UpdateCheckResult(
-        status: UpdateStatus.error,
-        errorMessage: 'Unable to check for updates: $e',
-      );
+      return null;
+    } catch (_) {
+      return null;
     }
+  }
+
+  Future<AppUpdateInfo?> _fetchFromVersionJson([String? url]) async {
+    try {
+      final uri = Uri.parse(url ?? AppVersion.defaultUpdateUrl);
+      final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 7);
+
+      final request = await client.getUrl(uri);
+      request.headers.set('User-Agent', 'MyDay-App');
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        final body = await response.transform(utf8.decoder).join();
+        final data = jsonDecode(body) as Map<String, dynamic>;
+        return AppUpdateInfo.fromJson(data);
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<AppUpdateInfo?> _fetchFromUrl(String url) async {
+    if (url.contains('api.github.com')) {
+      return _fetchFromGitHubRelease();
+    }
+    return _fetchFromVersionJson(url);
   }
 
   /// Downloads the APK directly inside the app with byte-level progress,
@@ -207,6 +460,7 @@ class UpdateService {
   static void showUpdateSheet({
     required BuildContext context,
     required AppUpdateInfo info,
+    String? installedVersion,
   }) {
     showModalBottomSheet<void>(
       context: context,
@@ -214,15 +468,17 @@ class UpdateService {
       isDismissible: !info.isMandatory,
       enableDrag: !info.isMandatory,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _UpdateModalContent(info: info),
+      builder: (ctx) =>
+          _UpdateModalContent(info: info, installedVersion: installedVersion),
     );
   }
 }
 
 class _UpdateModalContent extends StatefulWidget {
   final AppUpdateInfo info;
+  final String? installedVersion;
 
-  const _UpdateModalContent({required this.info});
+  const _UpdateModalContent({required this.info, this.installedVersion});
 
   @override
   State<_UpdateModalContent> createState() => _UpdateModalContentState();
@@ -296,6 +552,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
         ? AppColors.darkSecondaryText
         : AppColors.lightSecondaryText;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+
+    final currentDisplayVersion =
+        widget.installedVersion ?? AppVersion.versionName;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
@@ -373,7 +632,7 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'Installed: v${AppVersion.versionName} • Size: ${widget.info.fileSize ?? "28 MB"}',
+                        'Installed: v$currentDisplayVersion • Size: ${widget.info.fileSize ?? "28 MB"}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontSize: 12,
@@ -616,3 +875,18 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
 final updateServiceProvider = Provider<UpdateService>((ref) {
   return UpdateService();
 });
+
+class AppUpdateCheckResultNotifier extends Notifier<UpdateCheckResult?> {
+  @override
+  UpdateCheckResult? build() => null;
+
+  void set(UpdateCheckResult? result) {
+    state = result;
+  }
+}
+
+/// Shared state provider holding the latest update check result
+final appUpdateCheckResultProvider =
+    NotifierProvider<AppUpdateCheckResultNotifier, UpdateCheckResult?>(
+      AppUpdateCheckResultNotifier.new,
+    );

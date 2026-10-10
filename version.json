@@ -1,17 +1,16 @@
 {
-  "latest_version": "1.1.0",
-  "version_code": 3,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.1.0/myday-v1.1.0.apk",
+  "latest_version": "1.1.1",
+  "version_code": 10101,
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.1.1/myday-v1.1.1.apk",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
   "file_size": "72 MB",
   "is_mandatory": false,
   "release_notes": [
-    "MyDay Split: Group Outing Budget & Shared Expense Management",
-    "Professional Accounting PDF Statements with App Logo & Member Balance Ledgers",
-    "Real-time Live Budget & Remaining updates as you add expenses",
-    "Automated Debt Simplification & Minimal Cash Flow settlements",
-    "Pinned Sticky Headers across all dashboards when scrolling",
-    "Over-The-Air (OTA) APK auto-update support via GitHub Releases"
+    "⚡ Live Budget Usage Updates: Real-time budget progress bar & remaining balance calculations when adding or editing expenses in MyDay Split.",
+    "📄 Professional Accounting PDF Export: Export comprehensive outing split statements with zero-sum member ledgers and itemized transaction tables.",
+    "📌 Pinned Sticky Headers: Headers remain fixed at the top across all dashboards when scrolling.",
+    "🗂️ Realigned Today Screen: Intuitive layout with Daily Habits & Streaks positioned at the bottom.",
+    "🌐 Universal Android Compatibility: Full support across all Android devices."
   ]
 }

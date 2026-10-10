@@ -66,14 +66,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (!mounted) return;
 
       setState(() => _isCheckingUpdate = false);
+      ref.read(appUpdateCheckResultProvider.notifier).set(result);
 
       if (result.status == UpdateStatus.updateAvailable &&
           result.updateInfo != null) {
         UpdateService.showUpdateSheet(
           context: context,
           info: result.updateInfo!,
+          installedVersion: result.installedVersion,
         );
       } else if (result.status == UpdateStatus.upToDate) {
+        final version = result.installedVersion ?? AppVersion.versionName;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -86,7 +89,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'You are on the latest version of MyDay (v${AppVersion.versionName})!',
+                    'You are on the latest version of MyDay (v$version)!',
                   ),
                 ),
               ],
@@ -751,57 +754,103 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                          Builder(
+                            builder: (context) {
+                              final updateState = ref.watch(
+                                appUpdateCheckResultProvider,
+                              );
+                              final displayVersion =
+                                  updateState?.installedVersion ??
+                                  AppVersion.versionName;
+                              final hasUpdate =
+                                  updateState?.status ==
+                                      UpdateStatus.updateAvailable &&
+                                  updateState?.updateInfo != null;
+
+                              return Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      'MyDay v${AppVersion.versionName}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15,
-                                        color: isDark
-                                            ? AppColors.darkPrimaryText
-                                            : AppColors.lightPrimaryText,
-                                      ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'MyDay v$displayVersion',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 15,
+                                            color: isDark
+                                                ? AppColors.darkPrimaryText
+                                                : AppColors.lightPrimaryText,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.successMint
+                                                .withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'Direct APK',
+                                            style: TextStyle(
+                                              color: AppColors.successMint,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        if (hasUpdate) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.primaryIndigo,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              'v${updateState!.updateInfo!.latestVersion} Available',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.successMint.withValues(
-                                          alpha: 0.15,
-                                        ),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: const Text(
-                                        'Direct APK',
-                                        style: TextStyle(
-                                          color: AppColors.successMint,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    Text(
+                                      hasUpdate &&
+                                              updateState?.updateInfo != null
+                                          ? 'New version v${updateState!.updateInfo!.latestVersion} is ready to install'
+                                          : 'Build ${AppVersion.versionCode} • Installed Locally',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: hasUpdate
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
+                                        color: hasUpdate
+                                            ? AppColors.primaryIndigo
+                                            : (isDark
+                                                  ? AppColors.darkSecondaryText
+                                                  : AppColors
+                                                        .lightSecondaryText),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Build ${AppVersion.versionCode} • Installed Locally',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? AppColors.darkSecondaryText
-                                        : AppColors.lightSecondaryText,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -817,77 +866,124 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: _isCheckingUpdate
-                                  ? null
-                                  : _checkAppUpdates,
-                              icon: _isCheckingUpdate
-                                  ? const SizedBox(
-                                      width: 14,
-                                      height: 14,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Icon(Icons.refresh_rounded, size: 16),
-                              label: Text(
-                                _isCheckingUpdate
-                                    ? 'Checking...'
-                                    : 'Check for Updates',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
+                      Builder(
+                        builder: (context) {
+                          final updateState = ref.watch(
+                            appUpdateCheckResultProvider,
+                          );
+                          final hasUpdate =
+                              updateState?.status ==
+                                  UpdateStatus.updateAvailable &&
+                              updateState?.updateInfo != null;
+
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _isCheckingUpdate
+                                      ? null
+                                      : (hasUpdate
+                                            ? () {
+                                                UpdateService.showUpdateSheet(
+                                                  context: context,
+                                                  info:
+                                                      updateState!.updateInfo!,
+                                                  installedVersion: updateState
+                                                      .installedVersion,
+                                                );
+                                              }
+                                            : _checkAppUpdates),
+                                  icon: _isCheckingUpdate
+                                      ? const SizedBox(
+                                          width: 14,
+                                          height: 14,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Icon(
+                                          hasUpdate
+                                              ? Icons.system_update_alt_rounded
+                                              : Icons.refresh_rounded,
+                                          size: 16,
+                                        ),
+                                  label: Text(
+                                    _isCheckingUpdate
+                                        ? 'Checking...'
+                                        : (hasUpdate
+                                              ? 'Install Update (v${updateState!.updateInfo!.latestVersion})'
+                                              : 'Check for Updates'),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryIndigo,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: AppRadius.buttonRadius,
+                                    ),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryIndigo,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: AppRadius.buttonRadius,
+                              if (hasUpdate) ...[
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  onPressed: _isCheckingUpdate
+                                      ? null
+                                      : _checkAppUpdates,
+                                  tooltip: 'Re-check for updates',
+                                  icon: const Icon(
+                                    Icons.refresh_rounded,
+                                    size: 20,
+                                  ),
+                                  style: IconButton.styleFrom(
+                                    foregroundColor: isDark
+                                        ? AppColors.darkSecondaryText
+                                        : AppColors.lightSecondaryText,
+                                  ),
                                 ),
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                              ],
+                              const SizedBox(width: 8),
+                              OutlinedButton(
+                                onPressed: _showTestUpdateModal,
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.lightBorder,
+                                  ),
+                                  foregroundColor: isDark
+                                      ? AppColors.darkPrimaryText
+                                      : AppColors.lightPrimaryText,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: AppRadius.buttonRadius,
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: const Tooltip(
+                                  message:
+                                      'Preview how the update prompt appears to users',
+                                  child: Text(
+                                    'Preview',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton(
-                            onPressed: _showTestUpdateModal,
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: isDark
-                                    ? AppColors.darkBorder
-                                    : AppColors.lightBorder,
-                              ),
-                              foregroundColor: isDark
-                                  ? AppColors.darkPrimaryText
-                                  : AppColors.lightPrimaryText,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: AppRadius.buttonRadius,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 12,
-                              ),
-                            ),
-                            child: const Tooltip(
-                              message:
-                                  'Preview how the update prompt appears to users',
-                              child: Text(
-                                'Preview',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                            ],
+                          );
+                        },
                       ),
                     ],
                   ),

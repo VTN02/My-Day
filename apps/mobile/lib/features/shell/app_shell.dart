@@ -68,12 +68,16 @@ class _AppShellState extends ConsumerState<AppShell> {
       try {
         final updateService = ref.read(updateServiceProvider);
         final result = await updateService.checkForUpdates();
+        if (mounted) {
+          ref.read(appUpdateCheckResultProvider.notifier).set(result);
+        }
         if (result.status == UpdateStatus.updateAvailable &&
             result.updateInfo != null &&
             mounted) {
           UpdateService.showUpdateSheet(
             context: context,
             info: result.updateInfo!,
+            installedVersion: result.installedVersion,
           );
         }
       } catch (_) {
