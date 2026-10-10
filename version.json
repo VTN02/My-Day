@@ -1,17 +1,17 @@
 {
-  "latest_version": "1.0.1",
-  "version_code": 2,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.0.1/myday-v1.0.1.apk",
+  "latest_version": "1.1.0",
+  "version_code": 3,
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.1.0/myday-v1.1.0.apk",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
-  "file_size": "28 MB",
+  "file_size": "68 MB",
   "is_mandatory": false,
   "release_notes": [
-    "New Rectangular Calendar layout with date pop-up modal",
-    "Interactive Finance Donut & Cash Flow charts",
-    "Full-context Reminder Notifications with Priority and Quick Actions",
-    "Profile Customization with custom DPs and Gradients",
-    "Official TheVBuilds WhatsApp Community Channel integration",
+    "MyDay Split: Group Outing Budget & Shared Expense Management",
+    "Automated Debt Simplification & Minimal Cash Flow settlements",
+    "Multiple payers and flexible split options (equal, exact, percentage, shares)",
+    "Comprehensive Outing Export (Summary, CSV breakdown, WhatsApp sharing)",
+    "Complete Sinhala, Tamil, and English localization for Split",
     "Over-The-Air (OTA) APK auto-update support via GitHub Releases"
   ]
 }

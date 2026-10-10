@@ -11,8 +11,8 @@ import 'notification_service.dart';
 
 /// App Version constants
 class AppVersion {
-  static const String versionName = '1.0.0';
-  static const int versionCode = 1;
+  static const String versionName = '1.1.0';
+  static const int versionCode = 3;
   static const String releaseDate = 'October 2026';
 
   /// Default remote version check URL from the official GitHub repo:
