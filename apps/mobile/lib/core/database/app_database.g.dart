@@ -5497,6 +5497,2832 @@ class HabitLogsTableCompanion extends UpdateCompanion<HabitLogEntry> {
   }
 }
 
+class $GroupOutingsTableTable extends GroupOutingsTable
+    with TableInfo<$GroupOutingsTableTable, GroupOutingEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GroupOutingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _organizerLocalIdMeta = const VerificationMeta(
+    'organizerLocalId',
+  );
+  @override
+  late final GeneratedColumn<String> organizerLocalId = GeneratedColumn<String>(
+    'organizer_local_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 150,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _outingDateMeta = const VerificationMeta(
+    'outingDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> outingDate = GeneratedColumn<DateTime>(
+    'outing_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _budgetMinorMeta = const VerificationMeta(
+    'budgetMinor',
+  );
+  @override
+  late final GeneratedColumn<int> budgetMinor = GeneratedColumn<int>(
+    'budget_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('LKR'),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    organizerLocalId,
+    title,
+    description,
+    outingDate,
+    budgetMinor,
+    currencyCode,
+    status,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'group_outings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<GroupOutingEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('organizer_local_id')) {
+      context.handle(
+        _organizerLocalIdMeta,
+        organizerLocalId.isAcceptableOrUnknown(
+          data['organizer_local_id']!,
+          _organizerLocalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_organizerLocalIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('outing_date')) {
+      context.handle(
+        _outingDateMeta,
+        outingDate.isAcceptableOrUnknown(data['outing_date']!, _outingDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_outingDateMeta);
+    }
+    if (data.containsKey('budget_minor')) {
+      context.handle(
+        _budgetMinorMeta,
+        budgetMinor.isAcceptableOrUnknown(
+          data['budget_minor']!,
+          _budgetMinorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  GroupOutingEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return GroupOutingEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      organizerLocalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}organizer_local_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      outingDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}outing_date'],
+      )!,
+      budgetMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}budget_minor'],
+      )!,
+      currencyCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_code'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $GroupOutingsTableTable createAlias(String alias) {
+    return $GroupOutingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class GroupOutingEntry extends DataClass
+    implements Insertable<GroupOutingEntry> {
+  final String id;
+  final String organizerLocalId;
+  final String title;
+  final String description;
+  final DateTime outingDate;
+  final int budgetMinor;
+  final String currencyCode;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const GroupOutingEntry({
+    required this.id,
+    required this.organizerLocalId,
+    required this.title,
+    required this.description,
+    required this.outingDate,
+    required this.budgetMinor,
+    required this.currencyCode,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['organizer_local_id'] = Variable<String>(organizerLocalId);
+    map['title'] = Variable<String>(title);
+    map['description'] = Variable<String>(description);
+    map['outing_date'] = Variable<DateTime>(outingDate);
+    map['budget_minor'] = Variable<int>(budgetMinor);
+    map['currency_code'] = Variable<String>(currencyCode);
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  GroupOutingsTableCompanion toCompanion(bool nullToAbsent) {
+    return GroupOutingsTableCompanion(
+      id: Value(id),
+      organizerLocalId: Value(organizerLocalId),
+      title: Value(title),
+      description: Value(description),
+      outingDate: Value(outingDate),
+      budgetMinor: Value(budgetMinor),
+      currencyCode: Value(currencyCode),
+      status: Value(status),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory GroupOutingEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return GroupOutingEntry(
+      id: serializer.fromJson<String>(json['id']),
+      organizerLocalId: serializer.fromJson<String>(json['organizerLocalId']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String>(json['description']),
+      outingDate: serializer.fromJson<DateTime>(json['outingDate']),
+      budgetMinor: serializer.fromJson<int>(json['budgetMinor']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'organizerLocalId': serializer.toJson<String>(organizerLocalId),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String>(description),
+      'outingDate': serializer.toJson<DateTime>(outingDate),
+      'budgetMinor': serializer.toJson<int>(budgetMinor),
+      'currencyCode': serializer.toJson<String>(currencyCode),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  GroupOutingEntry copyWith({
+    String? id,
+    String? organizerLocalId,
+    String? title,
+    String? description,
+    DateTime? outingDate,
+    int? budgetMinor,
+    String? currencyCode,
+    String? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => GroupOutingEntry(
+    id: id ?? this.id,
+    organizerLocalId: organizerLocalId ?? this.organizerLocalId,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    outingDate: outingDate ?? this.outingDate,
+    budgetMinor: budgetMinor ?? this.budgetMinor,
+    currencyCode: currencyCode ?? this.currencyCode,
+    status: status ?? this.status,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  GroupOutingEntry copyWithCompanion(GroupOutingsTableCompanion data) {
+    return GroupOutingEntry(
+      id: data.id.present ? data.id.value : this.id,
+      organizerLocalId: data.organizerLocalId.present
+          ? data.organizerLocalId.value
+          : this.organizerLocalId,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      outingDate: data.outingDate.present
+          ? data.outingDate.value
+          : this.outingDate,
+      budgetMinor: data.budgetMinor.present
+          ? data.budgetMinor.value
+          : this.budgetMinor,
+      currencyCode: data.currencyCode.present
+          ? data.currencyCode.value
+          : this.currencyCode,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GroupOutingEntry(')
+          ..write('id: $id, ')
+          ..write('organizerLocalId: $organizerLocalId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('outingDate: $outingDate, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    organizerLocalId,
+    title,
+    description,
+    outingDate,
+    budgetMinor,
+    currencyCode,
+    status,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is GroupOutingEntry &&
+          other.id == this.id &&
+          other.organizerLocalId == this.organizerLocalId &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.outingDate == this.outingDate &&
+          other.budgetMinor == this.budgetMinor &&
+          other.currencyCode == this.currencyCode &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class GroupOutingsTableCompanion extends UpdateCompanion<GroupOutingEntry> {
+  final Value<String> id;
+  final Value<String> organizerLocalId;
+  final Value<String> title;
+  final Value<String> description;
+  final Value<DateTime> outingDate;
+  final Value<int> budgetMinor;
+  final Value<String> currencyCode;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const GroupOutingsTableCompanion({
+    this.id = const Value.absent(),
+    this.organizerLocalId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.outingDate = const Value.absent(),
+    this.budgetMinor = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  GroupOutingsTableCompanion.insert({
+    required String id,
+    required String organizerLocalId,
+    required String title,
+    this.description = const Value.absent(),
+    required DateTime outingDate,
+    this.budgetMinor = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       organizerLocalId = Value(organizerLocalId),
+       title = Value(title),
+       outingDate = Value(outingDate);
+  static Insertable<GroupOutingEntry> custom({
+    Expression<String>? id,
+    Expression<String>? organizerLocalId,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<DateTime>? outingDate,
+    Expression<int>? budgetMinor,
+    Expression<String>? currencyCode,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (organizerLocalId != null) 'organizer_local_id': organizerLocalId,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (outingDate != null) 'outing_date': outingDate,
+      if (budgetMinor != null) 'budget_minor': budgetMinor,
+      if (currencyCode != null) 'currency_code': currencyCode,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  GroupOutingsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? organizerLocalId,
+    Value<String>? title,
+    Value<String>? description,
+    Value<DateTime>? outingDate,
+    Value<int>? budgetMinor,
+    Value<String>? currencyCode,
+    Value<String>? status,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return GroupOutingsTableCompanion(
+      id: id ?? this.id,
+      organizerLocalId: organizerLocalId ?? this.organizerLocalId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      outingDate: outingDate ?? this.outingDate,
+      budgetMinor: budgetMinor ?? this.budgetMinor,
+      currencyCode: currencyCode ?? this.currencyCode,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (organizerLocalId.present) {
+      map['organizer_local_id'] = Variable<String>(organizerLocalId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (outingDate.present) {
+      map['outing_date'] = Variable<DateTime>(outingDate.value);
+    }
+    if (budgetMinor.present) {
+      map['budget_minor'] = Variable<int>(budgetMinor.value);
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GroupOutingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('organizerLocalId: $organizerLocalId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('outingDate: $outingDate, ')
+          ..write('budgetMinor: $budgetMinor, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OutingMembersTableTable extends OutingMembersTable
+    with TableInfo<$OutingMembersTableTable, OutingMemberEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutingMembersTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _outingIdMeta = const VerificationMeta(
+    'outingId',
+  );
+  @override
+  late final GeneratedColumn<String> outingId = GeneratedColumn<String>(
+    'outing_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 100,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _linkedUserIdMeta = const VerificationMeta(
+    'linkedUserId',
+  );
+  @override
+  late final GeneratedColumn<String> linkedUserId = GeneratedColumn<String>(
+    'linked_user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isOrganizerMeta = const VerificationMeta(
+    'isOrganizer',
+  );
+  @override
+  late final GeneratedColumn<bool> isOrganizer = GeneratedColumn<bool>(
+    'is_organizer',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_organizer" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    outingId,
+    displayName,
+    linkedUserId,
+    isOrganizer,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outing_members';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OutingMemberEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('outing_id')) {
+      context.handle(
+        _outingIdMeta,
+        outingId.isAcceptableOrUnknown(data['outing_id']!, _outingIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_outingIdMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('linked_user_id')) {
+      context.handle(
+        _linkedUserIdMeta,
+        linkedUserId.isAcceptableOrUnknown(
+          data['linked_user_id']!,
+          _linkedUserIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_organizer')) {
+      context.handle(
+        _isOrganizerMeta,
+        isOrganizer.isAcceptableOrUnknown(
+          data['is_organizer']!,
+          _isOrganizerMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OutingMemberEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OutingMemberEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      outingId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}outing_id'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      linkedUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}linked_user_id'],
+      ),
+      isOrganizer: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_organizer'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OutingMembersTableTable createAlias(String alias) {
+    return $OutingMembersTableTable(attachedDatabase, alias);
+  }
+}
+
+class OutingMemberEntry extends DataClass
+    implements Insertable<OutingMemberEntry> {
+  final String id;
+  final String outingId;
+  final String displayName;
+  final String? linkedUserId;
+  final bool isOrganizer;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const OutingMemberEntry({
+    required this.id,
+    required this.outingId,
+    required this.displayName,
+    this.linkedUserId,
+    required this.isOrganizer,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['outing_id'] = Variable<String>(outingId);
+    map['display_name'] = Variable<String>(displayName);
+    if (!nullToAbsent || linkedUserId != null) {
+      map['linked_user_id'] = Variable<String>(linkedUserId);
+    }
+    map['is_organizer'] = Variable<bool>(isOrganizer);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  OutingMembersTableCompanion toCompanion(bool nullToAbsent) {
+    return OutingMembersTableCompanion(
+      id: Value(id),
+      outingId: Value(outingId),
+      displayName: Value(displayName),
+      linkedUserId: linkedUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkedUserId),
+      isOrganizer: Value(isOrganizer),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory OutingMemberEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OutingMemberEntry(
+      id: serializer.fromJson<String>(json['id']),
+      outingId: serializer.fromJson<String>(json['outingId']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      linkedUserId: serializer.fromJson<String?>(json['linkedUserId']),
+      isOrganizer: serializer.fromJson<bool>(json['isOrganizer']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'outingId': serializer.toJson<String>(outingId),
+      'displayName': serializer.toJson<String>(displayName),
+      'linkedUserId': serializer.toJson<String?>(linkedUserId),
+      'isOrganizer': serializer.toJson<bool>(isOrganizer),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  OutingMemberEntry copyWith({
+    String? id,
+    String? outingId,
+    String? displayName,
+    Value<String?> linkedUserId = const Value.absent(),
+    bool? isOrganizer,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => OutingMemberEntry(
+    id: id ?? this.id,
+    outingId: outingId ?? this.outingId,
+    displayName: displayName ?? this.displayName,
+    linkedUserId: linkedUserId.present ? linkedUserId.value : this.linkedUserId,
+    isOrganizer: isOrganizer ?? this.isOrganizer,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  OutingMemberEntry copyWithCompanion(OutingMembersTableCompanion data) {
+    return OutingMemberEntry(
+      id: data.id.present ? data.id.value : this.id,
+      outingId: data.outingId.present ? data.outingId.value : this.outingId,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      linkedUserId: data.linkedUserId.present
+          ? data.linkedUserId.value
+          : this.linkedUserId,
+      isOrganizer: data.isOrganizer.present
+          ? data.isOrganizer.value
+          : this.isOrganizer,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingMemberEntry(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('displayName: $displayName, ')
+          ..write('linkedUserId: $linkedUserId, ')
+          ..write('isOrganizer: $isOrganizer, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    outingId,
+    displayName,
+    linkedUserId,
+    isOrganizer,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OutingMemberEntry &&
+          other.id == this.id &&
+          other.outingId == this.outingId &&
+          other.displayName == this.displayName &&
+          other.linkedUserId == this.linkedUserId &&
+          other.isOrganizer == this.isOrganizer &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class OutingMembersTableCompanion extends UpdateCompanion<OutingMemberEntry> {
+  final Value<String> id;
+  final Value<String> outingId;
+  final Value<String> displayName;
+  final Value<String?> linkedUserId;
+  final Value<bool> isOrganizer;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const OutingMembersTableCompanion({
+    this.id = const Value.absent(),
+    this.outingId = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.linkedUserId = const Value.absent(),
+    this.isOrganizer = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OutingMembersTableCompanion.insert({
+    required String id,
+    required String outingId,
+    required String displayName,
+    this.linkedUserId = const Value.absent(),
+    this.isOrganizer = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       outingId = Value(outingId),
+       displayName = Value(displayName);
+  static Insertable<OutingMemberEntry> custom({
+    Expression<String>? id,
+    Expression<String>? outingId,
+    Expression<String>? displayName,
+    Expression<String>? linkedUserId,
+    Expression<bool>? isOrganizer,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (outingId != null) 'outing_id': outingId,
+      if (displayName != null) 'display_name': displayName,
+      if (linkedUserId != null) 'linked_user_id': linkedUserId,
+      if (isOrganizer != null) 'is_organizer': isOrganizer,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OutingMembersTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? outingId,
+    Value<String>? displayName,
+    Value<String?>? linkedUserId,
+    Value<bool>? isOrganizer,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return OutingMembersTableCompanion(
+      id: id ?? this.id,
+      outingId: outingId ?? this.outingId,
+      displayName: displayName ?? this.displayName,
+      linkedUserId: linkedUserId ?? this.linkedUserId,
+      isOrganizer: isOrganizer ?? this.isOrganizer,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (outingId.present) {
+      map['outing_id'] = Variable<String>(outingId.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (linkedUserId.present) {
+      map['linked_user_id'] = Variable<String>(linkedUserId.value);
+    }
+    if (isOrganizer.present) {
+      map['is_organizer'] = Variable<bool>(isOrganizer.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingMembersTableCompanion(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('displayName: $displayName, ')
+          ..write('linkedUserId: $linkedUserId, ')
+          ..write('isOrganizer: $isOrganizer, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OutingExpensesTableTable extends OutingExpensesTable
+    with TableInfo<$OutingExpensesTableTable, OutingExpenseEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutingExpensesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _outingIdMeta = const VerificationMeta(
+    'outingId',
+  );
+  @override
+  late final GeneratedColumn<String> outingId = GeneratedColumn<String>(
+    'outing_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payerMemberIdMeta = const VerificationMeta(
+    'payerMemberId',
+  );
+  @override
+  late final GeneratedColumn<String> payerMemberId = GeneratedColumn<String>(
+    'payer_member_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 150,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _categoryMeta = const VerificationMeta(
+    'category',
+  );
+  @override
+  late final GeneratedColumn<String> category = GeneratedColumn<String>(
+    'category',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 50,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMinorMeta = const VerificationMeta(
+    'amountMinor',
+  );
+  @override
+  late final GeneratedColumn<int> amountMinor = GeneratedColumn<int>(
+    'amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expenseDateMeta = const VerificationMeta(
+    'expenseDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> expenseDate = GeneratedColumn<DateTime>(
+    'expense_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    outingId,
+    payerMemberId,
+    title,
+    description,
+    category,
+    amountMinor,
+    expenseDate,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outing_expenses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OutingExpenseEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('outing_id')) {
+      context.handle(
+        _outingIdMeta,
+        outingId.isAcceptableOrUnknown(data['outing_id']!, _outingIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_outingIdMeta);
+    }
+    if (data.containsKey('payer_member_id')) {
+      context.handle(
+        _payerMemberIdMeta,
+        payerMemberId.isAcceptableOrUnknown(
+          data['payer_member_id']!,
+          _payerMemberIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payerMemberIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('category')) {
+      context.handle(
+        _categoryMeta,
+        category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_categoryMeta);
+    }
+    if (data.containsKey('amount_minor')) {
+      context.handle(
+        _amountMinorMeta,
+        amountMinor.isAcceptableOrUnknown(
+          data['amount_minor']!,
+          _amountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMinorMeta);
+    }
+    if (data.containsKey('expense_date')) {
+      context.handle(
+        _expenseDateMeta,
+        expenseDate.isAcceptableOrUnknown(
+          data['expense_date']!,
+          _expenseDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_expenseDateMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OutingExpenseEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OutingExpenseEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      outingId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}outing_id'],
+      )!,
+      payerMemberId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payer_member_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      )!,
+      category: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}category'],
+      )!,
+      amountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_minor'],
+      )!,
+      expenseDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expense_date'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $OutingExpensesTableTable createAlias(String alias) {
+    return $OutingExpensesTableTable(attachedDatabase, alias);
+  }
+}
+
+class OutingExpenseEntry extends DataClass
+    implements Insertable<OutingExpenseEntry> {
+  final String id;
+  final String outingId;
+  final String payerMemberId;
+  final String title;
+  final String description;
+  final String category;
+  final int amountMinor;
+  final DateTime expenseDate;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  const OutingExpenseEntry({
+    required this.id,
+    required this.outingId,
+    required this.payerMemberId,
+    required this.title,
+    required this.description,
+    required this.category,
+    required this.amountMinor,
+    required this.expenseDate,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['outing_id'] = Variable<String>(outingId);
+    map['payer_member_id'] = Variable<String>(payerMemberId);
+    map['title'] = Variable<String>(title);
+    map['description'] = Variable<String>(description);
+    map['category'] = Variable<String>(category);
+    map['amount_minor'] = Variable<int>(amountMinor);
+    map['expense_date'] = Variable<DateTime>(expenseDate);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  OutingExpensesTableCompanion toCompanion(bool nullToAbsent) {
+    return OutingExpensesTableCompanion(
+      id: Value(id),
+      outingId: Value(outingId),
+      payerMemberId: Value(payerMemberId),
+      title: Value(title),
+      description: Value(description),
+      category: Value(category),
+      amountMinor: Value(amountMinor),
+      expenseDate: Value(expenseDate),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+    );
+  }
+
+  factory OutingExpenseEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OutingExpenseEntry(
+      id: serializer.fromJson<String>(json['id']),
+      outingId: serializer.fromJson<String>(json['outingId']),
+      payerMemberId: serializer.fromJson<String>(json['payerMemberId']),
+      title: serializer.fromJson<String>(json['title']),
+      description: serializer.fromJson<String>(json['description']),
+      category: serializer.fromJson<String>(json['category']),
+      amountMinor: serializer.fromJson<int>(json['amountMinor']),
+      expenseDate: serializer.fromJson<DateTime>(json['expenseDate']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'outingId': serializer.toJson<String>(outingId),
+      'payerMemberId': serializer.toJson<String>(payerMemberId),
+      'title': serializer.toJson<String>(title),
+      'description': serializer.toJson<String>(description),
+      'category': serializer.toJson<String>(category),
+      'amountMinor': serializer.toJson<int>(amountMinor),
+      'expenseDate': serializer.toJson<DateTime>(expenseDate),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  OutingExpenseEntry copyWith({
+    String? id,
+    String? outingId,
+    String? payerMemberId,
+    String? title,
+    String? description,
+    String? category,
+    int? amountMinor,
+    DateTime? expenseDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => OutingExpenseEntry(
+    id: id ?? this.id,
+    outingId: outingId ?? this.outingId,
+    payerMemberId: payerMemberId ?? this.payerMemberId,
+    title: title ?? this.title,
+    description: description ?? this.description,
+    category: category ?? this.category,
+    amountMinor: amountMinor ?? this.amountMinor,
+    expenseDate: expenseDate ?? this.expenseDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  OutingExpenseEntry copyWithCompanion(OutingExpensesTableCompanion data) {
+    return OutingExpenseEntry(
+      id: data.id.present ? data.id.value : this.id,
+      outingId: data.outingId.present ? data.outingId.value : this.outingId,
+      payerMemberId: data.payerMemberId.present
+          ? data.payerMemberId.value
+          : this.payerMemberId,
+      title: data.title.present ? data.title.value : this.title,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      category: data.category.present ? data.category.value : this.category,
+      amountMinor: data.amountMinor.present
+          ? data.amountMinor.value
+          : this.amountMinor,
+      expenseDate: data.expenseDate.present
+          ? data.expenseDate.value
+          : this.expenseDate,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingExpenseEntry(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('payerMemberId: $payerMemberId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('category: $category, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('expenseDate: $expenseDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    outingId,
+    payerMemberId,
+    title,
+    description,
+    category,
+    amountMinor,
+    expenseDate,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OutingExpenseEntry &&
+          other.id == this.id &&
+          other.outingId == this.outingId &&
+          other.payerMemberId == this.payerMemberId &&
+          other.title == this.title &&
+          other.description == this.description &&
+          other.category == this.category &&
+          other.amountMinor == this.amountMinor &&
+          other.expenseDate == this.expenseDate &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class OutingExpensesTableCompanion extends UpdateCompanion<OutingExpenseEntry> {
+  final Value<String> id;
+  final Value<String> outingId;
+  final Value<String> payerMemberId;
+  final Value<String> title;
+  final Value<String> description;
+  final Value<String> category;
+  final Value<int> amountMinor;
+  final Value<DateTime> expenseDate;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<int> rowid;
+  const OutingExpensesTableCompanion({
+    this.id = const Value.absent(),
+    this.outingId = const Value.absent(),
+    this.payerMemberId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.description = const Value.absent(),
+    this.category = const Value.absent(),
+    this.amountMinor = const Value.absent(),
+    this.expenseDate = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OutingExpensesTableCompanion.insert({
+    required String id,
+    required String outingId,
+    required String payerMemberId,
+    required String title,
+    this.description = const Value.absent(),
+    required String category,
+    required int amountMinor,
+    required DateTime expenseDate,
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       outingId = Value(outingId),
+       payerMemberId = Value(payerMemberId),
+       title = Value(title),
+       category = Value(category),
+       amountMinor = Value(amountMinor),
+       expenseDate = Value(expenseDate);
+  static Insertable<OutingExpenseEntry> custom({
+    Expression<String>? id,
+    Expression<String>? outingId,
+    Expression<String>? payerMemberId,
+    Expression<String>? title,
+    Expression<String>? description,
+    Expression<String>? category,
+    Expression<int>? amountMinor,
+    Expression<DateTime>? expenseDate,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (outingId != null) 'outing_id': outingId,
+      if (payerMemberId != null) 'payer_member_id': payerMemberId,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
+      if (category != null) 'category': category,
+      if (amountMinor != null) 'amount_minor': amountMinor,
+      if (expenseDate != null) 'expense_date': expenseDate,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OutingExpensesTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? outingId,
+    Value<String>? payerMemberId,
+    Value<String>? title,
+    Value<String>? description,
+    Value<String>? category,
+    Value<int>? amountMinor,
+    Value<DateTime>? expenseDate,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<int>? rowid,
+  }) {
+    return OutingExpensesTableCompanion(
+      id: id ?? this.id,
+      outingId: outingId ?? this.outingId,
+      payerMemberId: payerMemberId ?? this.payerMemberId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      amountMinor: amountMinor ?? this.amountMinor,
+      expenseDate: expenseDate ?? this.expenseDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (outingId.present) {
+      map['outing_id'] = Variable<String>(outingId.value);
+    }
+    if (payerMemberId.present) {
+      map['payer_member_id'] = Variable<String>(payerMemberId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (category.present) {
+      map['category'] = Variable<String>(category.value);
+    }
+    if (amountMinor.present) {
+      map['amount_minor'] = Variable<int>(amountMinor.value);
+    }
+    if (expenseDate.present) {
+      map['expense_date'] = Variable<DateTime>(expenseDate.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingExpensesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('payerMemberId: $payerMemberId, ')
+          ..write('title: $title, ')
+          ..write('description: $description, ')
+          ..write('category: $category, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('expenseDate: $expenseDate, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OutingExpenseSharesTableTable extends OutingExpenseSharesTable
+    with TableInfo<$OutingExpenseSharesTableTable, OutingExpenseShareEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutingExpenseSharesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _expenseIdMeta = const VerificationMeta(
+    'expenseId',
+  );
+  @override
+  late final GeneratedColumn<String> expenseId = GeneratedColumn<String>(
+    'expense_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _memberIdMeta = const VerificationMeta(
+    'memberId',
+  );
+  @override
+  late final GeneratedColumn<String> memberId = GeneratedColumn<String>(
+    'member_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMinorMeta = const VerificationMeta(
+    'amountMinor',
+  );
+  @override
+  late final GeneratedColumn<int> amountMinor = GeneratedColumn<int>(
+    'amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, expenseId, memberId, amountMinor];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outing_expense_shares';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OutingExpenseShareEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('expense_id')) {
+      context.handle(
+        _expenseIdMeta,
+        expenseId.isAcceptableOrUnknown(data['expense_id']!, _expenseIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_expenseIdMeta);
+    }
+    if (data.containsKey('member_id')) {
+      context.handle(
+        _memberIdMeta,
+        memberId.isAcceptableOrUnknown(data['member_id']!, _memberIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_memberIdMeta);
+    }
+    if (data.containsKey('amount_minor')) {
+      context.handle(
+        _amountMinorMeta,
+        amountMinor.isAcceptableOrUnknown(
+          data['amount_minor']!,
+          _amountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMinorMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OutingExpenseShareEntry map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OutingExpenseShareEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      expenseId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}expense_id'],
+      )!,
+      memberId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}member_id'],
+      )!,
+      amountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_minor'],
+      )!,
+    );
+  }
+
+  @override
+  $OutingExpenseSharesTableTable createAlias(String alias) {
+    return $OutingExpenseSharesTableTable(attachedDatabase, alias);
+  }
+}
+
+class OutingExpenseShareEntry extends DataClass
+    implements Insertable<OutingExpenseShareEntry> {
+  final String id;
+  final String expenseId;
+  final String memberId;
+  final int amountMinor;
+  const OutingExpenseShareEntry({
+    required this.id,
+    required this.expenseId,
+    required this.memberId,
+    required this.amountMinor,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['expense_id'] = Variable<String>(expenseId);
+    map['member_id'] = Variable<String>(memberId);
+    map['amount_minor'] = Variable<int>(amountMinor);
+    return map;
+  }
+
+  OutingExpenseSharesTableCompanion toCompanion(bool nullToAbsent) {
+    return OutingExpenseSharesTableCompanion(
+      id: Value(id),
+      expenseId: Value(expenseId),
+      memberId: Value(memberId),
+      amountMinor: Value(amountMinor),
+    );
+  }
+
+  factory OutingExpenseShareEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OutingExpenseShareEntry(
+      id: serializer.fromJson<String>(json['id']),
+      expenseId: serializer.fromJson<String>(json['expenseId']),
+      memberId: serializer.fromJson<String>(json['memberId']),
+      amountMinor: serializer.fromJson<int>(json['amountMinor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'expenseId': serializer.toJson<String>(expenseId),
+      'memberId': serializer.toJson<String>(memberId),
+      'amountMinor': serializer.toJson<int>(amountMinor),
+    };
+  }
+
+  OutingExpenseShareEntry copyWith({
+    String? id,
+    String? expenseId,
+    String? memberId,
+    int? amountMinor,
+  }) => OutingExpenseShareEntry(
+    id: id ?? this.id,
+    expenseId: expenseId ?? this.expenseId,
+    memberId: memberId ?? this.memberId,
+    amountMinor: amountMinor ?? this.amountMinor,
+  );
+  OutingExpenseShareEntry copyWithCompanion(
+    OutingExpenseSharesTableCompanion data,
+  ) {
+    return OutingExpenseShareEntry(
+      id: data.id.present ? data.id.value : this.id,
+      expenseId: data.expenseId.present ? data.expenseId.value : this.expenseId,
+      memberId: data.memberId.present ? data.memberId.value : this.memberId,
+      amountMinor: data.amountMinor.present
+          ? data.amountMinor.value
+          : this.amountMinor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingExpenseShareEntry(')
+          ..write('id: $id, ')
+          ..write('expenseId: $expenseId, ')
+          ..write('memberId: $memberId, ')
+          ..write('amountMinor: $amountMinor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, expenseId, memberId, amountMinor);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OutingExpenseShareEntry &&
+          other.id == this.id &&
+          other.expenseId == this.expenseId &&
+          other.memberId == this.memberId &&
+          other.amountMinor == this.amountMinor);
+}
+
+class OutingExpenseSharesTableCompanion
+    extends UpdateCompanion<OutingExpenseShareEntry> {
+  final Value<String> id;
+  final Value<String> expenseId;
+  final Value<String> memberId;
+  final Value<int> amountMinor;
+  final Value<int> rowid;
+  const OutingExpenseSharesTableCompanion({
+    this.id = const Value.absent(),
+    this.expenseId = const Value.absent(),
+    this.memberId = const Value.absent(),
+    this.amountMinor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OutingExpenseSharesTableCompanion.insert({
+    required String id,
+    required String expenseId,
+    required String memberId,
+    required int amountMinor,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       expenseId = Value(expenseId),
+       memberId = Value(memberId),
+       amountMinor = Value(amountMinor);
+  static Insertable<OutingExpenseShareEntry> custom({
+    Expression<String>? id,
+    Expression<String>? expenseId,
+    Expression<String>? memberId,
+    Expression<int>? amountMinor,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (expenseId != null) 'expense_id': expenseId,
+      if (memberId != null) 'member_id': memberId,
+      if (amountMinor != null) 'amount_minor': amountMinor,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OutingExpenseSharesTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? expenseId,
+    Value<String>? memberId,
+    Value<int>? amountMinor,
+    Value<int>? rowid,
+  }) {
+    return OutingExpenseSharesTableCompanion(
+      id: id ?? this.id,
+      expenseId: expenseId ?? this.expenseId,
+      memberId: memberId ?? this.memberId,
+      amountMinor: amountMinor ?? this.amountMinor,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (expenseId.present) {
+      map['expense_id'] = Variable<String>(expenseId.value);
+    }
+    if (memberId.present) {
+      map['member_id'] = Variable<String>(memberId.value);
+    }
+    if (amountMinor.present) {
+      map['amount_minor'] = Variable<int>(amountMinor.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingExpenseSharesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('expenseId: $expenseId, ')
+          ..write('memberId: $memberId, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OutingSettlementsTableTable extends OutingSettlementsTable
+    with TableInfo<$OutingSettlementsTableTable, OutingSettlementEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OutingSettlementsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _outingIdMeta = const VerificationMeta(
+    'outingId',
+  );
+  @override
+  late final GeneratedColumn<String> outingId = GeneratedColumn<String>(
+    'outing_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fromMemberIdMeta = const VerificationMeta(
+    'fromMemberId',
+  );
+  @override
+  late final GeneratedColumn<String> fromMemberId = GeneratedColumn<String>(
+    'from_member_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _toMemberIdMeta = const VerificationMeta(
+    'toMemberId',
+  );
+  @override
+  late final GeneratedColumn<String> toMemberId = GeneratedColumn<String>(
+    'to_member_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMinorMeta = const VerificationMeta(
+    'amountMinor',
+  );
+  @override
+  late final GeneratedColumn<int> amountMinor = GeneratedColumn<int>(
+    'amount_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _settlementDateMeta = const VerificationMeta(
+    'settlementDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> settlementDate =
+      GeneratedColumn<DateTime>(
+        'settlement_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _paymentMethodMeta = const VerificationMeta(
+    'paymentMethod',
+  );
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+    'payment_method',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('cash'),
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('completed'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    outingId,
+    fromMemberId,
+    toMemberId,
+    amountMinor,
+    settlementDate,
+    note,
+    paymentMethod,
+    status,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'outing_settlements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OutingSettlementEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('outing_id')) {
+      context.handle(
+        _outingIdMeta,
+        outingId.isAcceptableOrUnknown(data['outing_id']!, _outingIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_outingIdMeta);
+    }
+    if (data.containsKey('from_member_id')) {
+      context.handle(
+        _fromMemberIdMeta,
+        fromMemberId.isAcceptableOrUnknown(
+          data['from_member_id']!,
+          _fromMemberIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fromMemberIdMeta);
+    }
+    if (data.containsKey('to_member_id')) {
+      context.handle(
+        _toMemberIdMeta,
+        toMemberId.isAcceptableOrUnknown(
+          data['to_member_id']!,
+          _toMemberIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_toMemberIdMeta);
+    }
+    if (data.containsKey('amount_minor')) {
+      context.handle(
+        _amountMinorMeta,
+        amountMinor.isAcceptableOrUnknown(
+          data['amount_minor']!,
+          _amountMinorMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMinorMeta);
+    }
+    if (data.containsKey('settlement_date')) {
+      context.handle(
+        _settlementDateMeta,
+        settlementDate.isAcceptableOrUnknown(
+          data['settlement_date']!,
+          _settlementDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_settlementDateMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+        _paymentMethodMeta,
+        paymentMethod.isAcceptableOrUnknown(
+          data['payment_method']!,
+          _paymentMethodMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OutingSettlementEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OutingSettlementEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      outingId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}outing_id'],
+      )!,
+      fromMemberId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_member_id'],
+      )!,
+      toMemberId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_member_id'],
+      )!,
+      amountMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_minor'],
+      )!,
+      settlementDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}settlement_date'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      )!,
+      paymentMethod: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_method'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $OutingSettlementsTableTable createAlias(String alias) {
+    return $OutingSettlementsTableTable(attachedDatabase, alias);
+  }
+}
+
+class OutingSettlementEntry extends DataClass
+    implements Insertable<OutingSettlementEntry> {
+  final String id;
+  final String outingId;
+  final String fromMemberId;
+  final String toMemberId;
+  final int amountMinor;
+  final DateTime settlementDate;
+  final String note;
+  final String paymentMethod;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const OutingSettlementEntry({
+    required this.id,
+    required this.outingId,
+    required this.fromMemberId,
+    required this.toMemberId,
+    required this.amountMinor,
+    required this.settlementDate,
+    required this.note,
+    required this.paymentMethod,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['outing_id'] = Variable<String>(outingId);
+    map['from_member_id'] = Variable<String>(fromMemberId);
+    map['to_member_id'] = Variable<String>(toMemberId);
+    map['amount_minor'] = Variable<int>(amountMinor);
+    map['settlement_date'] = Variable<DateTime>(settlementDate);
+    map['note'] = Variable<String>(note);
+    map['payment_method'] = Variable<String>(paymentMethod);
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  OutingSettlementsTableCompanion toCompanion(bool nullToAbsent) {
+    return OutingSettlementsTableCompanion(
+      id: Value(id),
+      outingId: Value(outingId),
+      fromMemberId: Value(fromMemberId),
+      toMemberId: Value(toMemberId),
+      amountMinor: Value(amountMinor),
+      settlementDate: Value(settlementDate),
+      note: Value(note),
+      paymentMethod: Value(paymentMethod),
+      status: Value(status),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory OutingSettlementEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OutingSettlementEntry(
+      id: serializer.fromJson<String>(json['id']),
+      outingId: serializer.fromJson<String>(json['outingId']),
+      fromMemberId: serializer.fromJson<String>(json['fromMemberId']),
+      toMemberId: serializer.fromJson<String>(json['toMemberId']),
+      amountMinor: serializer.fromJson<int>(json['amountMinor']),
+      settlementDate: serializer.fromJson<DateTime>(json['settlementDate']),
+      note: serializer.fromJson<String>(json['note']),
+      paymentMethod: serializer.fromJson<String>(json['paymentMethod']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'outingId': serializer.toJson<String>(outingId),
+      'fromMemberId': serializer.toJson<String>(fromMemberId),
+      'toMemberId': serializer.toJson<String>(toMemberId),
+      'amountMinor': serializer.toJson<int>(amountMinor),
+      'settlementDate': serializer.toJson<DateTime>(settlementDate),
+      'note': serializer.toJson<String>(note),
+      'paymentMethod': serializer.toJson<String>(paymentMethod),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  OutingSettlementEntry copyWith({
+    String? id,
+    String? outingId,
+    String? fromMemberId,
+    String? toMemberId,
+    int? amountMinor,
+    DateTime? settlementDate,
+    String? note,
+    String? paymentMethod,
+    String? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => OutingSettlementEntry(
+    id: id ?? this.id,
+    outingId: outingId ?? this.outingId,
+    fromMemberId: fromMemberId ?? this.fromMemberId,
+    toMemberId: toMemberId ?? this.toMemberId,
+    amountMinor: amountMinor ?? this.amountMinor,
+    settlementDate: settlementDate ?? this.settlementDate,
+    note: note ?? this.note,
+    paymentMethod: paymentMethod ?? this.paymentMethod,
+    status: status ?? this.status,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  OutingSettlementEntry copyWithCompanion(
+    OutingSettlementsTableCompanion data,
+  ) {
+    return OutingSettlementEntry(
+      id: data.id.present ? data.id.value : this.id,
+      outingId: data.outingId.present ? data.outingId.value : this.outingId,
+      fromMemberId: data.fromMemberId.present
+          ? data.fromMemberId.value
+          : this.fromMemberId,
+      toMemberId: data.toMemberId.present
+          ? data.toMemberId.value
+          : this.toMemberId,
+      amountMinor: data.amountMinor.present
+          ? data.amountMinor.value
+          : this.amountMinor,
+      settlementDate: data.settlementDate.present
+          ? data.settlementDate.value
+          : this.settlementDate,
+      note: data.note.present ? data.note.value : this.note,
+      paymentMethod: data.paymentMethod.present
+          ? data.paymentMethod.value
+          : this.paymentMethod,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingSettlementEntry(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('fromMemberId: $fromMemberId, ')
+          ..write('toMemberId: $toMemberId, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('settlementDate: $settlementDate, ')
+          ..write('note: $note, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    outingId,
+    fromMemberId,
+    toMemberId,
+    amountMinor,
+    settlementDate,
+    note,
+    paymentMethod,
+    status,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OutingSettlementEntry &&
+          other.id == this.id &&
+          other.outingId == this.outingId &&
+          other.fromMemberId == this.fromMemberId &&
+          other.toMemberId == this.toMemberId &&
+          other.amountMinor == this.amountMinor &&
+          other.settlementDate == this.settlementDate &&
+          other.note == this.note &&
+          other.paymentMethod == this.paymentMethod &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class OutingSettlementsTableCompanion
+    extends UpdateCompanion<OutingSettlementEntry> {
+  final Value<String> id;
+  final Value<String> outingId;
+  final Value<String> fromMemberId;
+  final Value<String> toMemberId;
+  final Value<int> amountMinor;
+  final Value<DateTime> settlementDate;
+  final Value<String> note;
+  final Value<String> paymentMethod;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const OutingSettlementsTableCompanion({
+    this.id = const Value.absent(),
+    this.outingId = const Value.absent(),
+    this.fromMemberId = const Value.absent(),
+    this.toMemberId = const Value.absent(),
+    this.amountMinor = const Value.absent(),
+    this.settlementDate = const Value.absent(),
+    this.note = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OutingSettlementsTableCompanion.insert({
+    required String id,
+    required String outingId,
+    required String fromMemberId,
+    required String toMemberId,
+    required int amountMinor,
+    required DateTime settlementDate,
+    this.note = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       outingId = Value(outingId),
+       fromMemberId = Value(fromMemberId),
+       toMemberId = Value(toMemberId),
+       amountMinor = Value(amountMinor),
+       settlementDate = Value(settlementDate);
+  static Insertable<OutingSettlementEntry> custom({
+    Expression<String>? id,
+    Expression<String>? outingId,
+    Expression<String>? fromMemberId,
+    Expression<String>? toMemberId,
+    Expression<int>? amountMinor,
+    Expression<DateTime>? settlementDate,
+    Expression<String>? note,
+    Expression<String>? paymentMethod,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (outingId != null) 'outing_id': outingId,
+      if (fromMemberId != null) 'from_member_id': fromMemberId,
+      if (toMemberId != null) 'to_member_id': toMemberId,
+      if (amountMinor != null) 'amount_minor': amountMinor,
+      if (settlementDate != null) 'settlement_date': settlementDate,
+      if (note != null) 'note': note,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OutingSettlementsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? outingId,
+    Value<String>? fromMemberId,
+    Value<String>? toMemberId,
+    Value<int>? amountMinor,
+    Value<DateTime>? settlementDate,
+    Value<String>? note,
+    Value<String>? paymentMethod,
+    Value<String>? status,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return OutingSettlementsTableCompanion(
+      id: id ?? this.id,
+      outingId: outingId ?? this.outingId,
+      fromMemberId: fromMemberId ?? this.fromMemberId,
+      toMemberId: toMemberId ?? this.toMemberId,
+      amountMinor: amountMinor ?? this.amountMinor,
+      settlementDate: settlementDate ?? this.settlementDate,
+      note: note ?? this.note,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (outingId.present) {
+      map['outing_id'] = Variable<String>(outingId.value);
+    }
+    if (fromMemberId.present) {
+      map['from_member_id'] = Variable<String>(fromMemberId.value);
+    }
+    if (toMemberId.present) {
+      map['to_member_id'] = Variable<String>(toMemberId.value);
+    }
+    if (amountMinor.present) {
+      map['amount_minor'] = Variable<int>(amountMinor.value);
+    }
+    if (settlementDate.present) {
+      map['settlement_date'] = Variable<DateTime>(settlementDate.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OutingSettlementsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('outingId: $outingId, ')
+          ..write('fromMemberId: $fromMemberId, ')
+          ..write('toMemberId: $toMemberId, ')
+          ..write('amountMinor: $amountMinor, ')
+          ..write('settlementDate: $settlementDate, ')
+          ..write('note: $note, ')
+          ..write('paymentMethod: $paymentMethod, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5522,6 +8348,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $HabitsTableTable habitsTable = $HabitsTableTable(this);
   late final $HabitLogsTableTable habitLogsTable = $HabitLogsTableTable(this);
+  late final $GroupOutingsTableTable groupOutingsTable =
+      $GroupOutingsTableTable(this);
+  late final $OutingMembersTableTable outingMembersTable =
+      $OutingMembersTableTable(this);
+  late final $OutingExpensesTableTable outingExpensesTable =
+      $OutingExpensesTableTable(this);
+  late final $OutingExpenseSharesTableTable outingExpenseSharesTable =
+      $OutingExpenseSharesTableTable(this);
+  late final $OutingSettlementsTableTable outingSettlementsTable =
+      $OutingSettlementsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5539,6 +8375,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     appSettingsTable,
     habitsTable,
     habitLogsTable,
+    groupOutingsTable,
+    outingMembersTable,
+    outingExpensesTable,
+    outingExpenseSharesTable,
+    outingSettlementsTable,
   ];
 }
 
@@ -8634,6 +11475,1538 @@ typedef $$HabitLogsTableTableProcessedTableManager =
       HabitLogEntry,
       PrefetchHooks Function()
     >;
+typedef $$GroupOutingsTableTableCreateCompanionBuilder =
+    GroupOutingsTableCompanion Function({
+      required String id,
+      required String organizerLocalId,
+      required String title,
+      Value<String> description,
+      required DateTime outingDate,
+      Value<int> budgetMinor,
+      Value<String> currencyCode,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$GroupOutingsTableTableUpdateCompanionBuilder =
+    GroupOutingsTableCompanion Function({
+      Value<String> id,
+      Value<String> organizerLocalId,
+      Value<String> title,
+      Value<String> description,
+      Value<DateTime> outingDate,
+      Value<int> budgetMinor,
+      Value<String> currencyCode,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$GroupOutingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $GroupOutingsTableTable> {
+  $$GroupOutingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get organizerLocalId => $composableBuilder(
+    column: $table.organizerLocalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get outingDate => $composableBuilder(
+    column: $table.outingDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$GroupOutingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $GroupOutingsTableTable> {
+  $$GroupOutingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get organizerLocalId => $composableBuilder(
+    column: $table.organizerLocalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get outingDate => $composableBuilder(
+    column: $table.outingDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GroupOutingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GroupOutingsTableTable> {
+  $$GroupOutingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get organizerLocalId => $composableBuilder(
+    column: $table.organizerLocalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get outingDate => $composableBuilder(
+    column: $table.outingDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get budgetMinor => $composableBuilder(
+    column: $table.budgetMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$GroupOutingsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GroupOutingsTableTable,
+          GroupOutingEntry,
+          $$GroupOutingsTableTableFilterComposer,
+          $$GroupOutingsTableTableOrderingComposer,
+          $$GroupOutingsTableTableAnnotationComposer,
+          $$GroupOutingsTableTableCreateCompanionBuilder,
+          $$GroupOutingsTableTableUpdateCompanionBuilder,
+          (
+            GroupOutingEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $GroupOutingsTableTable,
+              GroupOutingEntry
+            >,
+          ),
+          GroupOutingEntry,
+          PrefetchHooks Function()
+        > {
+  $$GroupOutingsTableTableTableManager(
+    _$AppDatabase db,
+    $GroupOutingsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GroupOutingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GroupOutingsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GroupOutingsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> organizerLocalId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<DateTime> outingDate = const Value.absent(),
+                Value<int> budgetMinor = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GroupOutingsTableCompanion(
+                id: id,
+                organizerLocalId: organizerLocalId,
+                title: title,
+                description: description,
+                outingDate: outingDate,
+                budgetMinor: budgetMinor,
+                currencyCode: currencyCode,
+                status: status,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String organizerLocalId,
+                required String title,
+                Value<String> description = const Value.absent(),
+                required DateTime outingDate,
+                Value<int> budgetMinor = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => GroupOutingsTableCompanion.insert(
+                id: id,
+                organizerLocalId: organizerLocalId,
+                title: title,
+                description: description,
+                outingDate: outingDate,
+                budgetMinor: budgetMinor,
+                currencyCode: currencyCode,
+                status: status,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$GroupOutingsTableTable, GroupOutingEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $GroupOutingsTableTable,
+                    GroupOutingEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$GroupOutingsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GroupOutingsTableTable,
+      GroupOutingEntry,
+      $$GroupOutingsTableTableFilterComposer,
+      $$GroupOutingsTableTableOrderingComposer,
+      $$GroupOutingsTableTableAnnotationComposer,
+      $$GroupOutingsTableTableCreateCompanionBuilder,
+      $$GroupOutingsTableTableUpdateCompanionBuilder,
+      (
+        GroupOutingEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $GroupOutingsTableTable,
+          GroupOutingEntry
+        >,
+      ),
+      GroupOutingEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$OutingMembersTableTableCreateCompanionBuilder =
+    OutingMembersTableCompanion Function({
+      required String id,
+      required String outingId,
+      required String displayName,
+      Value<String?> linkedUserId,
+      Value<bool> isOrganizer,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$OutingMembersTableTableUpdateCompanionBuilder =
+    OutingMembersTableCompanion Function({
+      Value<String> id,
+      Value<String> outingId,
+      Value<String> displayName,
+      Value<String?> linkedUserId,
+      Value<bool> isOrganizer,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$OutingMembersTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OutingMembersTableTable> {
+  $$OutingMembersTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get linkedUserId => $composableBuilder(
+    column: $table.linkedUserId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isOrganizer => $composableBuilder(
+    column: $table.isOrganizer,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OutingMembersTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OutingMembersTableTable> {
+  $$OutingMembersTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get linkedUserId => $composableBuilder(
+    column: $table.linkedUserId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isOrganizer => $composableBuilder(
+    column: $table.isOrganizer,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OutingMembersTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OutingMembersTableTable> {
+  $$OutingMembersTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get outingId =>
+      $composableBuilder(column: $table.outingId, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get linkedUserId => $composableBuilder(
+    column: $table.linkedUserId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isOrganizer => $composableBuilder(
+    column: $table.isOrganizer,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$OutingMembersTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OutingMembersTableTable,
+          OutingMemberEntry,
+          $$OutingMembersTableTableFilterComposer,
+          $$OutingMembersTableTableOrderingComposer,
+          $$OutingMembersTableTableAnnotationComposer,
+          $$OutingMembersTableTableCreateCompanionBuilder,
+          $$OutingMembersTableTableUpdateCompanionBuilder,
+          (
+            OutingMemberEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $OutingMembersTableTable,
+              OutingMemberEntry
+            >,
+          ),
+          OutingMemberEntry,
+          PrefetchHooks Function()
+        > {
+  $$OutingMembersTableTableTableManager(
+    _$AppDatabase db,
+    $OutingMembersTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutingMembersTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OutingMembersTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OutingMembersTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> outingId = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String?> linkedUserId = const Value.absent(),
+                Value<bool> isOrganizer = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingMembersTableCompanion(
+                id: id,
+                outingId: outingId,
+                displayName: displayName,
+                linkedUserId: linkedUserId,
+                isOrganizer: isOrganizer,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String outingId,
+                required String displayName,
+                Value<String?> linkedUserId = const Value.absent(),
+                Value<bool> isOrganizer = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingMembersTableCompanion.insert(
+                id: id,
+                outingId: outingId,
+                displayName: displayName,
+                linkedUserId: linkedUserId,
+                isOrganizer: isOrganizer,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OutingMembersTableTable, OutingMemberEntry>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OutingMembersTableTable,
+                    OutingMemberEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OutingMembersTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OutingMembersTableTable,
+      OutingMemberEntry,
+      $$OutingMembersTableTableFilterComposer,
+      $$OutingMembersTableTableOrderingComposer,
+      $$OutingMembersTableTableAnnotationComposer,
+      $$OutingMembersTableTableCreateCompanionBuilder,
+      $$OutingMembersTableTableUpdateCompanionBuilder,
+      (
+        OutingMemberEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $OutingMembersTableTable,
+          OutingMemberEntry
+        >,
+      ),
+      OutingMemberEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$OutingExpensesTableTableCreateCompanionBuilder =
+    OutingExpensesTableCompanion Function({
+      required String id,
+      required String outingId,
+      required String payerMemberId,
+      required String title,
+      Value<String> description,
+      required String category,
+      required int amountMinor,
+      required DateTime expenseDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+typedef $$OutingExpensesTableTableUpdateCompanionBuilder =
+    OutingExpensesTableCompanion Function({
+      Value<String> id,
+      Value<String> outingId,
+      Value<String> payerMemberId,
+      Value<String> title,
+      Value<String> description,
+      Value<String> category,
+      Value<int> amountMinor,
+      Value<DateTime> expenseDate,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<int> rowid,
+    });
+
+class $$OutingExpensesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OutingExpensesTableTable> {
+  $$OutingExpensesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payerMemberId => $composableBuilder(
+    column: $table.payerMemberId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get expenseDate => $composableBuilder(
+    column: $table.expenseDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OutingExpensesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OutingExpensesTableTable> {
+  $$OutingExpensesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payerMemberId => $composableBuilder(
+    column: $table.payerMemberId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get category => $composableBuilder(
+    column: $table.category,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get expenseDate => $composableBuilder(
+    column: $table.expenseDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OutingExpensesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OutingExpensesTableTable> {
+  $$OutingExpensesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get outingId =>
+      $composableBuilder(column: $table.outingId, builder: (column) => column);
+
+  GeneratedColumn<String> get payerMemberId => $composableBuilder(
+    column: $table.payerMemberId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get category =>
+      $composableBuilder(column: $table.category, builder: (column) => column);
+
+  GeneratedColumn<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get expenseDate => $composableBuilder(
+    column: $table.expenseDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$OutingExpensesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OutingExpensesTableTable,
+          OutingExpenseEntry,
+          $$OutingExpensesTableTableFilterComposer,
+          $$OutingExpensesTableTableOrderingComposer,
+          $$OutingExpensesTableTableAnnotationComposer,
+          $$OutingExpensesTableTableCreateCompanionBuilder,
+          $$OutingExpensesTableTableUpdateCompanionBuilder,
+          (
+            OutingExpenseEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $OutingExpensesTableTable,
+              OutingExpenseEntry
+            >,
+          ),
+          OutingExpenseEntry,
+          PrefetchHooks Function()
+        > {
+  $$OutingExpensesTableTableTableManager(
+    _$AppDatabase db,
+    $OutingExpensesTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutingExpensesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OutingExpensesTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$OutingExpensesTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> outingId = const Value.absent(),
+                Value<String> payerMemberId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> description = const Value.absent(),
+                Value<String> category = const Value.absent(),
+                Value<int> amountMinor = const Value.absent(),
+                Value<DateTime> expenseDate = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingExpensesTableCompanion(
+                id: id,
+                outingId: outingId,
+                payerMemberId: payerMemberId,
+                title: title,
+                description: description,
+                category: category,
+                amountMinor: amountMinor,
+                expenseDate: expenseDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String outingId,
+                required String payerMemberId,
+                required String title,
+                Value<String> description = const Value.absent(),
+                required String category,
+                required int amountMinor,
+                required DateTime expenseDate,
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingExpensesTableCompanion.insert(
+                id: id,
+                outingId: outingId,
+                payerMemberId: payerMemberId,
+                title: title,
+                description: description,
+                category: category,
+                amountMinor: amountMinor,
+                expenseDate: expenseDate,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$OutingExpensesTableTable, OutingExpenseEntry>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OutingExpensesTableTable,
+                    OutingExpenseEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OutingExpensesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OutingExpensesTableTable,
+      OutingExpenseEntry,
+      $$OutingExpensesTableTableFilterComposer,
+      $$OutingExpensesTableTableOrderingComposer,
+      $$OutingExpensesTableTableAnnotationComposer,
+      $$OutingExpensesTableTableCreateCompanionBuilder,
+      $$OutingExpensesTableTableUpdateCompanionBuilder,
+      (
+        OutingExpenseEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $OutingExpensesTableTable,
+          OutingExpenseEntry
+        >,
+      ),
+      OutingExpenseEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$OutingExpenseSharesTableTableCreateCompanionBuilder =
+    OutingExpenseSharesTableCompanion Function({
+      required String id,
+      required String expenseId,
+      required String memberId,
+      required int amountMinor,
+      Value<int> rowid,
+    });
+typedef $$OutingExpenseSharesTableTableUpdateCompanionBuilder =
+    OutingExpenseSharesTableCompanion Function({
+      Value<String> id,
+      Value<String> expenseId,
+      Value<String> memberId,
+      Value<int> amountMinor,
+      Value<int> rowid,
+    });
+
+class $$OutingExpenseSharesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OutingExpenseSharesTableTable> {
+  $$OutingExpenseSharesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get expenseId => $composableBuilder(
+    column: $table.expenseId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get memberId => $composableBuilder(
+    column: $table.memberId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OutingExpenseSharesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OutingExpenseSharesTableTable> {
+  $$OutingExpenseSharesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get expenseId => $composableBuilder(
+    column: $table.expenseId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get memberId => $composableBuilder(
+    column: $table.memberId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OutingExpenseSharesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OutingExpenseSharesTableTable> {
+  $$OutingExpenseSharesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get expenseId =>
+      $composableBuilder(column: $table.expenseId, builder: (column) => column);
+
+  GeneratedColumn<String> get memberId =>
+      $composableBuilder(column: $table.memberId, builder: (column) => column);
+
+  GeneratedColumn<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => column,
+  );
+}
+
+class $$OutingExpenseSharesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OutingExpenseSharesTableTable,
+          OutingExpenseShareEntry,
+          $$OutingExpenseSharesTableTableFilterComposer,
+          $$OutingExpenseSharesTableTableOrderingComposer,
+          $$OutingExpenseSharesTableTableAnnotationComposer,
+          $$OutingExpenseSharesTableTableCreateCompanionBuilder,
+          $$OutingExpenseSharesTableTableUpdateCompanionBuilder,
+          (
+            OutingExpenseShareEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $OutingExpenseSharesTableTable,
+              OutingExpenseShareEntry
+            >,
+          ),
+          OutingExpenseShareEntry,
+          PrefetchHooks Function()
+        > {
+  $$OutingExpenseSharesTableTableTableManager(
+    _$AppDatabase db,
+    $OutingExpenseSharesTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutingExpenseSharesTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$OutingExpenseSharesTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$OutingExpenseSharesTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> expenseId = const Value.absent(),
+                Value<String> memberId = const Value.absent(),
+                Value<int> amountMinor = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingExpenseSharesTableCompanion(
+                id: id,
+                expenseId: expenseId,
+                memberId: memberId,
+                amountMinor: amountMinor,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String expenseId,
+                required String memberId,
+                required int amountMinor,
+                Value<int> rowid = const Value.absent(),
+              }) => OutingExpenseSharesTableCompanion.insert(
+                id: id,
+                expenseId: expenseId,
+                memberId: memberId,
+                amountMinor: amountMinor,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $OutingExpenseSharesTableTable,
+                    OutingExpenseShareEntry
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OutingExpenseSharesTableTable,
+                    OutingExpenseShareEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OutingExpenseSharesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OutingExpenseSharesTableTable,
+      OutingExpenseShareEntry,
+      $$OutingExpenseSharesTableTableFilterComposer,
+      $$OutingExpenseSharesTableTableOrderingComposer,
+      $$OutingExpenseSharesTableTableAnnotationComposer,
+      $$OutingExpenseSharesTableTableCreateCompanionBuilder,
+      $$OutingExpenseSharesTableTableUpdateCompanionBuilder,
+      (
+        OutingExpenseShareEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $OutingExpenseSharesTableTable,
+          OutingExpenseShareEntry
+        >,
+      ),
+      OutingExpenseShareEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$OutingSettlementsTableTableCreateCompanionBuilder =
+    OutingSettlementsTableCompanion Function({
+      required String id,
+      required String outingId,
+      required String fromMemberId,
+      required String toMemberId,
+      required int amountMinor,
+      required DateTime settlementDate,
+      Value<String> note,
+      Value<String> paymentMethod,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$OutingSettlementsTableTableUpdateCompanionBuilder =
+    OutingSettlementsTableCompanion Function({
+      Value<String> id,
+      Value<String> outingId,
+      Value<String> fromMemberId,
+      Value<String> toMemberId,
+      Value<int> amountMinor,
+      Value<DateTime> settlementDate,
+      Value<String> note,
+      Value<String> paymentMethod,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$OutingSettlementsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OutingSettlementsTableTable> {
+  $$OutingSettlementsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromMemberId => $composableBuilder(
+    column: $table.fromMemberId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toMemberId => $composableBuilder(
+    column: $table.toMemberId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get settlementDate => $composableBuilder(
+    column: $table.settlementDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$OutingSettlementsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OutingSettlementsTableTable> {
+  $$OutingSettlementsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outingId => $composableBuilder(
+    column: $table.outingId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromMemberId => $composableBuilder(
+    column: $table.fromMemberId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toMemberId => $composableBuilder(
+    column: $table.toMemberId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get settlementDate => $composableBuilder(
+    column: $table.settlementDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OutingSettlementsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OutingSettlementsTableTable> {
+  $$OutingSettlementsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get outingId =>
+      $composableBuilder(column: $table.outingId, builder: (column) => column);
+
+  GeneratedColumn<String> get fromMemberId => $composableBuilder(
+    column: $table.fromMemberId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get toMemberId => $composableBuilder(
+    column: $table.toMemberId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get amountMinor => $composableBuilder(
+    column: $table.amountMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get settlementDate => $composableBuilder(
+    column: $table.settlementDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentMethod => $composableBuilder(
+    column: $table.paymentMethod,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$OutingSettlementsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OutingSettlementsTableTable,
+          OutingSettlementEntry,
+          $$OutingSettlementsTableTableFilterComposer,
+          $$OutingSettlementsTableTableOrderingComposer,
+          $$OutingSettlementsTableTableAnnotationComposer,
+          $$OutingSettlementsTableTableCreateCompanionBuilder,
+          $$OutingSettlementsTableTableUpdateCompanionBuilder,
+          (
+            OutingSettlementEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $OutingSettlementsTableTable,
+              OutingSettlementEntry
+            >,
+          ),
+          OutingSettlementEntry,
+          PrefetchHooks Function()
+        > {
+  $$OutingSettlementsTableTableTableManager(
+    _$AppDatabase db,
+    $OutingSettlementsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OutingSettlementsTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$OutingSettlementsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$OutingSettlementsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> outingId = const Value.absent(),
+                Value<String> fromMemberId = const Value.absent(),
+                Value<String> toMemberId = const Value.absent(),
+                Value<int> amountMinor = const Value.absent(),
+                Value<DateTime> settlementDate = const Value.absent(),
+                Value<String> note = const Value.absent(),
+                Value<String> paymentMethod = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingSettlementsTableCompanion(
+                id: id,
+                outingId: outingId,
+                fromMemberId: fromMemberId,
+                toMemberId: toMemberId,
+                amountMinor: amountMinor,
+                settlementDate: settlementDate,
+                note: note,
+                paymentMethod: paymentMethod,
+                status: status,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String outingId,
+                required String fromMemberId,
+                required String toMemberId,
+                required int amountMinor,
+                required DateTime settlementDate,
+                Value<String> note = const Value.absent(),
+                Value<String> paymentMethod = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OutingSettlementsTableCompanion.insert(
+                id: id,
+                outingId: outingId,
+                fromMemberId: fromMemberId,
+                toMemberId: toMemberId,
+                amountMinor: amountMinor,
+                settlementDate: settlementDate,
+                note: note,
+                paymentMethod: paymentMethod,
+                status: status,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $OutingSettlementsTableTable,
+                    OutingSettlementEntry
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $OutingSettlementsTableTable,
+                    OutingSettlementEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$OutingSettlementsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OutingSettlementsTableTable,
+      OutingSettlementEntry,
+      $$OutingSettlementsTableTableFilterComposer,
+      $$OutingSettlementsTableTableOrderingComposer,
+      $$OutingSettlementsTableTableAnnotationComposer,
+      $$OutingSettlementsTableTableCreateCompanionBuilder,
+      $$OutingSettlementsTableTableUpdateCompanionBuilder,
+      (
+        OutingSettlementEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $OutingSettlementsTableTable,
+          OutingSettlementEntry
+        >,
+      ),
+      OutingSettlementEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8672,4 +13045,20 @@ class $AppDatabaseManager {
       $$HabitsTableTableTableManager(_db, _db.habitsTable);
   $$HabitLogsTableTableTableManager get habitLogsTable =>
       $$HabitLogsTableTableTableManager(_db, _db.habitLogsTable);
+  $$GroupOutingsTableTableTableManager get groupOutingsTable =>
+      $$GroupOutingsTableTableTableManager(_db, _db.groupOutingsTable);
+  $$OutingMembersTableTableTableManager get outingMembersTable =>
+      $$OutingMembersTableTableTableManager(_db, _db.outingMembersTable);
+  $$OutingExpensesTableTableTableManager get outingExpensesTable =>
+      $$OutingExpensesTableTableTableManager(_db, _db.outingExpensesTable);
+  $$OutingExpenseSharesTableTableTableManager get outingExpenseSharesTable =>
+      $$OutingExpenseSharesTableTableTableManager(
+        _db,
+        _db.outingExpenseSharesTable,
+      );
+  $$OutingSettlementsTableTableTableManager get outingSettlementsTable =>
+      $$OutingSettlementsTableTableTableManager(
+        _db,
+        _db.outingSettlementsTable,
+      );
 }

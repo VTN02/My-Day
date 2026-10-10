@@ -15,6 +15,7 @@ import '../../../core/widgets/task_card.dart';
 import '../../../core/widgets/user_avatar.dart';
 import '../../habits/presentation/daily_habits_section.dart';
 import '../../tasks/presentation/task_edit_sheet.dart';
+import '../../group_expenses/presentation/widgets/outing_gradient_card.dart';
 
 /// Today Dashboard Screen connected to Drift database.
 class TodayScreen extends ConsumerWidget {
@@ -259,9 +260,20 @@ class TodayScreen extends ConsumerWidget {
                         icon: Icons.note_add_outlined,
                         onTap: () => context.go('/notes'),
                       ),
+                      const SizedBox(width: 8),
+                      StatusChip(
+                        label: 'Split',
+                        icon: Icons.groups_outlined,
+                        onTap: () => context.push('/split'),
+                      ),
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                // MyDay Split Outings Section
+                const OutingGradientCard(),
 
                 const SizedBox(height: 16),
 

@@ -170,4 +170,50 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get joinCommunity => 'சமூகத்தில் இணைக';
+
+  @override
+  String get splitTitle => 'MyDay ஸ்ப்ளிட்';
+
+  @override
+  String get splitTagline => 'நண்பர்களுடன் வெளியே செல்கிறீர்களா?';
+
+  @override
+  String get splitSubtitle =>
+      'பட்ஜெட்டைத் திட்டமிடுங்கள். செலவுகளைப் பகிருங்கள். கணக்கைத் தீர்க்கவும்.';
+
+  @override
+  String get splitCreateOuting => 'பயணத்தை உருவாக்கு';
+
+  @override
+  String get splitAllOutings => 'அனைத்து பயணங்கள்';
+
+  @override
+  String get splitActive => 'செயலில் உள்ளவை';
+
+  @override
+  String get splitCompleted => 'முடிந்தவை';
+
+  @override
+  String get splitArchived => 'காப்பகப்படுத்தப்பட்டவை';
+
+  @override
+  String get splitSpent => 'செலவிடப்பட்டது';
+
+  @override
+  String get splitBudget => 'பட்ஜெட்';
+
+  @override
+  String get splitRemaining => 'மீதி';
+
+  @override
+  String get splitSettleUp => 'கணக்கைத் தீர்க்க';
+
+  @override
+  String get splitManageFriends => 'நண்பர்களை நிர்வகி';
+
+  @override
+  String get splitRepaymentHistory => 'திருப்பிச் செலுத்திய வரலாறு';
+
+  @override
+  String get splitAddExpense => 'செலவைச் சேர்';
 }

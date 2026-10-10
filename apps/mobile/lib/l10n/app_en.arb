@@ -52,5 +52,20 @@
   "emptyTransactionsSubtitle": "Track your daily income and expenses effortlessly.",
   "techCommunity": "Tech Community",
   "techCommunityDescription": "Join our WhatsApp community for tech discussions and updates.",
-  "joinCommunity": "Join Community"
+  "joinCommunity": "Join Community",
+  "splitTitle": "MyDay Split",
+  "splitTagline": "Going out with friends?",
+  "splitSubtitle": "Plan your budget. Split expenses. Settle up.",
+  "splitCreateOuting": "Create Outing",
+  "splitAllOutings": "All Outings",
+  "splitActive": "Active",
+  "splitCompleted": "Completed",
+  "splitArchived": "Archived",
+  "splitSpent": "Spent",
+  "splitBudget": "Budget",
+  "splitRemaining": "Remaining",
+  "splitSettleUp": "Settle Up",
+  "splitManageFriends": "Manage Friends",
+  "splitRepaymentHistory": "Repayment History",
+  "splitAddExpense": "Add Expense"
 }

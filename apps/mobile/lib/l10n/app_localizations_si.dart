@@ -170,4 +170,50 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get joinCommunity => 'ප්‍රජාවට එක්වන්න';
+
+  @override
+  String get splitTitle => 'MyDay ස්ප්ලිට්';
+
+  @override
+  String get splitTagline => 'යහළුවන් සමඟ විනෝද චාරිකාවක් යනවද?';
+
+  @override
+  String get splitSubtitle =>
+      'අයවැය සැලසුම් කරන්න. වියදම් බෙදාගන්න. හිඟ මුදල් පියවන්න.';
+
+  @override
+  String get splitCreateOuting => 'චාරිකාවක් සාදන්න';
+
+  @override
+  String get splitAllOutings => 'සියලු චාරිකා';
+
+  @override
+  String get splitActive => 'ක්‍රියාකාරී';
+
+  @override
+  String get splitCompleted => 'අවසන් වූ';
+
+  @override
+  String get splitArchived => 'ලේඛනාගාරගත';
+
+  @override
+  String get splitSpent => 'වියදම් කළ මුදල';
+
+  @override
+  String get splitBudget => 'අයවැය';
+
+  @override
+  String get splitRemaining => 'ඉතිරි';
+
+  @override
+  String get splitSettleUp => 'ගනුදෙනු පියවන්න';
+
+  @override
+  String get splitManageFriends => 'යහළුවන් කළමනාකරණය';
+
+  @override
+  String get splitRepaymentHistory => 'ආපසු ගෙවීම් ඉතිහාසය';
+
+  @override
+  String get splitAddExpense => 'වියදමක් එක් කරන්න';
 }

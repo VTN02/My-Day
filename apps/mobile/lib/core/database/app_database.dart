@@ -8,6 +8,11 @@ import 'tables/notes_table.dart';
 import 'tables/task_categories_table.dart';
 import 'tables/tasks_table.dart';
 import 'tables/user_profile_table.dart';
+import '../../features/group_expenses/data/tables/group_outings_table.dart';
+import '../../features/group_expenses/data/tables/outing_members_table.dart';
+import '../../features/group_expenses/data/tables/outing_expenses_table.dart';
+import '../../features/group_expenses/data/tables/outing_expense_shares_table.dart';
+import '../../features/group_expenses/data/tables/outing_settlements_table.dart';
 
 part 'app_database.g.dart';
 
@@ -26,19 +31,33 @@ part 'app_database.g.dart';
     AppSettingsTable,
     HabitsTable,
     HabitLogsTable,
+    GroupOutingsTable,
+    OutingMembersTable,
+    OutingExpensesTable,
+    OutingExpenseSharesTable,
+    OutingSettlementsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
       await m.createAll();
       await _seedInitialData();
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(groupOutingsTable);
+        await m.createTable(outingMembersTable);
+        await m.createTable(outingExpensesTable);
+        await m.createTable(outingExpenseSharesTable);
+        await m.createTable(outingSettlementsTable);
+      }
     },
   );
 

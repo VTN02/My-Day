@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/app/app.dart';
 import 'package:mobile/core/providers/database_providers.dart';
+import 'package:mobile/features/group_expenses/presentation/providers/group_expenses_providers.dart';
 import 'package:mobile/core/widgets/balance_card.dart';
 import 'package:mobile/core/widgets/status_chip.dart';
 import 'package:mobile/core/widgets/summary_card.dart';
@@ -129,6 +130,7 @@ void main() {
             todayHabitLogsStreamProvider.overrideWith(
               (ref) => Stream.value([]),
             ),
+            activeOutingsStreamProvider.overrideWith((ref) => Stream.value([])),
           ],
           child: const MyDayApp(),
         ),

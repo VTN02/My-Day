@@ -52,5 +52,20 @@
   "emptyTransactionsSubtitle": "ඔබේ ආදායම් සහ වියදම් පහසුවෙන් සටහන් කරගන්න.",
   "techCommunity": "තාක්ෂණික ප්‍රජාව",
   "techCommunityDescription": "තාක්ෂණික සාකච්ඡා සහ යාවත්කාලීන සඳහා අපගේ WhatsApp ප්‍රජාවට එකතු වන්න.",
-  "joinCommunity": "ප්‍රජාවට එක්වන්න"
+  "joinCommunity": "ප්‍රජාවට එක්වන්න",
+  "splitTitle": "MyDay ස්ප්ලිට්",
+  "splitTagline": "යහළුවන් සමඟ විනෝද චාරිකාවක් යනවද?",
+  "splitSubtitle": "අයවැය සැලසුම් කරන්න. වියදම් බෙදාගන්න. හිඟ මුදල් පියවන්න.",
+  "splitCreateOuting": "චාරිකාවක් සාදන්න",
+  "splitAllOutings": "සියලු චාරිකා",
+  "splitActive": "ක්‍රියාකාරී",
+  "splitCompleted": "අවසන් වූ",
+  "splitArchived": "ලේඛනාගාරගත",
+  "splitSpent": "වියදම් කළ මුදල",
+  "splitBudget": "අයවැය",
+  "splitRemaining": "ඉතිරි",
+  "splitSettleUp": "ගනුදෙනු පියවන්න",
+  "splitManageFriends": "යහළුවන් කළමනාකරණය",
+  "splitRepaymentHistory": "ආපසු ගෙවීම් ඉතිහාසය",
+  "splitAddExpense": "වියදමක් එක් කරන්න"
 }

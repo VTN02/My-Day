@@ -169,4 +169,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get joinCommunity => 'Join Community';
+
+  @override
+  String get splitTitle => 'MyDay Split';
+
+  @override
+  String get splitTagline => 'Going out with friends?';
+
+  @override
+  String get splitSubtitle => 'Plan your budget. Split expenses. Settle up.';
+
+  @override
+  String get splitCreateOuting => 'Create Outing';
+
+  @override
+  String get splitAllOutings => 'All Outings';
+
+  @override
+  String get splitActive => 'Active';
+
+  @override
+  String get splitCompleted => 'Completed';
+
+  @override
+  String get splitArchived => 'Archived';
+
+  @override
+  String get splitSpent => 'Spent';
+
+  @override
+  String get splitBudget => 'Budget';
+
+  @override
+  String get splitRemaining => 'Remaining';
+
+  @override
+  String get splitSettleUp => 'Settle Up';
+
+  @override
+  String get splitManageFriends => 'Manage Friends';
+
+  @override
+  String get splitRepaymentHistory => 'Repayment History';
+
+  @override
+  String get splitAddExpense => 'Add Expense';
 }

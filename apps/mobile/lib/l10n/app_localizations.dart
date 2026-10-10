@@ -417,6 +417,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join Community'**
   String get joinCommunity;
+
+  /// No description provided for @splitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'MyDay Split'**
+  String get splitTitle;
+
+  /// No description provided for @splitTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Going out with friends?'**
+  String get splitTagline;
+
+  /// No description provided for @splitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan your budget. Split expenses. Settle up.'**
+  String get splitSubtitle;
+
+  /// No description provided for @splitCreateOuting.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Outing'**
+  String get splitCreateOuting;
+
+  /// No description provided for @splitAllOutings.
+  ///
+  /// In en, this message translates to:
+  /// **'All Outings'**
+  String get splitAllOutings;
+
+  /// No description provided for @splitActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get splitActive;
+
+  /// No description provided for @splitCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get splitCompleted;
+
+  /// No description provided for @splitArchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get splitArchived;
+
+  /// No description provided for @splitSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get splitSpent;
+
+  /// No description provided for @splitBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get splitBudget;
+
+  /// No description provided for @splitRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get splitRemaining;
+
+  /// No description provided for @splitSettleUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Settle Up'**
+  String get splitSettleUp;
+
+  /// No description provided for @splitManageFriends.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Friends'**
+  String get splitManageFriends;
+
+  /// No description provided for @splitRepaymentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Repayment History'**
+  String get splitRepaymentHistory;
+
+  /// No description provided for @splitAddExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get splitAddExpense;
 }
 
 class _AppLocalizationsDelegate

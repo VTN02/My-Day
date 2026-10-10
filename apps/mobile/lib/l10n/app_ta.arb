@@ -52,5 +52,20 @@
   "emptyTransactionsSubtitle": "உங்கள் வருமானம் மற்றும் செலவுகளை எளிதாகக் கண்காணிக்கவும்.",
   "techCommunity": "தொழில்நுட்ப சமூகம்",
   "techCommunityDescription": "தொழில்நுட்ப விவாதங்கள் மற்றும் புதுப்பிப்புகளுக்கு எங்கள் வாட்ஸ்அப் சமூகத்தில் இணையுங்கள்.",
-  "joinCommunity": "சமூகத்தில் இணைக"
+  "joinCommunity": "சமூகத்தில் இணைக",
+  "splitTitle": "MyDay ஸ்ப்ளிட்",
+  "splitTagline": "நண்பர்களுடன் வெளியே செல்கிறீர்களா?",
+  "splitSubtitle": "பட்ஜெட்டைத் திட்டமிடுங்கள். செலவுகளைப் பகிருங்கள். கணக்கைத் தீர்க்கவும்.",
+  "splitCreateOuting": "பயணத்தை உருவாக்கு",
+  "splitAllOutings": "அனைத்து பயணங்கள்",
+  "splitActive": "செயலில் உள்ளவை",
+  "splitCompleted": "முடிந்தவை",
+  "splitArchived": "காப்பகப்படுத்தப்பட்டவை",
+  "splitSpent": "செலவிடப்பட்டது",
+  "splitBudget": "பட்ஜெட்",
+  "splitRemaining": "மீதி",
+  "splitSettleUp": "கணக்கைத் தீர்க்க",
+  "splitManageFriends": "நண்பர்களை நிர்வகி",
+  "splitRepaymentHistory": "திருப்பிச் செலுத்திய வரலாறு",
+  "splitAddExpense": "செலவைச் சேர்"
 }
