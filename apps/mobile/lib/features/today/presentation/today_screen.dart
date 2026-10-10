@@ -37,11 +37,10 @@ class TodayScreen extends ConsumerWidget {
     final displayName = profileAsync.value?.displayName ?? 'MyDay User';
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: todayTasksAsync.when(
-              data: (tasks) {
+      body: Column(
+        children: [
+          todayTasksAsync.when(
+            data: (tasks) {
                 final totalTasks = tasks.length;
                 final completedTasks = tasks.where((t) => t.isCompleted).length;
                 final progressFactor = totalTasks == 0
@@ -128,8 +127,10 @@ class TodayScreen extends ConsumerWidget {
                 subtitle: 'Overview',
               ),
             ),
-          ),
-          SliverPadding(
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
@@ -334,6 +335,9 @@ class TodayScreen extends ConsumerWidget {
           ),
         ],
       ),
+    ),
+  ],
+),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

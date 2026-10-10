@@ -1143,16 +1143,17 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
     final budgetAsync = ref.watch(currentMonthBudgetStreamProvider);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: GradientHeader(
-              eyebrow: 'Income & Expense',
-              title: 'Personal Finance',
-              subtitle: 'Accurate minor currency unit arithmetic with Drift',
-              gradient: AppGradients.finance,
-            ),
+      body: Column(
+        children: [
+          const GradientHeader(
+            eyebrow: 'Income & Expense',
+            title: 'Personal Finance',
+            subtitle: 'Accurate minor currency unit arithmetic with Drift',
+            gradient: AppGradients.finance,
           ),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -1243,6 +1244,9 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           ),
         ],
       ),
+    ),
+  ],
+),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

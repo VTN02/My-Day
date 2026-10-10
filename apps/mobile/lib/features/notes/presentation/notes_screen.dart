@@ -640,15 +640,16 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
     final notesAsync = ref.watch(allNotesStreamProvider);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: GradientHeader(
-              eyebrow: 'Knowledge & Ideas',
-              title: 'Personal Notes',
-              subtitle: 'Local SQLite encrypted notes with attachments',
-            ),
+      body: Column(
+        children: [
+          const GradientHeader(
+            eyebrow: 'Knowledge & Ideas',
+            title: 'Personal Notes',
+            subtitle: 'Local SQLite encrypted notes with attachments',
           ),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -753,6 +754,9 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
           ),
         ],
       ),
+    ),
+  ],
+),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

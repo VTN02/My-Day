@@ -140,6 +140,9 @@ void main() {
       // Check bottom nav items
       expect(find.text('Today'), findsAtLeastNWidgets(1));
       expect(find.text('Tasks'), findsAtLeastNWidgets(1));
+
+      // Cleanly dispose tree and cancel timers
+      await tester.pumpWidget(const SizedBox());
     });
   });
 }

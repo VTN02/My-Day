@@ -636,15 +636,16 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     );
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          const SliverToBoxAdapter(
-            child: GradientHeader(
-              eyebrow: 'Schedule & Time',
-              title: 'Calendar',
-              subtitle: 'Tap any date to open details and add tasks',
-            ),
+      body: Column(
+        children: [
+          const GradientHeader(
+            eyebrow: 'Schedule & Time',
+            title: 'Calendar',
+            subtitle: 'Tap any date to open details and add tasks',
           ),
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -875,6 +876,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ),
         ],
       ),
+    ),
+  ],
+),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

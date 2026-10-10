@@ -1,12 +1,23 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/services/update_service.dart';
 import '../../core/widgets/custom_bottom_navigation.dart';
 
-/// AppShell hosting the persistent bottom navigation and branch routing.
-class AppShell extends StatelessWidget {
+/// AppShell hosting the persistent bottom navigation, branch routing,
+/// and automated on-launch app update detection.
+class AppShell extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const AppShell({super.key, required this.navigationShell});
+
+  @override
+  ConsumerState<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends ConsumerState<AppShell> {
+  Timer? _updateTimer;
 
   static const List<BottomNavItem> _navItems = [
     BottomNavItem(
@@ -36,19 +47,54 @@ class AppShell extends StatelessWidget {
     ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAutoUpdate();
+    });
+  }
+
+  @override
+  void dispose() {
+    _updateTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkAutoUpdate() {
+    // Brief delay to allow initial layout and splash to settle smoothly
+    _updateTimer = Timer(const Duration(milliseconds: 1500), () async {
+      if (!mounted) return;
+      try {
+        final updateService = ref.read(updateServiceProvider);
+        final result = await updateService.checkForUpdates();
+        if (result.status == UpdateStatus.updateAvailable &&
+            result.updateInfo != null &&
+            mounted) {
+          UpdateService.showUpdateSheet(
+            context: context,
+            info: result.updateInfo!,
+          );
+        }
+      } catch (_) {
+        // Ignore background network/silently
+      }
+    });
+  }
+
   void _onTabTapped(int index) {
-    navigationShell.goBranch(
+    widget.navigationShell.goBranch(
       index,
-      initialLocation: index == navigationShell.currentIndex,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: navigationShell,
+      body: widget.navigationShell,
       bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: navigationShell.currentIndex,
+        currentIndex: widget.navigationShell.currentIndex,
         onTap: _onTabTapped,
         items: _navItems,
       ),
