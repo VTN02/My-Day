@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../providers/group_expenses_providers.dart';
+import '../../domain/services/outing_pdf_export_service.dart';
 
 /// Screen: Outing Settings (Status management, editing, and deletion safeguards).
 class OutingSettingsScreen extends ConsumerWidget {
@@ -170,6 +171,41 @@ class OutingSettingsScreen extends ConsumerWidget {
                   style: TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: const Text('Change name, budget, date, or notes'),
+                trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+              ),
+              const SizedBox(height: 12),
+
+              ListTile(
+                onTap: () async {
+                  final summary = await ref.read(
+                    outingSummaryStreamProvider(outingId).future,
+                  );
+                  if (summary != null) {
+                    await OutingPdfExportService.printOrSharePdf(summary);
+                  }
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.cardRadius,
+                  side: BorderSide(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                  ),
+                ),
+                tileColor: isDark
+                    ? AppColors.darkCardSurface
+                    : AppColors.lightCardSurface,
+                leading: const Icon(
+                  Icons.picture_as_pdf_rounded,
+                  color: AppColors.primaryIndigo,
+                ),
+                title: const Text(
+                  'Export Statement as PDF',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(
+                  'Print or share professional ledger with logo',
+                ),
                 trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
               ),
               const SizedBox(height: 12),

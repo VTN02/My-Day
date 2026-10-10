@@ -11,6 +11,7 @@ import '../widgets/budget_progress_bar.dart';
 import '../widgets/expense_item_tile.dart';
 import '../widgets/member_avatar_tile.dart';
 import '../widgets/settlement_tile.dart';
+import '../../domain/services/outing_pdf_export_service.dart';
 
 /// Screen 4: Outing Dashboard Screen with 4 in-page tabs (Overview, Expenses, Balances, Activity).
 class OutingDashboardScreen extends ConsumerStatefulWidget {
@@ -71,143 +72,148 @@ class _OutingDashboardScreenState extends ConsumerState<OutingDashboardScreen>
         final progressPercent = (progressRatio * 100).round();
 
         return Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                SliverToBoxAdapter(
-                  child: GradientHeader(
-                    eyebrow: 'MyDay Split • ${outing.currencyCode}',
-                    title: outing.title,
-                    subtitle:
-                        '$memberCount Friends • Date: ${DateFormat('MMM d, yyyy').format(outing.outingDate)}',
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          tooltip: 'Manage Friends',
-                          icon: const Icon(
-                            Icons.group_add_outlined,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                          onPressed: () =>
-                              context.push('/split/${outing.id}/members'),
-                        ),
-                        IconButton(
-                          tooltip: 'Settings',
-                          icon: const Icon(
-                            Icons.settings_outlined,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                          onPressed: () =>
-                              context.push('/split/${outing.id}/settings'),
-                        ),
-                      ],
-                    ),
-                    bottomChild: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Total Spent: ${_formatAmount(totalSpentMinor)}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'Budget: ${_formatAmount(budgetMinor)}',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: AppRadius.pillRadius,
-                          child: Container(
-                            height: 8,
-                            color: Colors.white.withValues(alpha: 0.25),
-                            child: FractionallySizedBox(
-                              alignment: Alignment.centerLeft,
-                              widthFactor: progressRatio.clamp(0.0, 1.0),
-                              child: Container(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Remaining: ${_formatAmount(remainingMinor)}',
-                              style: TextStyle(
-                                color: remainingMinor < 0
-                                    ? AppColors.errorCoral
-                                    : Colors.white.withValues(alpha: 0.95),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              'Progress: $progressPercent%',
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.95),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _SliverAppBarDelegate(
-                    TabBar(
-                      controller: _tabController,
-                      indicatorColor: AppColors.primaryIndigo,
-                      indicatorWeight: 3,
-                      labelColor: AppColors.primaryIndigo,
-                      unselectedLabelColor: isDark
-                          ? AppColors.darkSecondaryText
-                          : AppColors.lightSecondaryText,
-                      labelStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13.5,
+          body: Column(
+            children: [
+              GradientHeader(
+                eyebrow: 'MyDay Split • ${outing.currencyCode}',
+                title: outing.title,
+                subtitle:
+                    '$memberCount Friends • Date: ${DateFormat('MMM d, yyyy').format(outing.outingDate)}',
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'Export Statement (PDF)',
+                      icon: const Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: Colors.white,
+                        size: 22,
                       ),
-                      tabs: const [
-                        Tab(text: 'Overview'),
-                        Tab(text: 'Expenses'),
-                        Tab(text: 'Balances'),
-                        Tab(text: 'Activity'),
+                      onPressed: () =>
+                          OutingPdfExportService.printOrSharePdf(summary),
+                    ),
+                    IconButton(
+                      tooltip: 'Manage Friends',
+                      icon: const Icon(
+                        Icons.group_add_outlined,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      onPressed: () =>
+                          context.push('/split/${outing.id}/members'),
+                    ),
+                    IconButton(
+                      tooltip: 'Settings',
+                      icon: const Icon(
+                        Icons.settings_outlined,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      onPressed: () =>
+                          context.push('/split/${outing.id}/settings'),
+                    ),
+                  ],
+                ),
+                bottomChild: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Spent: ${_formatAmount(totalSpentMinor)}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Budget: ${_formatAmount(budgetMinor)}',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
-                    isDark
-                        ? AppColors.darkBackground
-                        : AppColors.lightBackground,
-                  ),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: AppRadius.pillRadius,
+                      child: Container(
+                        height: 8,
+                        color: Colors.white.withValues(alpha: 0.25),
+                        child: FractionallySizedBox(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: progressRatio.clamp(0.0, 1.0),
+                          child: Container(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Remaining: ${_formatAmount(remainingMinor)}',
+                          style: TextStyle(
+                            color: remainingMinor < 0
+                                ? AppColors.errorCoral
+                                : Colors.white.withValues(alpha: 0.95),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'Progress: $progressPercent%',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ];
-            },
-            body: TabBarView(
-              controller: _tabController,
-              children: [
-                _OverviewTab(summary: summary),
-                _ExpensesTab(outingId: outing.id),
-                _BalancesTab(summary: summary),
-                _ActivityTab(outingId: outing.id),
-              ],
-            ),
+              ),
+              Container(
+                color: isDark
+                    ? AppColors.darkBackground
+                    : AppColors.lightBackground,
+                child: TabBar(
+                  controller: _tabController,
+                  indicatorColor: AppColors.primaryIndigo,
+                  indicatorWeight: 3,
+                  labelColor: AppColors.primaryIndigo,
+                  unselectedLabelColor: isDark
+                      ? AppColors.darkSecondaryText
+                      : AppColors.lightSecondaryText,
+                  labelStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.5,
+                  ),
+                  tabs: const [
+                    Tab(text: 'Overview'),
+                    Tab(text: 'Expenses'),
+                    Tab(text: 'Balances'),
+                    Tab(text: 'Activity'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _OverviewTab(summary: summary),
+                    _ExpensesTab(outingId: outing.id),
+                    _BalancesTab(summary: summary),
+                    _ActivityTab(outingId: outing.id),
+                  ],
+                ),
+              ),
+            ],
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => context.push('/split/${outing.id}/expenses/add'),
@@ -226,33 +232,6 @@ class _OutingDashboardScreenState extends ConsumerState<OutingDashboardScreen>
       error: (err, _) =>
           Scaffold(body: Center(child: Text('Error loading dashboard: $err'))),
     );
-  }
-}
-
-// Delegate for pinned TabBar in NestedScrollView
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
-  final Color _bgColor;
-
-  _SliverAppBarDelegate(this._tabBar, this._bgColor);
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
-    return Container(color: _bgColor, child: _tabBar);
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
   }
 }
 
@@ -432,6 +411,24 @@ class _OverviewTab extends StatelessWidget {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 12),
+
+        // Export as Professional PDF Button
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () => OutingPdfExportService.printOrSharePdf(summary),
+            icon: const Icon(Icons.picture_as_pdf_rounded, size: 18),
+            label: const Text('Export Statement as PDF'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryIndigo,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 13),
+              shape: RoundedRectangleBorder(borderRadius: AppRadius.cardRadius),
+              elevation: 0,
+            ),
+          ),
         ),
       ],
     );

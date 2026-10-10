@@ -634,34 +634,46 @@ class DriftGroupExpensesRepository implements GroupExpensesRepository {
 
   @override
   Stream<OutingSummary?> watchOutingSummary(String outingId) {
-    final outingStream = watchOuting(outingId);
+    return _db
+        .customSelect(
+          'SELECT 1',
+          readsFrom: {
+            _db.groupOutingsTable,
+            _db.outingExpensesTable,
+            _db.outingExpenseSharesTable,
+            _db.outingSettlementsTable,
+            _db.outingMembersTable,
+          },
+        )
+        .watch()
+        .asyncMap((_) async {
+          final outing = await getOuting(outingId);
+          if (outing == null) return null;
 
-    return outingStream.asyncMap((outing) async {
-      if (outing == null) return null;
+          final members = await getMembers(outingId);
+          final activeExpenses =
+              await (_db.select(_db.outingExpensesTable)..where(
+                    (tbl) =>
+                        tbl.outingId.equals(outingId) & tbl.deletedAt.isNull(),
+                  ))
+                  .get();
 
-      final members = await getMembers(outingId);
-      final activeExpenses =
-          await (_db.select(_db.outingExpensesTable)..where(
-                (tbl) => tbl.outingId.equals(outingId) & tbl.deletedAt.isNull(),
-              ))
-              .get();
+          final expenseIds = activeExpenses.map((e) => e.id).toList();
+          final activeShares = expenseIds.isEmpty
+              ? <OutingExpenseShareEntry>[]
+              : await (_db.select(
+                  _db.outingExpenseSharesTable,
+                )..where((tbl) => tbl.expenseId.isIn(expenseIds))).get();
 
-      final expenseIds = activeExpenses.map((e) => e.id).toList();
-      final activeShares = expenseIds.isEmpty
-          ? <OutingExpenseShareEntry>[]
-          : await (_db.select(
-              _db.outingExpenseSharesTable,
-            )..where((tbl) => tbl.expenseId.isIn(expenseIds))).get();
+          final settlements = await getSettlements(outingId);
 
-      final settlements = await getSettlements(outingId);
-
-      return _calculator.summarizeOuting(
-        outing: outing,
-        members: members,
-        activeExpenses: activeExpenses,
-        activeShares: activeShares,
-        completedSettlements: settlements,
-      );
-    });
+          return _calculator.summarizeOuting(
+            outing: outing,
+            members: members,
+            activeExpenses: activeExpenses,
+            activeShares: activeShares,
+            completedSettlements: settlements,
+          );
+        });
   }
 }

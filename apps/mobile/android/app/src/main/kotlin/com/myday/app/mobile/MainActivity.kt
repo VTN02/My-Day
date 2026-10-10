@@ -46,6 +46,17 @@ class MainActivity : FlutterActivity() {
                         result.success(true)
                     }
                 }
+                "shareFile" -> {
+                    val filePath = call.argument<String>("filePath")
+                    val mimeType = call.argument<String>("mimeType") ?: "application/pdf"
+                    val title = call.argument<String>("title") ?: "Share Statement"
+                    if (filePath != null) {
+                        val success = shareFile(filePath, mimeType, title)
+                        result.success(success)
+                    } else {
+                        result.error("INVALID_PATH", "File path was null", null)
+                    }
+                }
                 else -> {
                     result.notImplemented()
                 }
@@ -82,6 +93,35 @@ class MainActivity : FlutterActivity() {
             }
 
             startActivity(intent)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    private fun shareFile(filePath: String, mimeType: String, title: String): Boolean {
+        val file = File(filePath)
+        if (!file.exists()) return false
+
+        return try {
+            val uri = FileProvider.getUriForFile(
+                applicationContext,
+                "$packageName.fileprovider",
+                file
+            )
+
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+            val chooser = Intent.createChooser(intent, title).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            startActivity(chooser)
             true
         } catch (e: Exception) {
             e.printStackTrace()

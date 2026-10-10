@@ -280,11 +280,6 @@ class TodayScreen extends ConsumerWidget {
 
                       const SizedBox(height: 16),
 
-                      // Daily Habits & Streaks
-                      const DailyHabitsSection(),
-
-                      const SizedBox(height: 16),
-
                       // Today's Scheduled Tasks
                       SectionHeader(
                         title: "Today's Tasks",
@@ -334,6 +329,11 @@ class TodayScreen extends ConsumerWidget {
                           child: Text('Error loading today tasks: $err'),
                         ),
                       ),
+
+                      const SizedBox(height: 16),
+
+                      // Daily Habits & Streaks (in last position)
+                      const DailyHabitsSection(),
                     ]),
                   ),
                 ),
