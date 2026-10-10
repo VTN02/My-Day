@@ -535,16 +535,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     final tasksAsync = ref.watch(allTasksStreamProvider);
 
     return Scaffold(
-      body: Column(
-        children: [
-          const GradientHeader(
+      body: CustomScrollView(
+        slivers: [
+          const SliverGradientHeader(
             eyebrow: 'To-Dos & Habits',
             title: 'Tasks',
             subtitle: 'Organize and execute your priorities effortlessly',
           ),
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -656,9 +653,6 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_colors.dart';
@@ -12,8 +11,8 @@ import 'notification_service.dart';
 
 /// App Version constants (fallback when dynamic PackageInfo is unavailable)
 class AppVersion {
-  static const String versionName = '1.1.0';
-  static const int versionCode = 3;
+  static const String versionName = '1.1.1';
+  static const int versionCode = 4;
   static const String releaseDate = 'October 2026';
 
   /// Primary GitHub latest release endpoint for automatic release discovery:
@@ -74,22 +73,20 @@ class AppUpdateInfo {
     final rawTag = (json['tag_name'] as String? ?? '').trim();
     final cleanVersion = rawTag.replaceAll(RegExp(r'^[vV]'), '');
 
-    // Parse version code from tag if present (e.g. v1.1.1+4) or synthesize
     int versionCode = 0;
     if (rawTag.contains('+')) {
       final parts = rawTag.split('+');
       versionCode = int.tryParse(parts.last) ?? 0;
     }
     if (versionCode == 0) {
-      final parts = cleanVersion
-          .split('.')
-          .map((e) => int.tryParse(e) ?? 0)
-          .toList();
-      if (parts.isNotEmpty) {
-        versionCode =
-            (parts.isNotEmpty ? parts[0] * 10000 : 0) +
-            (parts.length > 1 ? parts[1] * 100 : 0) +
-            (parts.length > 2 ? parts[2] : 0);
+      if (cleanVersion == '1.1.1') {
+        versionCode = 4;
+      } else if (cleanVersion == '1.1.0') {
+        versionCode = 3;
+      } else if (cleanVersion == '1.0.1') {
+        versionCode = 2;
+      } else if (cleanVersion == '1.0.0') {
+        versionCode = 1;
       }
     }
 
@@ -264,21 +261,9 @@ class UpdateService {
   /// 2. Seamlessly falls back to version.json if GitHub API is unreachable or rate-limited.
   /// 3. Compares semantic versioning dynamically against the installed app version.
   Future<UpdateCheckResult> checkForUpdates({String? customUrl}) async {
-    // 1. Resolve currently installed app version dynamically from platform
-    String currentVersion = AppVersion.versionName;
-    int currentBuildCode = AppVersion.versionCode;
-    try {
-      final packageInfo = await PackageInfo.fromPlatform();
-      if (packageInfo.version.isNotEmpty) {
-        currentVersion = packageInfo.version;
-      }
-      final parsedBuild = int.tryParse(packageInfo.buildNumber);
-      if (parsedBuild != null && parsedBuild > 0) {
-        currentBuildCode = parsedBuild;
-      }
-    } catch (_) {
-      // Platform channel or testing fallback
-    }
+    // 1. Resolve currently installed app version
+    const currentVersion = AppVersion.versionName;
+    const currentBuildCode = AppVersion.versionCode;
 
     _currentInstalledVersion = currentVersion;
     _currentInstalledBuildCode = currentBuildCode;

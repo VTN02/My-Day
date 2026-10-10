@@ -37,8 +37,8 @@ class TodayScreen extends ConsumerWidget {
     final displayName = profileAsync.value?.displayName ?? 'MyDay User';
 
     return Scaffold(
-      body: Column(
-        children: [
+      body: CustomScrollView(
+        slivers: [
           todayTasksAsync.when(
             data: (tasks) {
               final totalTasks = tasks.length;
@@ -48,7 +48,7 @@ class TodayScreen extends ConsumerWidget {
                   : completedTasks / totalTasks;
               final progressPercent = (progressFactor * 100).round();
 
-              return GradientHeader(
+              return SliverGradientHeader(
                 eyebrow: "Today's Focus",
                 title: 'Good day, $displayName',
                 subtitle: '$totalTasks tasks scheduled for today',
@@ -116,23 +116,46 @@ class TodayScreen extends ConsumerWidget {
                 ),
               );
             },
-            loading: () => GradientHeader(
+            loading: () => SliverGradientHeader(
               eyebrow: "Today's Focus",
               title: 'Good day, $displayName',
               subtitle: 'Loading your day...',
+              trailing: Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Settings',
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: () => context.push('/settings'),
+                  ),
+                ],
+              ),
             ),
-            error: (error, stackTrace) => GradientHeader(
+            error: (error, stackTrace) => SliverGradientHeader(
               eyebrow: "Today's Focus",
               title: 'Good day, $displayName',
               subtitle: 'Overview',
+              trailing: Row(
+                children: [
+                  IconButton(
+                    tooltip: 'Settings',
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: () => context.push('/settings'),
+                  ),
+                ],
+              ),
             ),
           ),
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                  sliver: SliverList(
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       // Quick Metric Summary
                       todayTasksAsync.when(
@@ -339,9 +362,6 @@ class TodayScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,
