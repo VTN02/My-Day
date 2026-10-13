@@ -6,6 +6,7 @@ abstract class TasksRepository {
   Stream<List<TaskEntry>> watchAllTasks();
   Stream<List<TaskEntry>> watchTasksForDate(DateTime date);
   Stream<List<TaskEntry>> watchTodayTasks();
+  Stream<List<TaskEntry>> watchTasksForMonth(DateTime month);
   Future<TaskEntry?> getTask(String id);
   Future<String> createTask({
     required String title,
@@ -59,6 +60,27 @@ class DriftTasksRepository implements TasksRepository {
   @override
   Stream<List<TaskEntry>> watchTodayTasks() {
     return watchTasksForDate(DateTime.now());
+  }
+
+  @override
+  Stream<List<TaskEntry>> watchTasksForMonth(DateTime month) {
+    final startOfMonth = DateTime(month.year, month.month, 1);
+    final nextMonth = month.month == 12
+        ? DateTime(month.year + 1, 1, 1)
+        : DateTime(month.year, month.month + 1, 1);
+    final endOfMonth = nextMonth.subtract(const Duration(milliseconds: 1));
+
+    final query = _db.select(_db.tasksTable)
+      ..where(
+        (t) =>
+            t.dueDate.isBiggerOrEqualValue(startOfMonth) &
+            t.dueDate.isSmallerOrEqualValue(endOfMonth),
+      )
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.isCompleted, mode: OrderingMode.asc),
+        (t) => OrderingTerm(expression: t.dueDate, mode: OrderingMode.asc),
+      ]);
+    return query.watch();
   }
 
   @override

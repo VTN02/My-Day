@@ -115,6 +115,55 @@ class $TasksTableTable extends TasksTable
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _followUpEnabledMeta = const VerificationMeta(
+    'followUpEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> followUpEnabled = GeneratedColumn<bool>(
+    'follow_up_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("follow_up_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _followUpDelayMinutesMeta =
+      const VerificationMeta('followUpDelayMinutes');
+  @override
+  late final GeneratedColumn<int> followUpDelayMinutes = GeneratedColumn<int>(
+    'follow_up_delay_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(10),
+  );
+  static const VerificationMeta _maxRepeatsMeta = const VerificationMeta(
+    'maxRepeats',
+  );
+  @override
+  late final GeneratedColumn<int> maxRepeats = GeneratedColumn<int>(
+    'max_repeats',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
+  static const VerificationMeta _selectedTuneIdMeta = const VerificationMeta(
+    'selectedTuneId',
+  );
+  @override
+  late final GeneratedColumn<String> selectedTuneId = GeneratedColumn<String>(
+    'selected_tune_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -150,6 +199,10 @@ class $TasksTableTable extends TasksTable
     dueTime,
     reminder,
     isCompleted,
+    followUpEnabled,
+    followUpDelayMinutes,
+    maxRepeats,
+    selectedTuneId,
     createdAt,
     updatedAt,
   ];
@@ -226,6 +279,39 @@ class $TasksTableTable extends TasksTable
         ),
       );
     }
+    if (data.containsKey('follow_up_enabled')) {
+      context.handle(
+        _followUpEnabledMeta,
+        followUpEnabled.isAcceptableOrUnknown(
+          data['follow_up_enabled']!,
+          _followUpEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('follow_up_delay_minutes')) {
+      context.handle(
+        _followUpDelayMinutesMeta,
+        followUpDelayMinutes.isAcceptableOrUnknown(
+          data['follow_up_delay_minutes']!,
+          _followUpDelayMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('max_repeats')) {
+      context.handle(
+        _maxRepeatsMeta,
+        maxRepeats.isAcceptableOrUnknown(data['max_repeats']!, _maxRepeatsMeta),
+      );
+    }
+    if (data.containsKey('selected_tune_id')) {
+      context.handle(
+        _selectedTuneIdMeta,
+        selectedTuneId.isAcceptableOrUnknown(
+          data['selected_tune_id']!,
+          _selectedTuneIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -283,6 +369,22 @@ class $TasksTableTable extends TasksTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_completed'],
       )!,
+      followUpEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}follow_up_enabled'],
+      )!,
+      followUpDelayMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}follow_up_delay_minutes'],
+      )!,
+      maxRepeats: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}max_repeats'],
+      )!,
+      selectedTuneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_tune_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -310,6 +412,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
   final String? dueTime;
   final String reminder;
   final bool isCompleted;
+  final bool followUpEnabled;
+  final int followUpDelayMinutes;
+  final int maxRepeats;
+  final String? selectedTuneId;
   final DateTime createdAt;
   final DateTime updatedAt;
   const TaskEntry({
@@ -322,6 +428,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     this.dueTime,
     required this.reminder,
     required this.isCompleted,
+    required this.followUpEnabled,
+    required this.followUpDelayMinutes,
+    required this.maxRepeats,
+    this.selectedTuneId,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -343,6 +453,12 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     }
     map['reminder'] = Variable<String>(reminder);
     map['is_completed'] = Variable<bool>(isCompleted);
+    map['follow_up_enabled'] = Variable<bool>(followUpEnabled);
+    map['follow_up_delay_minutes'] = Variable<int>(followUpDelayMinutes);
+    map['max_repeats'] = Variable<int>(maxRepeats);
+    if (!nullToAbsent || selectedTuneId != null) {
+      map['selected_tune_id'] = Variable<String>(selectedTuneId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -365,6 +481,12 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
           : Value(dueTime),
       reminder: Value(reminder),
       isCompleted: Value(isCompleted),
+      followUpEnabled: Value(followUpEnabled),
+      followUpDelayMinutes: Value(followUpDelayMinutes),
+      maxRepeats: Value(maxRepeats),
+      selectedTuneId: selectedTuneId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(selectedTuneId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -385,6 +507,12 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
       dueTime: serializer.fromJson<String?>(json['dueTime']),
       reminder: serializer.fromJson<String>(json['reminder']),
       isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      followUpEnabled: serializer.fromJson<bool>(json['followUpEnabled']),
+      followUpDelayMinutes: serializer.fromJson<int>(
+        json['followUpDelayMinutes'],
+      ),
+      maxRepeats: serializer.fromJson<int>(json['maxRepeats']),
+      selectedTuneId: serializer.fromJson<String?>(json['selectedTuneId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -402,6 +530,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
       'dueTime': serializer.toJson<String?>(dueTime),
       'reminder': serializer.toJson<String>(reminder),
       'isCompleted': serializer.toJson<bool>(isCompleted),
+      'followUpEnabled': serializer.toJson<bool>(followUpEnabled),
+      'followUpDelayMinutes': serializer.toJson<int>(followUpDelayMinutes),
+      'maxRepeats': serializer.toJson<int>(maxRepeats),
+      'selectedTuneId': serializer.toJson<String?>(selectedTuneId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -417,6 +549,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     Value<String?> dueTime = const Value.absent(),
     String? reminder,
     bool? isCompleted,
+    bool? followUpEnabled,
+    int? followUpDelayMinutes,
+    int? maxRepeats,
+    Value<String?> selectedTuneId = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => TaskEntry(
@@ -429,6 +565,12 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     dueTime: dueTime.present ? dueTime.value : this.dueTime,
     reminder: reminder ?? this.reminder,
     isCompleted: isCompleted ?? this.isCompleted,
+    followUpEnabled: followUpEnabled ?? this.followUpEnabled,
+    followUpDelayMinutes: followUpDelayMinutes ?? this.followUpDelayMinutes,
+    maxRepeats: maxRepeats ?? this.maxRepeats,
+    selectedTuneId: selectedTuneId.present
+        ? selectedTuneId.value
+        : this.selectedTuneId,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -447,6 +589,18 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
       isCompleted: data.isCompleted.present
           ? data.isCompleted.value
           : this.isCompleted,
+      followUpEnabled: data.followUpEnabled.present
+          ? data.followUpEnabled.value
+          : this.followUpEnabled,
+      followUpDelayMinutes: data.followUpDelayMinutes.present
+          ? data.followUpDelayMinutes.value
+          : this.followUpDelayMinutes,
+      maxRepeats: data.maxRepeats.present
+          ? data.maxRepeats.value
+          : this.maxRepeats,
+      selectedTuneId: data.selectedTuneId.present
+          ? data.selectedTuneId.value
+          : this.selectedTuneId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -464,6 +618,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
           ..write('dueTime: $dueTime, ')
           ..write('reminder: $reminder, ')
           ..write('isCompleted: $isCompleted, ')
+          ..write('followUpEnabled: $followUpEnabled, ')
+          ..write('followUpDelayMinutes: $followUpDelayMinutes, ')
+          ..write('maxRepeats: $maxRepeats, ')
+          ..write('selectedTuneId: $selectedTuneId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -481,6 +639,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
     dueTime,
     reminder,
     isCompleted,
+    followUpEnabled,
+    followUpDelayMinutes,
+    maxRepeats,
+    selectedTuneId,
     createdAt,
     updatedAt,
   );
@@ -497,6 +659,10 @@ class TaskEntry extends DataClass implements Insertable<TaskEntry> {
           other.dueTime == this.dueTime &&
           other.reminder == this.reminder &&
           other.isCompleted == this.isCompleted &&
+          other.followUpEnabled == this.followUpEnabled &&
+          other.followUpDelayMinutes == this.followUpDelayMinutes &&
+          other.maxRepeats == this.maxRepeats &&
+          other.selectedTuneId == this.selectedTuneId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -511,6 +677,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
   final Value<String?> dueTime;
   final Value<String> reminder;
   final Value<bool> isCompleted;
+  final Value<bool> followUpEnabled;
+  final Value<int> followUpDelayMinutes;
+  final Value<int> maxRepeats;
+  final Value<String?> selectedTuneId;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -524,6 +694,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
     this.dueTime = const Value.absent(),
     this.reminder = const Value.absent(),
     this.isCompleted = const Value.absent(),
+    this.followUpEnabled = const Value.absent(),
+    this.followUpDelayMinutes = const Value.absent(),
+    this.maxRepeats = const Value.absent(),
+    this.selectedTuneId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -538,6 +712,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
     this.dueTime = const Value.absent(),
     this.reminder = const Value.absent(),
     this.isCompleted = const Value.absent(),
+    this.followUpEnabled = const Value.absent(),
+    this.followUpDelayMinutes = const Value.absent(),
+    this.maxRepeats = const Value.absent(),
+    this.selectedTuneId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -553,6 +731,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
     Expression<String>? dueTime,
     Expression<String>? reminder,
     Expression<bool>? isCompleted,
+    Expression<bool>? followUpEnabled,
+    Expression<int>? followUpDelayMinutes,
+    Expression<int>? maxRepeats,
+    Expression<String>? selectedTuneId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -567,6 +749,11 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
       if (dueTime != null) 'due_time': dueTime,
       if (reminder != null) 'reminder': reminder,
       if (isCompleted != null) 'is_completed': isCompleted,
+      if (followUpEnabled != null) 'follow_up_enabled': followUpEnabled,
+      if (followUpDelayMinutes != null)
+        'follow_up_delay_minutes': followUpDelayMinutes,
+      if (maxRepeats != null) 'max_repeats': maxRepeats,
+      if (selectedTuneId != null) 'selected_tune_id': selectedTuneId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -583,6 +770,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
     Value<String?>? dueTime,
     Value<String>? reminder,
     Value<bool>? isCompleted,
+    Value<bool>? followUpEnabled,
+    Value<int>? followUpDelayMinutes,
+    Value<int>? maxRepeats,
+    Value<String?>? selectedTuneId,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -597,6 +788,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
       dueTime: dueTime ?? this.dueTime,
       reminder: reminder ?? this.reminder,
       isCompleted: isCompleted ?? this.isCompleted,
+      followUpEnabled: followUpEnabled ?? this.followUpEnabled,
+      followUpDelayMinutes: followUpDelayMinutes ?? this.followUpDelayMinutes,
+      maxRepeats: maxRepeats ?? this.maxRepeats,
+      selectedTuneId: selectedTuneId ?? this.selectedTuneId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -633,6 +828,20 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
     if (isCompleted.present) {
       map['is_completed'] = Variable<bool>(isCompleted.value);
     }
+    if (followUpEnabled.present) {
+      map['follow_up_enabled'] = Variable<bool>(followUpEnabled.value);
+    }
+    if (followUpDelayMinutes.present) {
+      map['follow_up_delay_minutes'] = Variable<int>(
+        followUpDelayMinutes.value,
+      );
+    }
+    if (maxRepeats.present) {
+      map['max_repeats'] = Variable<int>(maxRepeats.value);
+    }
+    if (selectedTuneId.present) {
+      map['selected_tune_id'] = Variable<String>(selectedTuneId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -657,6 +866,10 @@ class TasksTableCompanion extends UpdateCompanion<TaskEntry> {
           ..write('dueTime: $dueTime, ')
           ..write('reminder: $reminder, ')
           ..write('isCompleted: $isCompleted, ')
+          ..write('followUpEnabled: $followUpEnabled, ')
+          ..write('followUpDelayMinutes: $followUpDelayMinutes, ')
+          ..write('maxRepeats: $maxRepeats, ')
+          ..write('selectedTuneId: $selectedTuneId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -2913,6 +3126,420 @@ class BudgetAllocationsTableCompanion
   }
 }
 
+class $NoteFoldersTableTable extends NoteFoldersTable
+    with TableInfo<$NoteFoldersTableTable, NoteFolderEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NoteFoldersTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 100,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentFolderIdMeta = const VerificationMeta(
+    'parentFolderId',
+  );
+  @override
+  late final GeneratedColumn<String> parentFolderId = GeneratedColumn<String>(
+    'parent_folder_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _colorHexMeta = const VerificationMeta(
+    'colorHex',
+  );
+  @override
+  late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
+    'color_hex',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('#1565C0'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    parentFolderId,
+    colorHex,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'note_folders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NoteFolderEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('parent_folder_id')) {
+      context.handle(
+        _parentFolderIdMeta,
+        parentFolderId.isAcceptableOrUnknown(
+          data['parent_folder_id']!,
+          _parentFolderIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('color_hex')) {
+      context.handle(
+        _colorHexMeta,
+        colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NoteFolderEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NoteFolderEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      parentFolderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_folder_id'],
+      ),
+      colorHex: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}color_hex'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $NoteFoldersTableTable createAlias(String alias) {
+    return $NoteFoldersTableTable(attachedDatabase, alias);
+  }
+}
+
+class NoteFolderEntry extends DataClass implements Insertable<NoteFolderEntry> {
+  final String id;
+  final String name;
+  final String? parentFolderId;
+  final String colorHex;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const NoteFolderEntry({
+    required this.id,
+    required this.name,
+    this.parentFolderId,
+    required this.colorHex,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || parentFolderId != null) {
+      map['parent_folder_id'] = Variable<String>(parentFolderId);
+    }
+    map['color_hex'] = Variable<String>(colorHex);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  NoteFoldersTableCompanion toCompanion(bool nullToAbsent) {
+    return NoteFoldersTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      parentFolderId: parentFolderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentFolderId),
+      colorHex: Value(colorHex),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory NoteFolderEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NoteFolderEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      parentFolderId: serializer.fromJson<String?>(json['parentFolderId']),
+      colorHex: serializer.fromJson<String>(json['colorHex']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'parentFolderId': serializer.toJson<String?>(parentFolderId),
+      'colorHex': serializer.toJson<String>(colorHex),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  NoteFolderEntry copyWith({
+    String? id,
+    String? name,
+    Value<String?> parentFolderId = const Value.absent(),
+    String? colorHex,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => NoteFolderEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    parentFolderId: parentFolderId.present
+        ? parentFolderId.value
+        : this.parentFolderId,
+    colorHex: colorHex ?? this.colorHex,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  NoteFolderEntry copyWithCompanion(NoteFoldersTableCompanion data) {
+    return NoteFolderEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      parentFolderId: data.parentFolderId.present
+          ? data.parentFolderId.value
+          : this.parentFolderId,
+      colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NoteFolderEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('parentFolderId: $parentFolderId, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, parentFolderId, colorHex, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NoteFolderEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.parentFolderId == this.parentFolderId &&
+          other.colorHex == this.colorHex &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class NoteFoldersTableCompanion extends UpdateCompanion<NoteFolderEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String?> parentFolderId;
+  final Value<String> colorHex;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const NoteFoldersTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.parentFolderId = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NoteFoldersTableCompanion.insert({
+    required String id,
+    required String name,
+    this.parentFolderId = const Value.absent(),
+    this.colorHex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name);
+  static Insertable<NoteFolderEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? parentFolderId,
+    Expression<String>? colorHex,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (parentFolderId != null) 'parent_folder_id': parentFolderId,
+      if (colorHex != null) 'color_hex': colorHex,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NoteFoldersTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String?>? parentFolderId,
+    Value<String>? colorHex,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return NoteFoldersTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      parentFolderId: parentFolderId ?? this.parentFolderId,
+      colorHex: colorHex ?? this.colorHex,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (parentFolderId.present) {
+      map['parent_folder_id'] = Variable<String>(parentFolderId.value);
+    }
+    if (colorHex.present) {
+      map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NoteFoldersTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('parentFolderId: $parentFolderId, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $NotesTableTable extends NotesTable
     with TableInfo<$NotesTableTable, NoteEntry> {
   @override
@@ -2962,6 +3589,17 @@ class $NotesTableTable extends NotesTable
     requiredDuringInsert: false,
     defaultValue: const Constant('General'),
   );
+  static const VerificationMeta _folderIdMeta = const VerificationMeta(
+    'folderId',
+  );
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+    'folder_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isPinnedMeta = const VerificationMeta(
     'isPinned',
   );
@@ -2977,6 +3615,67 @@ class $NotesTableTable extends NotesTable
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _isTrashedMeta = const VerificationMeta(
+    'isTrashed',
+  );
+  @override
+  late final GeneratedColumn<bool> isTrashed = GeneratedColumn<bool>(
+    'is_trashed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_trashed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _trashedAtMeta = const VerificationMeta(
+    'trashedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> trashedAt = GeneratedColumn<DateTime>(
+    'trashed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _templateTypeMeta = const VerificationMeta(
+    'templateType',
+  );
+  @override
+  late final GeneratedColumn<String> templateType = GeneratedColumn<String>(
+    'template_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('blank'),
+  );
+  static const VerificationMeta _contentBlocksJsonMeta = const VerificationMeta(
+    'contentBlocksJson',
+  );
+  @override
+  late final GeneratedColumn<String> contentBlocksJson =
+      GeneratedColumn<String>(
+        'content_blocks_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _drawingStrokesJsonMeta =
+      const VerificationMeta('drawingStrokesJson');
+  @override
+  late final GeneratedColumn<String> drawingStrokesJson =
+      GeneratedColumn<String>(
+        'drawing_strokes_json',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -3007,7 +3706,13 @@ class $NotesTableTable extends NotesTable
     title,
     body,
     category,
+    folderId,
     isPinned,
+    isTrashed,
+    trashedAt,
+    templateType,
+    contentBlocksJson,
+    drawingStrokesJson,
     createdAt,
     updatedAt,
   ];
@@ -3050,10 +3755,55 @@ class $NotesTableTable extends NotesTable
         category.isAcceptableOrUnknown(data['category']!, _categoryMeta),
       );
     }
+    if (data.containsKey('folder_id')) {
+      context.handle(
+        _folderIdMeta,
+        folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta),
+      );
+    }
     if (data.containsKey('is_pinned')) {
       context.handle(
         _isPinnedMeta,
         isPinned.isAcceptableOrUnknown(data['is_pinned']!, _isPinnedMeta),
+      );
+    }
+    if (data.containsKey('is_trashed')) {
+      context.handle(
+        _isTrashedMeta,
+        isTrashed.isAcceptableOrUnknown(data['is_trashed']!, _isTrashedMeta),
+      );
+    }
+    if (data.containsKey('trashed_at')) {
+      context.handle(
+        _trashedAtMeta,
+        trashedAt.isAcceptableOrUnknown(data['trashed_at']!, _trashedAtMeta),
+      );
+    }
+    if (data.containsKey('template_type')) {
+      context.handle(
+        _templateTypeMeta,
+        templateType.isAcceptableOrUnknown(
+          data['template_type']!,
+          _templateTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('content_blocks_json')) {
+      context.handle(
+        _contentBlocksJsonMeta,
+        contentBlocksJson.isAcceptableOrUnknown(
+          data['content_blocks_json']!,
+          _contentBlocksJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('drawing_strokes_json')) {
+      context.handle(
+        _drawingStrokesJsonMeta,
+        drawingStrokesJson.isAcceptableOrUnknown(
+          data['drawing_strokes_json']!,
+          _drawingStrokesJsonMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -3093,10 +3843,34 @@ class $NotesTableTable extends NotesTable
         DriftSqlType.string,
         data['${effectivePrefix}category'],
       )!,
+      folderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_id'],
+      ),
       isPinned: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_pinned'],
       )!,
+      isTrashed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_trashed'],
+      )!,
+      trashedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}trashed_at'],
+      ),
+      templateType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}template_type'],
+      )!,
+      contentBlocksJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content_blocks_json'],
+      ),
+      drawingStrokesJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}drawing_strokes_json'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -3119,7 +3893,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
   final String title;
   final String body;
   final String category;
+  final String? folderId;
   final bool isPinned;
+  final bool isTrashed;
+  final DateTime? trashedAt;
+  final String templateType;
+  final String? contentBlocksJson;
+  final String? drawingStrokesJson;
   final DateTime createdAt;
   final DateTime updatedAt;
   const NoteEntry({
@@ -3127,7 +3907,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
     required this.title,
     required this.body,
     required this.category,
+    this.folderId,
     required this.isPinned,
+    required this.isTrashed,
+    this.trashedAt,
+    required this.templateType,
+    this.contentBlocksJson,
+    this.drawingStrokesJson,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -3138,7 +3924,21 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
     map['title'] = Variable<String>(title);
     map['body'] = Variable<String>(body);
     map['category'] = Variable<String>(category);
+    if (!nullToAbsent || folderId != null) {
+      map['folder_id'] = Variable<String>(folderId);
+    }
     map['is_pinned'] = Variable<bool>(isPinned);
+    map['is_trashed'] = Variable<bool>(isTrashed);
+    if (!nullToAbsent || trashedAt != null) {
+      map['trashed_at'] = Variable<DateTime>(trashedAt);
+    }
+    map['template_type'] = Variable<String>(templateType);
+    if (!nullToAbsent || contentBlocksJson != null) {
+      map['content_blocks_json'] = Variable<String>(contentBlocksJson);
+    }
+    if (!nullToAbsent || drawingStrokesJson != null) {
+      map['drawing_strokes_json'] = Variable<String>(drawingStrokesJson);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -3150,7 +3950,21 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
       title: Value(title),
       body: Value(body),
       category: Value(category),
+      folderId: folderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(folderId),
       isPinned: Value(isPinned),
+      isTrashed: Value(isTrashed),
+      trashedAt: trashedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(trashedAt),
+      templateType: Value(templateType),
+      contentBlocksJson: contentBlocksJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contentBlocksJson),
+      drawingStrokesJson: drawingStrokesJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(drawingStrokesJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -3166,7 +3980,17 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
       title: serializer.fromJson<String>(json['title']),
       body: serializer.fromJson<String>(json['body']),
       category: serializer.fromJson<String>(json['category']),
+      folderId: serializer.fromJson<String?>(json['folderId']),
       isPinned: serializer.fromJson<bool>(json['isPinned']),
+      isTrashed: serializer.fromJson<bool>(json['isTrashed']),
+      trashedAt: serializer.fromJson<DateTime?>(json['trashedAt']),
+      templateType: serializer.fromJson<String>(json['templateType']),
+      contentBlocksJson: serializer.fromJson<String?>(
+        json['contentBlocksJson'],
+      ),
+      drawingStrokesJson: serializer.fromJson<String?>(
+        json['drawingStrokesJson'],
+      ),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -3179,7 +4003,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
       'title': serializer.toJson<String>(title),
       'body': serializer.toJson<String>(body),
       'category': serializer.toJson<String>(category),
+      'folderId': serializer.toJson<String?>(folderId),
       'isPinned': serializer.toJson<bool>(isPinned),
+      'isTrashed': serializer.toJson<bool>(isTrashed),
+      'trashedAt': serializer.toJson<DateTime?>(trashedAt),
+      'templateType': serializer.toJson<String>(templateType),
+      'contentBlocksJson': serializer.toJson<String?>(contentBlocksJson),
+      'drawingStrokesJson': serializer.toJson<String?>(drawingStrokesJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -3190,7 +4020,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
     String? title,
     String? body,
     String? category,
+    Value<String?> folderId = const Value.absent(),
     bool? isPinned,
+    bool? isTrashed,
+    Value<DateTime?> trashedAt = const Value.absent(),
+    String? templateType,
+    Value<String?> contentBlocksJson = const Value.absent(),
+    Value<String?> drawingStrokesJson = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => NoteEntry(
@@ -3198,7 +4034,17 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
     title: title ?? this.title,
     body: body ?? this.body,
     category: category ?? this.category,
+    folderId: folderId.present ? folderId.value : this.folderId,
     isPinned: isPinned ?? this.isPinned,
+    isTrashed: isTrashed ?? this.isTrashed,
+    trashedAt: trashedAt.present ? trashedAt.value : this.trashedAt,
+    templateType: templateType ?? this.templateType,
+    contentBlocksJson: contentBlocksJson.present
+        ? contentBlocksJson.value
+        : this.contentBlocksJson,
+    drawingStrokesJson: drawingStrokesJson.present
+        ? drawingStrokesJson.value
+        : this.drawingStrokesJson,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -3208,7 +4054,19 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
       title: data.title.present ? data.title.value : this.title,
       body: data.body.present ? data.body.value : this.body,
       category: data.category.present ? data.category.value : this.category,
+      folderId: data.folderId.present ? data.folderId.value : this.folderId,
       isPinned: data.isPinned.present ? data.isPinned.value : this.isPinned,
+      isTrashed: data.isTrashed.present ? data.isTrashed.value : this.isTrashed,
+      trashedAt: data.trashedAt.present ? data.trashedAt.value : this.trashedAt,
+      templateType: data.templateType.present
+          ? data.templateType.value
+          : this.templateType,
+      contentBlocksJson: data.contentBlocksJson.present
+          ? data.contentBlocksJson.value
+          : this.contentBlocksJson,
+      drawingStrokesJson: data.drawingStrokesJson.present
+          ? data.drawingStrokesJson.value
+          : this.drawingStrokesJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -3221,7 +4079,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
           ..write('title: $title, ')
           ..write('body: $body, ')
           ..write('category: $category, ')
+          ..write('folderId: $folderId, ')
           ..write('isPinned: $isPinned, ')
+          ..write('isTrashed: $isTrashed, ')
+          ..write('trashedAt: $trashedAt, ')
+          ..write('templateType: $templateType, ')
+          ..write('contentBlocksJson: $contentBlocksJson, ')
+          ..write('drawingStrokesJson: $drawingStrokesJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -3229,8 +4093,21 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, title, body, category, isPinned, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+    id,
+    title,
+    body,
+    category,
+    folderId,
+    isPinned,
+    isTrashed,
+    trashedAt,
+    templateType,
+    contentBlocksJson,
+    drawingStrokesJson,
+    createdAt,
+    updatedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3239,7 +4116,13 @@ class NoteEntry extends DataClass implements Insertable<NoteEntry> {
           other.title == this.title &&
           other.body == this.body &&
           other.category == this.category &&
+          other.folderId == this.folderId &&
           other.isPinned == this.isPinned &&
+          other.isTrashed == this.isTrashed &&
+          other.trashedAt == this.trashedAt &&
+          other.templateType == this.templateType &&
+          other.contentBlocksJson == this.contentBlocksJson &&
+          other.drawingStrokesJson == this.drawingStrokesJson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -3249,7 +4132,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
   final Value<String> title;
   final Value<String> body;
   final Value<String> category;
+  final Value<String?> folderId;
   final Value<bool> isPinned;
+  final Value<bool> isTrashed;
+  final Value<DateTime?> trashedAt;
+  final Value<String> templateType;
+  final Value<String?> contentBlocksJson;
+  final Value<String?> drawingStrokesJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -3258,7 +4147,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
     this.title = const Value.absent(),
     this.body = const Value.absent(),
     this.category = const Value.absent(),
+    this.folderId = const Value.absent(),
     this.isPinned = const Value.absent(),
+    this.isTrashed = const Value.absent(),
+    this.trashedAt = const Value.absent(),
+    this.templateType = const Value.absent(),
+    this.contentBlocksJson = const Value.absent(),
+    this.drawingStrokesJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3268,7 +4163,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
     required String title,
     required String body,
     this.category = const Value.absent(),
+    this.folderId = const Value.absent(),
     this.isPinned = const Value.absent(),
+    this.isTrashed = const Value.absent(),
+    this.trashedAt = const Value.absent(),
+    this.templateType = const Value.absent(),
+    this.contentBlocksJson = const Value.absent(),
+    this.drawingStrokesJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3280,7 +4181,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
     Expression<String>? title,
     Expression<String>? body,
     Expression<String>? category,
+    Expression<String>? folderId,
     Expression<bool>? isPinned,
+    Expression<bool>? isTrashed,
+    Expression<DateTime>? trashedAt,
+    Expression<String>? templateType,
+    Expression<String>? contentBlocksJson,
+    Expression<String>? drawingStrokesJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -3290,7 +4197,14 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
       if (title != null) 'title': title,
       if (body != null) 'body': body,
       if (category != null) 'category': category,
+      if (folderId != null) 'folder_id': folderId,
       if (isPinned != null) 'is_pinned': isPinned,
+      if (isTrashed != null) 'is_trashed': isTrashed,
+      if (trashedAt != null) 'trashed_at': trashedAt,
+      if (templateType != null) 'template_type': templateType,
+      if (contentBlocksJson != null) 'content_blocks_json': contentBlocksJson,
+      if (drawingStrokesJson != null)
+        'drawing_strokes_json': drawingStrokesJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -3302,7 +4216,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
     Value<String>? title,
     Value<String>? body,
     Value<String>? category,
+    Value<String?>? folderId,
     Value<bool>? isPinned,
+    Value<bool>? isTrashed,
+    Value<DateTime?>? trashedAt,
+    Value<String>? templateType,
+    Value<String?>? contentBlocksJson,
+    Value<String?>? drawingStrokesJson,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -3312,7 +4232,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
       title: title ?? this.title,
       body: body ?? this.body,
       category: category ?? this.category,
+      folderId: folderId ?? this.folderId,
       isPinned: isPinned ?? this.isPinned,
+      isTrashed: isTrashed ?? this.isTrashed,
+      trashedAt: trashedAt ?? this.trashedAt,
+      templateType: templateType ?? this.templateType,
+      contentBlocksJson: contentBlocksJson ?? this.contentBlocksJson,
+      drawingStrokesJson: drawingStrokesJson ?? this.drawingStrokesJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -3334,8 +4260,26 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
     if (category.present) {
       map['category'] = Variable<String>(category.value);
     }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
     if (isPinned.present) {
       map['is_pinned'] = Variable<bool>(isPinned.value);
+    }
+    if (isTrashed.present) {
+      map['is_trashed'] = Variable<bool>(isTrashed.value);
+    }
+    if (trashedAt.present) {
+      map['trashed_at'] = Variable<DateTime>(trashedAt.value);
+    }
+    if (templateType.present) {
+      map['template_type'] = Variable<String>(templateType.value);
+    }
+    if (contentBlocksJson.present) {
+      map['content_blocks_json'] = Variable<String>(contentBlocksJson.value);
+    }
+    if (drawingStrokesJson.present) {
+      map['drawing_strokes_json'] = Variable<String>(drawingStrokesJson.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -3356,7 +4300,13 @@ class NotesTableCompanion extends UpdateCompanion<NoteEntry> {
           ..write('title: $title, ')
           ..write('body: $body, ')
           ..write('category: $category, ')
+          ..write('folderId: $folderId, ')
           ..write('isPinned: $isPinned, ')
+          ..write('isTrashed: $isTrashed, ')
+          ..write('trashedAt: $trashedAt, ')
+          ..write('templateType: $templateType, ')
+          ..write('contentBlocksJson: $contentBlocksJson, ')
+          ..write('drawingStrokesJson: $drawingStrokesJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -5490,6 +6440,479 @@ class HabitLogsTableCompanion extends UpdateCompanion<HabitLogEntry> {
           ..write('habitId: $habitId, ')
           ..write('logDate: $logDate, ')
           ..write('isCompleted: $isCompleted, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ScheduledRemindersTableTable extends ScheduledRemindersTable
+    with TableInfo<$ScheduledRemindersTableTable, ScheduledReminderEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScheduledRemindersTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _taskIdMeta = const VerificationMeta('taskId');
+  @override
+  late final GeneratedColumn<String> taskId = GeneratedColumn<String>(
+    'task_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _attemptIndexMeta = const VerificationMeta(
+    'attemptIndex',
+  );
+  @override
+  late final GeneratedColumn<int> attemptIndex = GeneratedColumn<int>(
+    'attempt_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _scheduledAtMeta = const VerificationMeta(
+    'scheduledAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> scheduledAt = GeneratedColumn<DateTime>(
+    'scheduled_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notificationIdMeta = const VerificationMeta(
+    'notificationId',
+  );
+  @override
+  late final GeneratedColumn<int> notificationId = GeneratedColumn<int>(
+    'notification_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('pending'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    taskId,
+    attemptIndex,
+    scheduledAt,
+    notificationId,
+    status,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'scheduled_reminders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ScheduledReminderEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('task_id')) {
+      context.handle(
+        _taskIdMeta,
+        taskId.isAcceptableOrUnknown(data['task_id']!, _taskIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_taskIdMeta);
+    }
+    if (data.containsKey('attempt_index')) {
+      context.handle(
+        _attemptIndexMeta,
+        attemptIndex.isAcceptableOrUnknown(
+          data['attempt_index']!,
+          _attemptIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('scheduled_at')) {
+      context.handle(
+        _scheduledAtMeta,
+        scheduledAt.isAcceptableOrUnknown(
+          data['scheduled_at']!,
+          _scheduledAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduledAtMeta);
+    }
+    if (data.containsKey('notification_id')) {
+      context.handle(
+        _notificationIdMeta,
+        notificationId.isAcceptableOrUnknown(
+          data['notification_id']!,
+          _notificationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_notificationIdMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ScheduledReminderEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ScheduledReminderEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      taskId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}task_id'],
+      )!,
+      attemptIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempt_index'],
+      )!,
+      scheduledAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}scheduled_at'],
+      )!,
+      notificationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}notification_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ScheduledRemindersTableTable createAlias(String alias) {
+    return $ScheduledRemindersTableTable(attachedDatabase, alias);
+  }
+}
+
+class ScheduledReminderEntry extends DataClass
+    implements Insertable<ScheduledReminderEntry> {
+  final String id;
+  final String taskId;
+  final int attemptIndex;
+  final DateTime scheduledAt;
+  final int notificationId;
+  final String status;
+  final DateTime createdAt;
+  const ScheduledReminderEntry({
+    required this.id,
+    required this.taskId,
+    required this.attemptIndex,
+    required this.scheduledAt,
+    required this.notificationId,
+    required this.status,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['task_id'] = Variable<String>(taskId);
+    map['attempt_index'] = Variable<int>(attemptIndex);
+    map['scheduled_at'] = Variable<DateTime>(scheduledAt);
+    map['notification_id'] = Variable<int>(notificationId);
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ScheduledRemindersTableCompanion toCompanion(bool nullToAbsent) {
+    return ScheduledRemindersTableCompanion(
+      id: Value(id),
+      taskId: Value(taskId),
+      attemptIndex: Value(attemptIndex),
+      scheduledAt: Value(scheduledAt),
+      notificationId: Value(notificationId),
+      status: Value(status),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ScheduledReminderEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ScheduledReminderEntry(
+      id: serializer.fromJson<String>(json['id']),
+      taskId: serializer.fromJson<String>(json['taskId']),
+      attemptIndex: serializer.fromJson<int>(json['attemptIndex']),
+      scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
+      notificationId: serializer.fromJson<int>(json['notificationId']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'taskId': serializer.toJson<String>(taskId),
+      'attemptIndex': serializer.toJson<int>(attemptIndex),
+      'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
+      'notificationId': serializer.toJson<int>(notificationId),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ScheduledReminderEntry copyWith({
+    String? id,
+    String? taskId,
+    int? attemptIndex,
+    DateTime? scheduledAt,
+    int? notificationId,
+    String? status,
+    DateTime? createdAt,
+  }) => ScheduledReminderEntry(
+    id: id ?? this.id,
+    taskId: taskId ?? this.taskId,
+    attemptIndex: attemptIndex ?? this.attemptIndex,
+    scheduledAt: scheduledAt ?? this.scheduledAt,
+    notificationId: notificationId ?? this.notificationId,
+    status: status ?? this.status,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ScheduledReminderEntry copyWithCompanion(
+    ScheduledRemindersTableCompanion data,
+  ) {
+    return ScheduledReminderEntry(
+      id: data.id.present ? data.id.value : this.id,
+      taskId: data.taskId.present ? data.taskId.value : this.taskId,
+      attemptIndex: data.attemptIndex.present
+          ? data.attemptIndex.value
+          : this.attemptIndex,
+      scheduledAt: data.scheduledAt.present
+          ? data.scheduledAt.value
+          : this.scheduledAt,
+      notificationId: data.notificationId.present
+          ? data.notificationId.value
+          : this.notificationId,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScheduledReminderEntry(')
+          ..write('id: $id, ')
+          ..write('taskId: $taskId, ')
+          ..write('attemptIndex: $attemptIndex, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('notificationId: $notificationId, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    taskId,
+    attemptIndex,
+    scheduledAt,
+    notificationId,
+    status,
+    createdAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ScheduledReminderEntry &&
+          other.id == this.id &&
+          other.taskId == this.taskId &&
+          other.attemptIndex == this.attemptIndex &&
+          other.scheduledAt == this.scheduledAt &&
+          other.notificationId == this.notificationId &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt);
+}
+
+class ScheduledRemindersTableCompanion
+    extends UpdateCompanion<ScheduledReminderEntry> {
+  final Value<String> id;
+  final Value<String> taskId;
+  final Value<int> attemptIndex;
+  final Value<DateTime> scheduledAt;
+  final Value<int> notificationId;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ScheduledRemindersTableCompanion({
+    this.id = const Value.absent(),
+    this.taskId = const Value.absent(),
+    this.attemptIndex = const Value.absent(),
+    this.scheduledAt = const Value.absent(),
+    this.notificationId = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ScheduledRemindersTableCompanion.insert({
+    required String id,
+    required String taskId,
+    this.attemptIndex = const Value.absent(),
+    required DateTime scheduledAt,
+    required int notificationId,
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       taskId = Value(taskId),
+       scheduledAt = Value(scheduledAt),
+       notificationId = Value(notificationId);
+  static Insertable<ScheduledReminderEntry> custom({
+    Expression<String>? id,
+    Expression<String>? taskId,
+    Expression<int>? attemptIndex,
+    Expression<DateTime>? scheduledAt,
+    Expression<int>? notificationId,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (taskId != null) 'task_id': taskId,
+      if (attemptIndex != null) 'attempt_index': attemptIndex,
+      if (scheduledAt != null) 'scheduled_at': scheduledAt,
+      if (notificationId != null) 'notification_id': notificationId,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ScheduledRemindersTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? taskId,
+    Value<int>? attemptIndex,
+    Value<DateTime>? scheduledAt,
+    Value<int>? notificationId,
+    Value<String>? status,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return ScheduledRemindersTableCompanion(
+      id: id ?? this.id,
+      taskId: taskId ?? this.taskId,
+      attemptIndex: attemptIndex ?? this.attemptIndex,
+      scheduledAt: scheduledAt ?? this.scheduledAt,
+      notificationId: notificationId ?? this.notificationId,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (taskId.present) {
+      map['task_id'] = Variable<String>(taskId.value);
+    }
+    if (attemptIndex.present) {
+      map['attempt_index'] = Variable<int>(attemptIndex.value);
+    }
+    if (scheduledAt.present) {
+      map['scheduled_at'] = Variable<DateTime>(scheduledAt.value);
+    }
+    if (notificationId.present) {
+      map['notification_id'] = Variable<int>(notificationId.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScheduledRemindersTableCompanion(')
+          ..write('id: $id, ')
+          ..write('taskId: $taskId, ')
+          ..write('attemptIndex: $attemptIndex, ')
+          ..write('scheduledAt: $scheduledAt, ')
+          ..write('notificationId: $notificationId, ')
+          ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -8337,6 +9760,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $MonthlyBudgetsTableTable(this);
   late final $BudgetAllocationsTableTable budgetAllocationsTable =
       $BudgetAllocationsTableTable(this);
+  late final $NoteFoldersTableTable noteFoldersTable = $NoteFoldersTableTable(
+    this,
+  );
   late final $NotesTableTable notesTable = $NotesTableTable(this);
   late final $NoteAttachmentsTableTable noteAttachmentsTable =
       $NoteAttachmentsTableTable(this);
@@ -8348,6 +9774,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $HabitsTableTable habitsTable = $HabitsTableTable(this);
   late final $HabitLogsTableTable habitLogsTable = $HabitLogsTableTable(this);
+  late final $ScheduledRemindersTableTable scheduledRemindersTable =
+      $ScheduledRemindersTableTable(this);
   late final $GroupOutingsTableTable groupOutingsTable =
       $GroupOutingsTableTable(this);
   late final $OutingMembersTableTable outingMembersTable =
@@ -8369,12 +9797,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     financialTransactionsTable,
     monthlyBudgetsTable,
     budgetAllocationsTable,
+    noteFoldersTable,
     notesTable,
     noteAttachmentsTable,
     userProfileTable,
     appSettingsTable,
     habitsTable,
     habitLogsTable,
+    scheduledRemindersTable,
     groupOutingsTable,
     outingMembersTable,
     outingExpensesTable,
@@ -8394,6 +9824,10 @@ typedef $$TasksTableTableCreateCompanionBuilder =
       Value<String?> dueTime,
       Value<String> reminder,
       Value<bool> isCompleted,
+      Value<bool> followUpEnabled,
+      Value<int> followUpDelayMinutes,
+      Value<int> maxRepeats,
+      Value<String?> selectedTuneId,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -8409,6 +9843,10 @@ typedef $$TasksTableTableUpdateCompanionBuilder =
       Value<String?> dueTime,
       Value<String> reminder,
       Value<bool> isCompleted,
+      Value<bool> followUpEnabled,
+      Value<int> followUpDelayMinutes,
+      Value<int> maxRepeats,
+      Value<String?> selectedTuneId,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -8465,6 +9903,26 @@ class $$TasksTableTableFilterComposer
 
   ColumnFilters<bool> get isCompleted => $composableBuilder(
     column: $table.isCompleted,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get followUpEnabled => $composableBuilder(
+    column: $table.followUpEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get followUpDelayMinutes => $composableBuilder(
+    column: $table.followUpDelayMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get maxRepeats => $composableBuilder(
+    column: $table.maxRepeats,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedTuneId => $composableBuilder(
+    column: $table.selectedTuneId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8533,6 +9991,26 @@ class $$TasksTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get followUpEnabled => $composableBuilder(
+    column: $table.followUpEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get followUpDelayMinutes => $composableBuilder(
+    column: $table.followUpDelayMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get maxRepeats => $composableBuilder(
+    column: $table.maxRepeats,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectedTuneId => $composableBuilder(
+    column: $table.selectedTuneId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -8584,6 +10062,26 @@ class $$TasksTableTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<bool> get followUpEnabled => $composableBuilder(
+    column: $table.followUpEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get followUpDelayMinutes => $composableBuilder(
+    column: $table.followUpDelayMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get maxRepeats => $composableBuilder(
+    column: $table.maxRepeats,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedTuneId => $composableBuilder(
+    column: $table.selectedTuneId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -8631,6 +10129,10 @@ class $$TasksTableTableTableManager
                 Value<String?> dueTime = const Value.absent(),
                 Value<String> reminder = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
+                Value<bool> followUpEnabled = const Value.absent(),
+                Value<int> followUpDelayMinutes = const Value.absent(),
+                Value<int> maxRepeats = const Value.absent(),
+                Value<String?> selectedTuneId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -8644,6 +10146,10 @@ class $$TasksTableTableTableManager
                 dueTime: dueTime,
                 reminder: reminder,
                 isCompleted: isCompleted,
+                followUpEnabled: followUpEnabled,
+                followUpDelayMinutes: followUpDelayMinutes,
+                maxRepeats: maxRepeats,
+                selectedTuneId: selectedTuneId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -8659,6 +10165,10 @@ class $$TasksTableTableTableManager
                 Value<String?> dueTime = const Value.absent(),
                 Value<String> reminder = const Value.absent(),
                 Value<bool> isCompleted = const Value.absent(),
+                Value<bool> followUpEnabled = const Value.absent(),
+                Value<int> followUpDelayMinutes = const Value.absent(),
+                Value<int> maxRepeats = const Value.absent(),
+                Value<String?> selectedTuneId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -8672,6 +10182,10 @@ class $$TasksTableTableTableManager
                 dueTime: dueTime,
                 reminder: reminder,
                 isCompleted: isCompleted,
+                followUpEnabled: followUpEnabled,
+                followUpDelayMinutes: followUpDelayMinutes,
+                maxRepeats: maxRepeats,
+                selectedTuneId: selectedTuneId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -10022,13 +11536,255 @@ typedef $$BudgetAllocationsTableTableProcessedTableManager =
       BudgetAllocationEntry,
       PrefetchHooks Function()
     >;
+typedef $$NoteFoldersTableTableCreateCompanionBuilder =
+    NoteFoldersTableCompanion Function({
+      required String id,
+      required String name,
+      Value<String?> parentFolderId,
+      Value<String> colorHex,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$NoteFoldersTableTableUpdateCompanionBuilder =
+    NoteFoldersTableCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String?> parentFolderId,
+      Value<String> colorHex,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$NoteFoldersTableTableFilterComposer
+    extends Composer<_$AppDatabase, $NoteFoldersTableTable> {
+  $$NoteFoldersTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get parentFolderId => $composableBuilder(
+    column: $table.parentFolderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NoteFoldersTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $NoteFoldersTableTable> {
+  $$NoteFoldersTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get parentFolderId => $composableBuilder(
+    column: $table.parentFolderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get colorHex => $composableBuilder(
+    column: $table.colorHex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NoteFoldersTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NoteFoldersTableTable> {
+  $$NoteFoldersTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get parentFolderId => $composableBuilder(
+    column: $table.parentFolderId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get colorHex =>
+      $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$NoteFoldersTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NoteFoldersTableTable,
+          NoteFolderEntry,
+          $$NoteFoldersTableTableFilterComposer,
+          $$NoteFoldersTableTableOrderingComposer,
+          $$NoteFoldersTableTableAnnotationComposer,
+          $$NoteFoldersTableTableCreateCompanionBuilder,
+          $$NoteFoldersTableTableUpdateCompanionBuilder,
+          (
+            NoteFolderEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $NoteFoldersTableTable,
+              NoteFolderEntry
+            >,
+          ),
+          NoteFolderEntry,
+          PrefetchHooks Function()
+        > {
+  $$NoteFoldersTableTableTableManager(
+    _$AppDatabase db,
+    $NoteFoldersTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NoteFoldersTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NoteFoldersTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NoteFoldersTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> parentFolderId = const Value.absent(),
+                Value<String> colorHex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NoteFoldersTableCompanion(
+                id: id,
+                name: name,
+                parentFolderId: parentFolderId,
+                colorHex: colorHex,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                Value<String?> parentFolderId = const Value.absent(),
+                Value<String> colorHex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NoteFoldersTableCompanion.insert(
+                id: id,
+                name: name,
+                parentFolderId: parentFolderId,
+                colorHex: colorHex,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$NoteFoldersTableTable, NoteFolderEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $NoteFoldersTableTable,
+                    NoteFolderEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NoteFoldersTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NoteFoldersTableTable,
+      NoteFolderEntry,
+      $$NoteFoldersTableTableFilterComposer,
+      $$NoteFoldersTableTableOrderingComposer,
+      $$NoteFoldersTableTableAnnotationComposer,
+      $$NoteFoldersTableTableCreateCompanionBuilder,
+      $$NoteFoldersTableTableUpdateCompanionBuilder,
+      (
+        NoteFolderEntry,
+        BaseReferences<_$AppDatabase, $NoteFoldersTableTable, NoteFolderEntry>,
+      ),
+      NoteFolderEntry,
+      PrefetchHooks Function()
+    >;
 typedef $$NotesTableTableCreateCompanionBuilder =
     NotesTableCompanion Function({
       required String id,
       required String title,
       required String body,
       Value<String> category,
+      Value<String?> folderId,
       Value<bool> isPinned,
+      Value<bool> isTrashed,
+      Value<DateTime?> trashedAt,
+      Value<String> templateType,
+      Value<String?> contentBlocksJson,
+      Value<String?> drawingStrokesJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -10039,7 +11795,13 @@ typedef $$NotesTableTableUpdateCompanionBuilder =
       Value<String> title,
       Value<String> body,
       Value<String> category,
+      Value<String?> folderId,
       Value<bool> isPinned,
+      Value<bool> isTrashed,
+      Value<DateTime?> trashedAt,
+      Value<String> templateType,
+      Value<String?> contentBlocksJson,
+      Value<String?> drawingStrokesJson,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -10074,8 +11836,38 @@ class $$NotesTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<bool> get isPinned => $composableBuilder(
     column: $table.isPinned,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isTrashed => $composableBuilder(
+    column: $table.isTrashed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get trashedAt => $composableBuilder(
+    column: $table.trashedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get templateType => $composableBuilder(
+    column: $table.templateType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentBlocksJson => $composableBuilder(
+    column: $table.contentBlocksJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get drawingStrokesJson => $composableBuilder(
+    column: $table.drawingStrokesJson,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -10119,8 +11911,38 @@ class $$NotesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isPinned => $composableBuilder(
     column: $table.isPinned,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isTrashed => $composableBuilder(
+    column: $table.isTrashed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get trashedAt => $composableBuilder(
+    column: $table.trashedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get templateType => $composableBuilder(
+    column: $table.templateType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentBlocksJson => $composableBuilder(
+    column: $table.contentBlocksJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get drawingStrokesJson => $composableBuilder(
+    column: $table.drawingStrokesJson,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -10156,8 +11978,32 @@ class $$NotesTableTableAnnotationComposer
   GeneratedColumn<String> get category =>
       $composableBuilder(column: $table.category, builder: (column) => column);
 
+  GeneratedColumn<String> get folderId =>
+      $composableBuilder(column: $table.folderId, builder: (column) => column);
+
   GeneratedColumn<bool> get isPinned =>
       $composableBuilder(column: $table.isPinned, builder: (column) => column);
+
+  GeneratedColumn<bool> get isTrashed =>
+      $composableBuilder(column: $table.isTrashed, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get trashedAt =>
+      $composableBuilder(column: $table.trashedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get templateType => $composableBuilder(
+    column: $table.templateType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get contentBlocksJson => $composableBuilder(
+    column: $table.contentBlocksJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get drawingStrokesJson => $composableBuilder(
+    column: $table.drawingStrokesJson,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -10201,7 +12047,13 @@ class $$NotesTableTableTableManager
                 Value<String> title = const Value.absent(),
                 Value<String> body = const Value.absent(),
                 Value<String> category = const Value.absent(),
+                Value<String?> folderId = const Value.absent(),
                 Value<bool> isPinned = const Value.absent(),
+                Value<bool> isTrashed = const Value.absent(),
+                Value<DateTime?> trashedAt = const Value.absent(),
+                Value<String> templateType = const Value.absent(),
+                Value<String?> contentBlocksJson = const Value.absent(),
+                Value<String?> drawingStrokesJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -10210,7 +12062,13 @@ class $$NotesTableTableTableManager
                 title: title,
                 body: body,
                 category: category,
+                folderId: folderId,
                 isPinned: isPinned,
+                isTrashed: isTrashed,
+                trashedAt: trashedAt,
+                templateType: templateType,
+                contentBlocksJson: contentBlocksJson,
+                drawingStrokesJson: drawingStrokesJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -10221,7 +12079,13 @@ class $$NotesTableTableTableManager
                 required String title,
                 required String body,
                 Value<String> category = const Value.absent(),
+                Value<String?> folderId = const Value.absent(),
                 Value<bool> isPinned = const Value.absent(),
+                Value<bool> isTrashed = const Value.absent(),
+                Value<DateTime?> trashedAt = const Value.absent(),
+                Value<String> templateType = const Value.absent(),
+                Value<String?> contentBlocksJson = const Value.absent(),
+                Value<String?> drawingStrokesJson = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -10230,7 +12094,13 @@ class $$NotesTableTableTableManager
                 title: title,
                 body: body,
                 category: category,
+                folderId: folderId,
                 isPinned: isPinned,
+                isTrashed: isTrashed,
+                trashedAt: trashedAt,
+                templateType: templateType,
+                contentBlocksJson: contentBlocksJson,
+                drawingStrokesJson: drawingStrokesJson,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -11473,6 +13343,281 @@ typedef $$HabitLogsTableTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $HabitLogsTableTable, HabitLogEntry>,
       ),
       HabitLogEntry,
+      PrefetchHooks Function()
+    >;
+typedef $$ScheduledRemindersTableTableCreateCompanionBuilder =
+    ScheduledRemindersTableCompanion Function({
+      required String id,
+      required String taskId,
+      Value<int> attemptIndex,
+      required DateTime scheduledAt,
+      required int notificationId,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+typedef $$ScheduledRemindersTableTableUpdateCompanionBuilder =
+    ScheduledRemindersTableCompanion Function({
+      Value<String> id,
+      Value<String> taskId,
+      Value<int> attemptIndex,
+      Value<DateTime> scheduledAt,
+      Value<int> notificationId,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$ScheduledRemindersTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ScheduledRemindersTableTable> {
+  $$ScheduledRemindersTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get taskId => $composableBuilder(
+    column: $table.taskId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get attemptIndex => $composableBuilder(
+    column: $table.attemptIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get notificationId => $composableBuilder(
+    column: $table.notificationId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ScheduledRemindersTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ScheduledRemindersTableTable> {
+  $$ScheduledRemindersTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get taskId => $composableBuilder(
+    column: $table.taskId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get attemptIndex => $composableBuilder(
+    column: $table.attemptIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get notificationId => $composableBuilder(
+    column: $table.notificationId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ScheduledRemindersTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ScheduledRemindersTableTable> {
+  $$ScheduledRemindersTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get taskId =>
+      $composableBuilder(column: $table.taskId, builder: (column) => column);
+
+  GeneratedColumn<int> get attemptIndex => $composableBuilder(
+    column: $table.attemptIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get scheduledAt => $composableBuilder(
+    column: $table.scheduledAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get notificationId => $composableBuilder(
+    column: $table.notificationId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ScheduledRemindersTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ScheduledRemindersTableTable,
+          ScheduledReminderEntry,
+          $$ScheduledRemindersTableTableFilterComposer,
+          $$ScheduledRemindersTableTableOrderingComposer,
+          $$ScheduledRemindersTableTableAnnotationComposer,
+          $$ScheduledRemindersTableTableCreateCompanionBuilder,
+          $$ScheduledRemindersTableTableUpdateCompanionBuilder,
+          (
+            ScheduledReminderEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $ScheduledRemindersTableTable,
+              ScheduledReminderEntry
+            >,
+          ),
+          ScheduledReminderEntry,
+          PrefetchHooks Function()
+        > {
+  $$ScheduledRemindersTableTableTableManager(
+    _$AppDatabase db,
+    $ScheduledRemindersTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScheduledRemindersTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ScheduledRemindersTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ScheduledRemindersTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> taskId = const Value.absent(),
+                Value<int> attemptIndex = const Value.absent(),
+                Value<DateTime> scheduledAt = const Value.absent(),
+                Value<int> notificationId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScheduledRemindersTableCompanion(
+                id: id,
+                taskId: taskId,
+                attemptIndex: attemptIndex,
+                scheduledAt: scheduledAt,
+                notificationId: notificationId,
+                status: status,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String taskId,
+                Value<int> attemptIndex = const Value.absent(),
+                required DateTime scheduledAt,
+                required int notificationId,
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScheduledRemindersTableCompanion.insert(
+                id: id,
+                taskId: taskId,
+                attemptIndex: attemptIndex,
+                scheduledAt: scheduledAt,
+                notificationId: notificationId,
+                status: status,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $ScheduledRemindersTableTable,
+                    ScheduledReminderEntry
+                  >(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ScheduledRemindersTableTable,
+                    ScheduledReminderEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ScheduledRemindersTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ScheduledRemindersTableTable,
+      ScheduledReminderEntry,
+      $$ScheduledRemindersTableTableFilterComposer,
+      $$ScheduledRemindersTableTableOrderingComposer,
+      $$ScheduledRemindersTableTableAnnotationComposer,
+      $$ScheduledRemindersTableTableCreateCompanionBuilder,
+      $$ScheduledRemindersTableTableUpdateCompanionBuilder,
+      (
+        ScheduledReminderEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $ScheduledRemindersTableTable,
+          ScheduledReminderEntry
+        >,
+      ),
+      ScheduledReminderEntry,
       PrefetchHooks Function()
     >;
 typedef $$GroupOutingsTableTableCreateCompanionBuilder =
@@ -13033,6 +15178,8 @@ class $AppDatabaseManager {
         _db,
         _db.budgetAllocationsTable,
       );
+  $$NoteFoldersTableTableTableManager get noteFoldersTable =>
+      $$NoteFoldersTableTableTableManager(_db, _db.noteFoldersTable);
   $$NotesTableTableTableManager get notesTable =>
       $$NotesTableTableTableManager(_db, _db.notesTable);
   $$NoteAttachmentsTableTableTableManager get noteAttachmentsTable =>
@@ -13045,6 +15192,11 @@ class $AppDatabaseManager {
       $$HabitsTableTableTableManager(_db, _db.habitsTable);
   $$HabitLogsTableTableTableManager get habitLogsTable =>
       $$HabitLogsTableTableTableManager(_db, _db.habitLogsTable);
+  $$ScheduledRemindersTableTableTableManager get scheduledRemindersTable =>
+      $$ScheduledRemindersTableTableTableManager(
+        _db,
+        _db.scheduledRemindersTable,
+      );
   $$GroupOutingsTableTableTableManager get groupOutingsTable =>
       $$GroupOutingsTableTableTableManager(_db, _db.groupOutingsTable);
   $$OutingMembersTableTableTableManager get outingMembersTable =>

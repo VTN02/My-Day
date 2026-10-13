@@ -4,7 +4,9 @@ import 'tables/budgets_table.dart';
 import 'tables/financial_accounts_table.dart';
 import 'tables/financial_transactions_table.dart';
 import 'tables/habits_table.dart';
+import 'tables/note_folders_table.dart';
 import 'tables/notes_table.dart';
+import 'tables/scheduled_reminders_table.dart';
 import 'tables/task_categories_table.dart';
 import 'tables/tasks_table.dart';
 import 'tables/user_profile_table.dart';
@@ -25,12 +27,14 @@ part 'app_database.g.dart';
     FinancialTransactionsTable,
     MonthlyBudgetsTable,
     BudgetAllocationsTable,
+    NoteFoldersTable,
     NotesTable,
     NoteAttachmentsTable,
     UserProfileTable,
     AppSettingsTable,
     HabitsTable,
     HabitLogsTable,
+    ScheduledRemindersTable,
     GroupOutingsTable,
     OutingMembersTable,
     OutingExpensesTable,
@@ -42,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -57,6 +61,20 @@ class AppDatabase extends _$AppDatabase {
         await m.createTable(outingExpensesTable);
         await m.createTable(outingExpenseSharesTable);
         await m.createTable(outingSettlementsTable);
+      }
+      if (from < 3) {
+        await m.createTable(noteFoldersTable);
+        await m.createTable(scheduledRemindersTable);
+        await m.addColumn(notesTable, notesTable.folderId);
+        await m.addColumn(notesTable, notesTable.isTrashed);
+        await m.addColumn(notesTable, notesTable.trashedAt);
+        await m.addColumn(notesTable, notesTable.templateType);
+        await m.addColumn(notesTable, notesTable.contentBlocksJson);
+        await m.addColumn(notesTable, notesTable.drawingStrokesJson);
+        await m.addColumn(tasksTable, tasksTable.followUpEnabled);
+        await m.addColumn(tasksTable, tasksTable.followUpDelayMinutes);
+        await m.addColumn(tasksTable, tasksTable.maxRepeats);
+        await m.addColumn(tasksTable, tasksTable.selectedTuneId);
       }
     },
   );
@@ -121,7 +139,27 @@ class AppDatabase extends _$AppDatabase {
       );
     }
 
-    // 4. Seed Default Habits
+    // 4. Seed Default Note Folders
+    final defaultFolders = [
+      ('folder_quick', 'Quick Notes', '#1565C0'),
+      ('folder_personal', 'Personal', '#10B981'),
+      ('folder_work', 'Work', '#7C3AED'),
+      ('folder_ideas', 'Ideas & Projects', '#F59E0B'),
+    ];
+
+    for (final f in defaultFolders) {
+      await into(noteFoldersTable).insert(
+        NoteFoldersTableCompanion.insert(
+          id: f.$1,
+          name: f.$2,
+          colorHex: Value(f.$3),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+    }
+
+    // 5. Seed Default Habits
     final defaultHabits = [
       (
         'habit_1',

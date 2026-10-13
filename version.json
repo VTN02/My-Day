@@ -1,16 +1,16 @@
 {
-  "latest_version": "1.1.1",
-  "version_code": 4,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.1.1/myday-v1.1.1.apk",
+  "latest_version": "1.2.0",
+  "version_code": 5,
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.2.0/myday-v1.2.0.apk",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
-  "file_size": "72 MB",
+  "file_size": "85 MB",
   "is_mandatory": false,
   "release_notes": [
-    "⚡ Live Budget Usage Updates: Real-time budget progress bar & remaining balance calculations when adding or editing expenses in MyDay Split.",
-    "📄 Professional Accounting PDF Export: Export comprehensive outing split statements with zero-sum member ledgers and itemized transaction tables.",
-    "📌 Pinned Sticky Headers: Headers remain fixed at the top across all dashboards when scrolling.",
-    "🗂️ Realigned Today Screen: Intuitive layout with Daily Habits & Streaks positioned at the bottom.",
-    "🌐 Universal Android Compatibility: Full support across all Android devices."
+    "🎨 Brand Identity Refresh: Clean transparent ribbon logo without background applied across app and admin console.",
+    "📝 MyDay Notes Experience: Samsung Notes–inspired editor with vector sketching, rich text formatting, checklist blocks, and audio/file attachments.",
+    "🔔 Smart Reminder Escalation: Configurable repetitive reminder escalation intervals and customizable reminder audio tunes managed through Super Admin.",
+    "📅 Calendar Integration: Unified view linking daily tasks, schedules, and reminders with monthly dot distribution.",
+    "📄 In-App Document Viewer: High-performance viewer supporting PDF documents and images with Android 'Open with' system integration."
   ]
 }

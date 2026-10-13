@@ -120,7 +120,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
-      color: const Color(0xFF4F46E5),
+      color: const Color(0xFF1565C0),
       styleInformation: BigTextStyleInformation(
         expandedBody,
         contentTitle: '⏰ $title ($summaryText)',
@@ -163,7 +163,7 @@ class NotificationService {
       importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
-      color: const Color(0xFF4F46E5),
+      color: const Color(0xFF1565C0),
       styleInformation: BigTextStyleInformation(
         notesText,
         contentTitle: '🚀 New MyDay Update (v$latestVersion)',
@@ -213,7 +213,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
-      color: const Color(0xFF4F46E5),
+      color: const Color(0xFF1565C0),
       styleInformation: BigTextStyleInformation(
         expandedBody,
         contentTitle: '⏰ $title ($summaryText)',

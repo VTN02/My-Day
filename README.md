@@ -54,9 +54,9 @@ npm run dev
 
 ## 🎨 Design System
 
-- **Primary Indigo:** `#4F46E5`
-- **Secondary Violet:** `#7C3AED`
-- **Accent Cyan:** `#06B6D4`
+- **Primary Ocean:** `#1565C0`
+- **Secondary Ocean:** `#0288D1`
+- **Accent Cyan:** `#4DD0E1`
 - **Success Mint:** `#10B981`
 - **Expense/Alert Coral:** `#F97373`
 - **Typography:** Modern sans-serif (Inter / Outfit)

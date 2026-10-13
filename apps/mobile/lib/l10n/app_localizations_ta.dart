@@ -216,4 +216,40 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get splitAddExpense => 'செலவைச் சேர்';
+
+  @override
+  String get notesTitle => 'குறிப்புகள்';
+
+  @override
+  String get notesCreate => 'புதிய குறிப்பு';
+
+  @override
+  String get notesSearchHint => 'குறிப்புகளைத் தேடுங்கள்...';
+
+  @override
+  String get notesAll => 'அனைத்து குறிப்புகள்';
+
+  @override
+  String get notesPinned => 'பின் செய்யப்பட்டவை';
+
+  @override
+  String get notesFolders => 'கோப்புறைகள்';
+
+  @override
+  String get notesTrash => 'குப்பைத் தொட்டி';
+
+  @override
+  String get notesEmpty => 'குறிப்புகள் எதுவும் இல்லை';
+
+  @override
+  String get notesTrashEmpty => 'குப்பைத் தொட்டி காலியாக உள்ளது';
+
+  @override
+  String get notesPaperStyle => 'தாள் பாணி';
+
+  @override
+  String get smartRemindersTitle => 'ஸ்மார்ட் நினைவூட்டல்கள் மற்றும் மெட்டுகள்';
+
+  @override
+  String get smartRemindersFollowUp => 'தொடர் நினைவூட்டல்கள்';
 }

@@ -1,29 +1,29 @@
 # MyDay — UI/UX Design System Specification
 
-## Brand Color Palette
-- **Primary Indigo**: `#4F46E5` (Brand focus, interactive elements)
-- **Secondary Violet**: `#7C3AED` (Gradients, secondary highlights)
-- **Accent Cyan**: `#06B6D4` (Highlights, positive accents)
+## Brand Color Palette (Ocean Blue Theme)
+- **Primary Ocean**: `#1565C0` (Brand focus, interactive elements)
+- **Secondary Ocean**: `#0288D1` (Gradients, secondary highlights)
+- **Accent Cyan**: `#4DD0E1` (Highlights, positive accents)
 - **Success Mint**: `#10B981` (Completed tasks, income, positive status)
 - **Expense/Alert Coral**: `#F97373` (Expenses, overdue tasks, destructive actions)
 
 ## Surface & Neutral Colors
-- **Light Background**: `#F7F8FC`
+- **Light Background**: `#F5F9FC`
 - **Light Surface / Card**: `#FFFFFF`
 - **Light Border / Divider**: `#E2E8F0`
-- **Primary Text**: `#0F172A`
-- **Secondary Text**: `#64748B`
+- **Primary Text**: `#172B4D`
+- **Secondary Text**: `#5E6C84`
 
-- **Dark Background**: `#0B1020`
-- **Dark Surface / Card**: `#151B2E`
-- **Dark Border**: `#1E293B`
+- **Dark Background**: `#0D1B2A`
+- **Dark Surface / Card**: `#1B263B`
+- **Dark Border**: `#24344D`
 - **Dark Primary Text**: `#F1F5F9`
 - **Dark Secondary Text**: `#94A3B8`
 
 ## Gradients
-- **Primary Brand Gradient**: `linear-gradient(120deg, #4338CA 0%, #7C3AED 55%, #06B6D4 100%)`
-- **Finance Gradient**: `linear-gradient(120deg, #0F766E 0%, #06B6D4 100%)`
-- **Dark Hero Gradient**: `linear-gradient(120deg, #111827 0%, #312E81 50%, #6D28D9 100%)`
+- **Primary Brand Gradient**: `linear-gradient(120deg, #1565C0 0%, #0288D1 55%, #4DD0E1 100%)`
+- **Finance Gradient**: `linear-gradient(120deg, #0288D1 0%, #4DD0E1 100%)`
+- **Dark Hero Gradient**: `linear-gradient(120deg, #0D1B2A 0%, #1B263B 50%, #0288D1 100%)`
 
 ## Typography
 - Font Family: `Outfit` / `Inter`

@@ -13,6 +13,6 @@ class AppShadows {
   ];
 
   static const List<BoxShadow> floating = [
-    BoxShadow(color: Color(0x334F46E5), blurRadius: 20, offset: Offset(0, 8)),
+    BoxShadow(color: Color(0x331565C0), blurRadius: 20, offset: Offset(0, 8)),
   ];
 }

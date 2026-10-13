@@ -507,6 +507,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Expense'**
   String get splitAddExpense;
+
+  /// No description provided for @notesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notesTitle;
+
+  /// No description provided for @notesCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Note'**
+  String get notesCreate;
+
+  /// No description provided for @notesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search titles and note text...'**
+  String get notesSearchHint;
+
+  /// No description provided for @notesAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All Notes'**
+  String get notesAll;
+
+  /// No description provided for @notesPinned.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get notesPinned;
+
+  /// No description provided for @notesFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get notesFolders;
+
+  /// No description provided for @notesTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash'**
+  String get notesTrash;
+
+  /// No description provided for @notesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes found'**
+  String get notesEmpty;
+
+  /// No description provided for @notesTrashEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash is empty'**
+  String get notesTrashEmpty;
+
+  /// No description provided for @notesPaperStyle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paper Style'**
+  String get notesPaperStyle;
+
+  /// No description provided for @smartRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Reminders & Tunes'**
+  String get smartRemindersTitle;
+
+  /// No description provided for @smartRemindersFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Follow-up Reminders'**
+  String get smartRemindersFollowUp;
 }
 
 class _AppLocalizationsDelegate

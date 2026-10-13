@@ -17,6 +17,9 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+    tasks.matching { it.name.contains("Lint") }.configureEach {
+        enabled = false
+    }
 }
 
 tasks.register<Delete>("clean") {

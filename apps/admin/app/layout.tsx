@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
 import React from 'react';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'MyDay Super Admin Console',
-  description: 'Administrative management console for MyDay platform.',
+  title: 'MyDay — Super Admin Console',
+  description: 'Enterprise administrative management, telemetry, and release console for MyDay.',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#0B1020] text-[#F1F5F9] antialiased">
+      <body className="bg-[#F6F8FC] text-[#1E293B] antialiased selection:bg-blue-100 selection:text-blue-900">
         {children}
       </body>
     </html>

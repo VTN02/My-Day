@@ -67,5 +67,17 @@
   "splitSettleUp": "கணக்கைத் தீர்க்க",
   "splitManageFriends": "நண்பர்களை நிர்வகி",
   "splitRepaymentHistory": "திருப்பிச் செலுத்திய வரலாறு",
-  "splitAddExpense": "செலவைச் சேர்"
+  "splitAddExpense": "செலவைச் சேர்",
+  "notesTitle": "குறிப்புகள்",
+  "notesCreate": "புதிய குறிப்பு",
+  "notesSearchHint": "குறிப்புகளைத் தேடுங்கள்...",
+  "notesAll": "அனைத்து குறிப்புகள்",
+  "notesPinned": "பின் செய்யப்பட்டவை",
+  "notesFolders": "கோப்புறைகள்",
+  "notesTrash": "குப்பைத் தொட்டி",
+  "notesEmpty": "குறிப்புகள் எதுவும் இல்லை",
+  "notesTrashEmpty": "குப்பைத் தொட்டி காலியாக உள்ளது",
+  "notesPaperStyle": "தாள் பாணி",
+  "smartRemindersTitle": "ஸ்மார்ட் நினைவூட்டல்கள் மற்றும் மெட்டுகள்",
+  "smartRemindersFollowUp": "தொடர் நினைவூட்டல்கள்"
 }

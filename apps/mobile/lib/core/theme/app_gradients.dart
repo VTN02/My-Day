@@ -4,33 +4,33 @@ import 'package:flutter/material.dart';
 class AppGradients {
   AppGradients._();
 
-  // Primary Brand: linear-gradient(120deg, #4338CA 0%, #7C3AED 55%, #06B6D4 100%)
+  // Primary Brand Ocean Blue: linear-gradient(120deg, #1565C0 0%, #0288D1 55%, #4DD0E1 100%)
   static const LinearGradient primaryBrand = LinearGradient(
     begin: Alignment(-0.86, -0.5), // ~120 degrees
     end: Alignment(0.86, 0.5),
-    colors: [Color(0xFF4338CA), Color(0xFF7C3AED), Color(0xFF06B6D4)],
+    colors: [Color(0xFF1565C0), Color(0xFF0288D1), Color(0xFF4DD0E1)],
     stops: [0.0, 0.55, 1.0],
   );
 
-  // Finance: linear-gradient(120deg, #0F766E, #06B6D4)
+  // Finance: linear-gradient(120deg, #0288D1, #4DD0E1)
   static const LinearGradient finance = LinearGradient(
     begin: Alignment(-0.86, -0.5),
     end: Alignment(0.86, 0.5),
-    colors: [Color(0xFF0F766E), Color(0xFF06B6D4)],
+    colors: [Color(0xFF0288D1), Color(0xFF4DD0E1)],
   );
 
-  // Dark Hero: linear-gradient(120deg, #111827, #312E81, #6D28D9)
+  // Dark Hero: linear-gradient(120deg, #0D1B2A, #1B263B, #0288D1)
   static const LinearGradient darkHero = LinearGradient(
     begin: Alignment(-0.86, -0.5),
     end: Alignment(0.86, 0.5),
-    colors: [Color(0xFF111827), Color(0xFF312E81), Color(0xFF6D28D9)],
+    colors: [Color(0xFF0D1B2A), Color(0xFF1B263B), Color(0xFF0288D1)],
   );
 
   // Subtle Card Gradients
   static const LinearGradient subtleCard = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+    colors: [Color(0xFF1565C0), Color(0xFF0288D1)],
   );
 
   // Mint / Success Gradient

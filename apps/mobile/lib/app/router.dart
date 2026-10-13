@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/calendar/presentation/calendar_screen.dart';
+import '../features/document_viewer/presentation/document_viewer_screen.dart';
 import '../features/finance/presentation/finance_screen.dart';
 import '../features/notes/presentation/notes_screen.dart';
+import '../features/notes/presentation/screens/note_editor_screen.dart';
+import '../features/notes/presentation/screens/notes_trash_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/settings/presentation/smart_reminder_settings_screen.dart';
 import '../features/shell/app_shell.dart';
 import '../features/tasks/presentation/tasks_screen.dart';
 import '../features/today/presentation/today_screen.dart';
@@ -100,6 +104,47 @@ final GoRouter appRouter = GoRouter(
       name: 'settings',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const SettingsScreen(),
+    ),
+    // Smart Reminders Settings Route
+    GoRoute(
+      path: '/settings/reminders',
+      name: 'settings_reminders',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const SmartReminderSettingsScreen(),
+    ),
+    // Notes: Create Note Route
+    GoRoute(
+      path: '/notes/create',
+      name: 'notes_create',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const NoteEditorScreen(),
+    ),
+    // Notes: Trash Screen Route
+    GoRoute(
+      path: '/notes/trash',
+      name: 'notes_trash',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const NotesTrashScreen(),
+    ),
+    // Notes: Edit Note Route
+    GoRoute(
+      path: '/notes/:id',
+      name: 'notes_edit',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final id = state.pathParameters['id'];
+        return NoteEditorScreen(noteId: id);
+      },
+    ),
+    // Document Viewer Route
+    GoRoute(
+      path: '/document-viewer',
+      name: 'document_viewer',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final args = state.extra as DocumentViewerArgs;
+        return DocumentViewerScreen(args: args);
+      },
     ),
     // MyDay Split: Outings List
     GoRoute(

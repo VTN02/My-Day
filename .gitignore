@@ -48,5 +48,6 @@ Thumbs.db
 logs/
 *.log
 
-# Binaries
+# Binaries & build artifacts
 *.apk
+*.tsbuildinfo

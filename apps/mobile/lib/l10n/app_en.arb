@@ -67,5 +67,17 @@
   "splitSettleUp": "Settle Up",
   "splitManageFriends": "Manage Friends",
   "splitRepaymentHistory": "Repayment History",
-  "splitAddExpense": "Add Expense"
+  "splitAddExpense": "Add Expense",
+  "notesTitle": "Notes",
+  "notesCreate": "Create Note",
+  "notesSearchHint": "Search titles and note text...",
+  "notesAll": "All Notes",
+  "notesPinned": "Pinned",
+  "notesFolders": "Folders",
+  "notesTrash": "Trash",
+  "notesEmpty": "No notes found",
+  "notesTrashEmpty": "Trash is empty",
+  "notesPaperStyle": "Paper Style",
+  "smartRemindersTitle": "Smart Reminders & Tunes",
+  "smartRemindersFollowUp": "Smart Follow-up Reminders"
 }

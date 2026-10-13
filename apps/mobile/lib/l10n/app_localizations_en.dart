@@ -214,4 +214,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get splitAddExpense => 'Add Expense';
+
+  @override
+  String get notesTitle => 'Notes';
+
+  @override
+  String get notesCreate => 'Create Note';
+
+  @override
+  String get notesSearchHint => 'Search titles and note text...';
+
+  @override
+  String get notesAll => 'All Notes';
+
+  @override
+  String get notesPinned => 'Pinned';
+
+  @override
+  String get notesFolders => 'Folders';
+
+  @override
+  String get notesTrash => 'Trash';
+
+  @override
+  String get notesEmpty => 'No notes found';
+
+  @override
+  String get notesTrashEmpty => 'Trash is empty';
+
+  @override
+  String get notesPaperStyle => 'Paper Style';
+
+  @override
+  String get smartRemindersTitle => 'Smart Reminders & Tunes';
+
+  @override
+  String get smartRemindersFollowUp => 'Smart Follow-up Reminders';
 }

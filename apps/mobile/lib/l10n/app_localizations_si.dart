@@ -216,4 +216,40 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get splitAddExpense => 'වියදමක් එක් කරන්න';
+
+  @override
+  String get notesTitle => 'සටහන්';
+
+  @override
+  String get notesCreate => 'නව සටහනක්';
+
+  @override
+  String get notesSearchHint => 'සටහන් සොයන්න...';
+
+  @override
+  String get notesAll => 'සියලු සටහන්';
+
+  @override
+  String get notesPinned => 'පින් කළ සටහන්';
+
+  @override
+  String get notesFolders => 'ෆෝල්ඩර';
+
+  @override
+  String get notesTrash => 'කසළ බඳුන';
+
+  @override
+  String get notesEmpty => 'සටහන් නොමැත';
+
+  @override
+  String get notesTrashEmpty => 'කසළ බඳුන හිස්ය';
+
+  @override
+  String get notesPaperStyle => 'කඩදාසි විලාසය';
+
+  @override
+  String get smartRemindersTitle => 'ස්මාර්ට් මතක්කිරීම් සහ තනු';
+
+  @override
+  String get smartRemindersFollowUp => 'නැවත සිහිපත් කිරීම්';
 }

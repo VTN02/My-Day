@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../core/database/app_database.dart';
 import '../../../core/providers/database_providers.dart';
+import '../../../core/services/smart_reminder_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -585,7 +587,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           finalDueTime = _formatTimeLabel(selectedTime!);
                         }
 
-                        await ref
+                        final taskId = await ref
                             .read(tasksRepositoryProvider)
                             .createTask(
                               title: title,
@@ -595,6 +597,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               dueDate: finalDueDate,
                               dueTime: finalDueTime,
                             );
+
+                        final createdTask = await ref
+                            .read(tasksRepositoryProvider)
+                            .getTask(taskId);
+                        if (createdTask != null) {
+                          await ref
+                              .read(smartReminderServiceProvider)
+                              .scheduleTaskWithEscalation(createdTask);
+                        }
 
                         if (ctx.mounted) Navigator.of(ctx).pop();
                       },
@@ -635,6 +646,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       _selectedDay,
     );
 
+    final monthTasksAsync = ref.watch(tasksForMonthStreamProvider(_currentMonth));
+    final Map<int, List<TaskEntry>> tasksByDay = {};
+    monthTasksAsync.whenData((tasks) {
+      for (final task in tasks) {
+        if (task.dueDate != null &&
+            task.dueDate!.year == _currentMonth.year &&
+            task.dueDate!.month == _currentMonth.month) {
+          tasksByDay.putIfAbsent(task.dueDate!.day, () => []).add(task);
+        }
+      }
+    });
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -643,169 +666,256 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             title: 'Calendar',
             subtitle: 'Tap any date to open details and add tasks',
           ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: AppRadius.cardRadius,
-                        border: Border.all(color: borderColor),
-                      ),
-                      child: Column(
-                        children: [
-                          // Month Navigation Inside the Calendar
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.chevron_left_rounded,
-                                  size: 24,
-                                ),
-                                tooltip: 'Previous month',
-                                onPressed: _previousMonth,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: surfaceColor,
+                  borderRadius: AppRadius.cardRadius,
+                  border: Border.all(color: borderColor),
+                ),
+                child: Column(
+                  children: [
+                    // Month Navigation Inside the Calendar with Today button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.chevron_left_rounded,
+                                size: 24,
                               ),
-                              Text(
-                                '${_monthName(_currentMonth.month)} ${_currentMonth.year}',
-                                style: TextStyle(
-                                  fontSize: 16.5,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                  color: isDark
-                                      ? AppColors.darkPrimaryText
-                                      : AppColors.lightPrimaryText,
-                                ),
+                              tooltip: 'Previous month',
+                              onPressed: _previousMonth,
+                            ),
+                            Text(
+                              '${_monthName(_currentMonth.month)} ${_currentMonth.year}',
+                              style: TextStyle(
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.3,
+                                color: isDark
+                                    ? AppColors.darkPrimaryText
+                                    : AppColors.lightPrimaryText,
                               ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.chevron_right_rounded,
-                                  size: 24,
-                                ),
-                                tooltip: 'Next month',
-                                onPressed: _nextMonth,
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.chevron_right_rounded,
+                                size: 24,
                               ),
-                            ],
+                              tooltip: 'Next month',
+                              onPressed: _nextMonth,
+                            ),
+                          ],
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.today_rounded, size: 15),
+                          label: const Text(
+                            'Today',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                          const SizedBox(height: 8),
-
-                          // Weekday Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: _weekdays.map((day) {
-                              return Expanded(
-                                child: Text(
-                                  day,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: isDark
-                                        ? AppColors.darkSecondaryText
-                                        : AppColors.lightSecondaryText,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primaryIndigo,
+                            backgroundColor:
+                                AppColors.primaryIndigo.withValues(alpha: 0.1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
-                          const SizedBox(height: 10),
+                          onPressed: () {
+                            final now = DateTime.now();
+                            setState(() {
+                              _currentMonth = DateTime(now.year, now.month, 1);
+                              _selectedDay = now.day;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
 
-                          // Rectangle Calendar Days Grid
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 7,
-                                  mainAxisSpacing: 6,
-                                  crossAxisSpacing: 6,
-                                  childAspectRatio: 1.18, // Rectangle day cells
-                                ),
-                            itemCount: startingWeekday + daysInMonth,
-                            itemBuilder: (context, index) {
-                              if (index < startingWeekday) {
-                                return const SizedBox.shrink();
-                              }
+                    // Weekday Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _weekdays.map((day) {
+                        return Expanded(
+                          child: Text(
+                            day,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.darkSecondaryText
+                                  : AppColors.lightSecondaryText,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 10),
 
-                              final dayNumber = index - startingWeekday + 1;
-                              final isSelected = dayNumber == _selectedDay;
-                              final isToday =
-                                  dayNumber == DateTime.now().day &&
-                                  _currentMonth.month == DateTime.now().month &&
-                                  _currentMonth.year == DateTime.now().year;
-                              final cellDate = DateTime(
-                                _currentMonth.year,
-                                _currentMonth.month,
-                                dayNumber,
-                              );
+                    // Rectangle Calendar Days Grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 7,
+                            mainAxisSpacing: 6,
+                            crossAxisSpacing: 6,
+                            childAspectRatio: 1.18, // Rectangle day cells
+                          ),
+                      itemCount: startingWeekday + daysInMonth,
+                      itemBuilder: (context, index) {
+                        if (index < startingWeekday) {
+                          return const SizedBox.shrink();
+                        }
 
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedDay = dayNumber;
-                                  });
-                                  _showDateDetailsSheet(cellDate);
-                                },
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 180),
-                                  decoration: BoxDecoration(
-                                    color: isSelected
-                                        ? AppColors.primaryIndigo
-                                        : (isToday
-                                              ? (isDark
-                                                    ? AppColors.darkSoftIndigo
-                                                    : AppColors.lightSoftIndigo)
-                                              : (isDark
-                                                    ? Colors.white.withValues(
-                                                        alpha: 0.03,
-                                                      )
-                                                    : AppColors
-                                                          .lightBackground)),
-                                    borderRadius: AppRadius.smRadius,
-                                    border: Border.all(
-                                      color: isSelected
+                        final dayNumber = index - startingWeekday + 1;
+                        final isSelected = dayNumber == _selectedDay;
+                        final isToday =
+                            dayNumber == DateTime.now().day &&
+                            _currentMonth.month == DateTime.now().month &&
+                            _currentMonth.year == DateTime.now().year;
+                        final cellDate = DateTime(
+                          _currentMonth.year,
+                          _currentMonth.month,
+                          dayNumber,
+                        );
+
+                        final dayTasks = tasksByDay[dayNumber] ?? [];
+                        final hasHighPriorityPending = dayTasks.any(
+                          (t) =>
+                              !t.isCompleted &&
+                              t.priority.toLowerCase() == 'high',
+                        );
+                        final hasPending = dayTasks.any((t) => !t.isCompleted);
+                        final allCompleted =
+                            dayTasks.isNotEmpty &&
+                            dayTasks.every((t) => t.isCompleted);
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedDay = dayNumber;
+                            });
+                            _showDateDetailsSheet(cellDate);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primaryIndigo
+                                  : (isToday
+                                        ? (isDark
+                                              ? AppColors.darkSoftIndigo
+                                              : AppColors.lightSoftIndigo)
+                                        : (isDark
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.03,
+                                                )
+                                              : AppColors.lightBackground)),
+                              borderRadius: AppRadius.smRadius,
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.primaryIndigo
+                                    : (isToday
                                           ? AppColors.primaryIndigo
-                                          : (isToday
-                                                ? AppColors.primaryIndigo
-                                                : (isDark
-                                                      ? AppColors.darkBorder
-                                                            .withValues(
-                                                              alpha: 0.6,
-                                                            )
-                                                      : AppColors.lightBorder)),
-                                      width: isSelected || isToday ? 1.5 : 1,
-                                    ),
+                                          : (isDark
+                                                ? AppColors.darkBorder
+                                                      .withValues(alpha: 0.6)
+                                                : AppColors.lightBorder)),
+                                width: isSelected || isToday ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$dayNumber',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isSelected || isToday
+                                        ? FontWeight.w800
+                                        : FontWeight.w600,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : (isDark
+                                              ? AppColors.darkPrimaryText
+                                              : AppColors.lightPrimaryText),
                                   ),
-                                  child: Column(
+                                ),
+                                if (dayTasks.isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        '$dayNumber',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: isSelected || isToday
-                                              ? FontWeight.w800
-                                              : FontWeight.w600,
-                                          color: isSelected
-                                              ? Colors.white
-                                              : (isDark
-                                                    ? AppColors.darkPrimaryText
-                                                    : AppColors
-                                                          .lightPrimaryText),
+                                      if (hasHighPriorityPending)
+                                        Container(
+                                          width: 5,
+                                          height: 5,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 1,
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.errorCoral,
+                                            shape: BoxShape.circle,
+                                          ),
                                         ),
-                                      ),
+                                      if (hasPending && !hasHighPriorityPending)
+                                        Container(
+                                          width: 5,
+                                          height: 5,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 1,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Colors.white
+                                                : AppColors.primaryIndigo,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      if (allCompleted)
+                                        Container(
+                                          width: 5,
+                                          height: 5,
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 1,
+                                          ),
+                                          decoration: const BoxDecoration(
+                                            color: AppColors.successMint,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
                                     ],
                                   ),
-                                ),
-                              );
-                            },
+                                ],
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  ),
+                  ],
                 ),
+              ),
+            ),
+          ),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),

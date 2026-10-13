@@ -88,13 +88,11 @@ class GradientHeader extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(3),
-                              child: Image.asset(
-                                'assets/images/app_logo.png',
-                                width: 14,
-                                height: 14,
-                              ),
+                            Image.asset(
+                              'assets/images/app_logo.png',
+                              width: 14,
+                              height: 14,
+                              fit: BoxFit.contain,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -312,13 +310,11 @@ class _SliverGradientHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(3),
-                              child: Image.asset(
-                                'assets/images/app_logo.png',
-                                width: 14,
-                                height: 14,
-                              ),
+                            Image.asset(
+                              'assets/images/app_logo.png',
+                              width: 14,
+                              height: 14,
+                              fit: BoxFit.contain,
                             ),
                             const SizedBox(width: 6),
                             Text(

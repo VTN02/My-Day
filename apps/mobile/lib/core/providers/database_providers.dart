@@ -7,6 +7,8 @@ import '../repositories/notes_repository.dart';
 import '../repositories/profile_repository.dart';
 import '../repositories/settings_repository.dart';
 import '../repositories/tasks_repository.dart';
+import '../../features/notes/domain/models/note.dart';
+import '../../features/notes/domain/models/note_folder_model.dart';
 
 /// Database singleton provider
 final appDatabaseProvider = Provider<AppDatabase>((ref) {
@@ -26,7 +28,7 @@ final financeRepositoryProvider = Provider<FinanceRepository>((ref) {
 });
 
 /// Notes repository provider
-final notesRepositoryProvider = Provider<NotesRepository>((ref) {
+final notesRepositoryProvider = Provider<DriftNotesRepository>((ref) {
   return DriftNotesRepository(ref.watch(appDatabaseProvider));
 });
 
@@ -73,6 +75,11 @@ final tasksForDateStreamProvider =
       return ref.watch(tasksRepositoryProvider).watchTasksForDate(date);
     });
 
+final tasksForMonthStreamProvider =
+    StreamProvider.family<List<TaskEntry>, DateTime>((ref, month) {
+      return ref.watch(tasksRepositoryProvider).watchTasksForMonth(month);
+    });
+
 final financialAccountsStreamProvider =
     StreamProvider<List<FinancialAccountEntry>>((ref) {
       return ref.watch(financeRepositoryProvider).watchAccounts();
@@ -101,6 +108,18 @@ final currentMonthBudgetStreamProvider = StreamProvider<MonthlyBudgetEntry?>((
 
 final allNotesStreamProvider = StreamProvider<List<NoteEntry>>((ref) {
   return ref.watch(notesRepositoryProvider).watchAllNotes();
+});
+
+final activeNotesStreamProvider = StreamProvider<List<Note>>((ref) {
+  return ref.watch(notesRepositoryProvider).watchAllActiveNotes();
+});
+
+final trashedNotesStreamProvider = StreamProvider<List<Note>>((ref) {
+  return ref.watch(notesRepositoryProvider).watchTrashedNotes();
+});
+
+final noteFoldersStreamProvider = StreamProvider<List<NoteFolder>>((ref) {
+  return ref.watch(notesRepositoryProvider).watchFolders();
 });
 
 final noteAttachmentsStreamProvider =

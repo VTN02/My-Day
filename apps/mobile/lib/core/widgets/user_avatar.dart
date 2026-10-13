@@ -65,16 +65,12 @@ class UserAvatar extends StatelessWidget {
     final path = avatarPath ?? '';
 
     if (path == 'logo' || path.startsWith('asset:')) {
-      return Container(
+      return SizedBox(
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          image: const DecorationImage(
-            image: AssetImage('assets/images/app_logo.png'),
-            fit: BoxFit.cover,
-          ),
-          border: Border.all(color: AppColors.primaryIndigo, width: 2),
+        child: Image.asset(
+          'assets/images/app_logo.png',
+          fit: BoxFit.contain,
         ),
       );
     }
@@ -188,10 +184,11 @@ class UserAvatar extends StatelessWidget {
         return const LinearGradient(
           colors: [Color(0xFFEF4444), Color(0xFFDB2777)],
         );
+      case 'ocean':
       case 'indigo':
       default:
         return const LinearGradient(
-          colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+          colors: [Color(0xFF1565C0), Color(0xFF0288D1)],
         );
     }
   }

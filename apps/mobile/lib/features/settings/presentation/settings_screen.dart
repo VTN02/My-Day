@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/providers/database_providers.dart';
+import '../../../core/services/analytics_service.dart';
 import '../../../core/services/backup_service.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/reminder_service.dart';
@@ -27,6 +28,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _selectedCurrency = 'LKR';
   String _selectedTheme = 'system';
   bool _notificationsEnabled = true;
+  bool _analyticsConsentEnabled = true;
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _loadSettings();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAppUpdates(isSilent: true);
+      ref.read(analyticsServiceProvider).trackFeatureOpen('settings');
     });
   }
 
@@ -44,6 +47,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final theme = await settingsRepo.getSetting('theme_mode') ?? 'system';
     final notif =
         await settingsRepo.getSetting('notifications_enabled') ?? 'true';
+    final analytics =
+        await settingsRepo.getSetting('analytics_consent_enabled') ?? 'true';
 
     if (mounted) {
       setState(() {
@@ -51,6 +56,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         _selectedCurrency = curr;
         _selectedTheme = theme;
         _notificationsEnabled = notif == 'true';
+        _analyticsConsentEnabled = analytics != 'false';
       });
     }
   }
@@ -637,6 +643,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 .sendTestReminder(context);
                           },
                         ),
+                        Divider(color: borderColor),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.alarm_add_rounded,
+                            color: AppColors.primaryIndigo,
+                          ),
+                          title: const Text(
+                            'Smart Reminders & Tunes',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: const Text(
+                            'Configure follow-up escalation and custom melodies',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => context.push('/settings/reminders'),
+                        ),
                       ],
                     ],
                   ),
@@ -719,6 +745,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: _showRestoreBackupSheet,
+                      ),
+                      Divider(color: borderColor),
+                      SwitchListTile(
+                        secondary: const Icon(
+                          Icons.insights_rounded,
+                          color: AppColors.accentCyan,
+                        ),
+                        title: const Text(
+                          'Anonymous Usage Telemetry',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Helps improve MyDay. Never collects titles, notes, amounts, or personal content.',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                        value: _analyticsConsentEnabled,
+                        activeTrackColor: AppColors.primaryIndigo,
+                        onChanged: (val) {
+                          setState(() => _analyticsConsentEnabled = val);
+                          _updateSetting('analytics_consent_enabled', val.toString());
+                          ref.read(analyticsServiceProvider).setConsentEnabled(val);
+                        },
                       ),
                     ],
                   ),
@@ -1173,24 +1224,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: const DecorationImage(
-                            image: AssetImage('assets/images/app_logo.png'),
-                            fit: BoxFit.cover,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primaryIndigo.withValues(
-                                alpha: 0.3,
-                              ),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                      SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: Image.asset(
+                          'assets/images/app_logo.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 10),

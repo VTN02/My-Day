@@ -67,5 +67,17 @@
   "splitSettleUp": "ගනුදෙනු පියවන්න",
   "splitManageFriends": "යහළුවන් කළමනාකරණය",
   "splitRepaymentHistory": "ආපසු ගෙවීම් ඉතිහාසය",
-  "splitAddExpense": "වියදමක් එක් කරන්න"
+  "splitAddExpense": "වියදමක් එක් කරන්න",
+  "notesTitle": "සටහන්",
+  "notesCreate": "නව සටහනක්",
+  "notesSearchHint": "සටහන් සොයන්න...",
+  "notesAll": "සියලු සටහන්",
+  "notesPinned": "පින් කළ සටහන්",
+  "notesFolders": "ෆෝල්ඩර",
+  "notesTrash": "කසළ බඳුන",
+  "notesEmpty": "සටහන් නොමැත",
+  "notesTrashEmpty": "කසළ බඳුන හිස්ය",
+  "notesPaperStyle": "කඩදාසි විලාසය",
+  "smartRemindersTitle": "ස්මාර්ට් මතක්කිරීම් සහ තනු",
+  "smartRemindersFollowUp": "නැවත සිහිපත් කිරීම්"
 }

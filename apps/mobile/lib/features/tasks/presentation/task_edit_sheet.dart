@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/providers/database_providers.dart';
+import '../../../core/services/smart_reminder_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/widgets/app_text_field.dart';
@@ -41,6 +42,10 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
   late DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   late bool _isCompleted;
+  late bool _followUpEnabled;
+  late int _followUpDelayMinutes;
+  late int _maxRepeats;
+  String? _selectedTuneId;
 
   @override
   void initState() {
@@ -53,6 +58,10 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
     _selectedPriority = widget.task.priority.toLowerCase();
     _selectedDate = widget.task.dueDate;
     _isCompleted = widget.task.isCompleted;
+    _followUpEnabled = widget.task.followUpEnabled;
+    _followUpDelayMinutes = widget.task.followUpDelayMinutes;
+    _maxRepeats = widget.task.maxRepeats;
+    _selectedTuneId = widget.task.selectedTuneId;
 
     if (widget.task.dueTime != null && widget.task.dueTime!.isNotEmpty) {
       _selectedTime = _parseTimeOfDay(widget.task.dueTime!);
@@ -508,6 +517,83 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
               ],
             ),
             const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkCardSurface : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: borderColor),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.alarm_add_rounded, size: 18, color: AppColors.primaryIndigo),
+                          SizedBox(width: 8),
+                          Text(
+                            'Smart Follow-up Reminders',
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                      Switch(
+                        value: _followUpEnabled,
+                        activeThumbColor: AppColors.primaryIndigo,
+                        onChanged: (val) => setState(() => _followUpEnabled = val),
+                      ),
+                    ],
+                  ),
+                  if (_followUpEnabled) ...[
+                    const Divider(height: 18),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Follow-up Interval', style: TextStyle(fontSize: 12)),
+                        DropdownButton<int>(
+                          value: _followUpDelayMinutes,
+                          isDense: true,
+                          underline: const SizedBox.shrink(),
+                          items: const [
+                            DropdownMenuItem(value: 5, child: Text('Every 5 mins', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(value: 10, child: Text('Every 10 mins', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(value: 15, child: Text('Every 15 mins', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(value: 30, child: Text('Every 30 mins', style: TextStyle(fontSize: 12))),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) setState(() => _followUpDelayMinutes = val);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Maximum Follow-ups', style: TextStyle(fontSize: 12)),
+                        DropdownButton<int>(
+                          value: _maxRepeats,
+                          isDense: true,
+                          underline: const SizedBox.shrink(),
+                          items: const [
+                            DropdownMenuItem(value: 1, child: Text('1 time', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(value: 2, child: Text('2 times', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(value: 3, child: Text('3 times', style: TextStyle(fontSize: 12))),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) setState(() => _maxRepeats = val);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
             CheckboxListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text(
@@ -568,12 +654,25 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                         dueDate: Value(finalDueDate),
                         dueTime: Value(finalDueTime),
                         isCompleted: _isCompleted,
+                        followUpEnabled: _followUpEnabled,
+                        followUpDelayMinutes: _followUpDelayMinutes,
+                        maxRepeats: _maxRepeats,
+                        selectedTuneId: Value(_selectedTuneId),
                         updatedAt: DateTime.now(),
                       );
 
                       await widget.ref
                           .read(tasksRepositoryProvider)
                           .updateTask(updated);
+
+                      // Smart Reminder Escalation Scheduling
+                      final smartReminderService =
+                          widget.ref.read(smartReminderServiceProvider);
+                      if (_isCompleted) {
+                        await smartReminderService.cancelTaskReminders(updated.id);
+                      } else {
+                        await smartReminderService.scheduleTaskWithEscalation(updated);
+                      }
 
                       if (context.mounted) Navigator.of(context).pop();
                     },
