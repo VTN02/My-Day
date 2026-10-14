@@ -1,15 +1,17 @@
 {
-  "latest_version": "1.2.0",
-  "version_code": 5,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.2.0/myday-v1.2.0.apk",
+  "latest_version": "1.2.1",
+  "version_code": 6,
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.2.1/myday-v1.2.1.apk",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
   "file_size": "85 MB",
   "is_mandatory": false,
   "release_notes": [
+    "🔄 In-App Updater Fix: Fixed modal bottom sheet layout overflow across all screen sizes.",
+    "⚡ Resilient OTA Downloads: Added automatic HTTP Range resume across intermittent network drops.",
     "🎨 Brand Identity Refresh: Clean transparent ribbon logo without background applied across app and admin console.",
     "📝 MyDay Notes Experience: Samsung Notes–inspired editor with vector sketching, rich text formatting, checklist blocks, and audio/file attachments.",
-    "🔔 Smart Reminder Escalation: Configurable repetitive reminder escalation intervals and customizable reminder audio tunes managed through Super Admin.",
+    "🔔 Smart Reminder Escalation: Configurable repetitive reminder escalation intervals and customizable reminder audio tunes.",
     "📅 Calendar Integration: Unified view linking daily tasks, schedules, and reminders with monthly dot distribution.",
     "📄 In-App Document Viewer: High-performance viewer supporting PDF documents and images with Android 'Open with' system integration."
   ]

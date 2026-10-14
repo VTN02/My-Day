@@ -11,8 +11,8 @@ import 'notification_service.dart';
 
 /// App Version constants (fallback when dynamic PackageInfo is unavailable)
 class AppVersion {
-  static const String versionName = '1.2.0';
-  static const int versionCode = 5;
+  static const String versionName = '1.2.1';
+  static const int versionCode = 6;
   static const String releaseDate = 'October 2026';
 
   /// Primary GitHub latest release endpoint for automatic release discovery:
@@ -79,7 +79,9 @@ class AppUpdateInfo {
       versionCode = int.tryParse(parts.last) ?? 0;
     }
     if (versionCode == 0) {
-      if (cleanVersion == '1.2.0') {
+      if (cleanVersion == '1.2.1') {
+        versionCode = 6;
+      } else if (cleanVersion == '1.2.0') {
         versionCode = 5;
       } else if (cleanVersion == '1.1.1') {
         versionCode = 4;
