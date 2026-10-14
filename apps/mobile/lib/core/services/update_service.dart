@@ -474,7 +474,8 @@ class UpdateService {
   }
 
   /// Downloads the APK directly inside the app with byte-level progress,
-  /// following redirects cleanly and launching Android's native installer dialog.
+  /// automatic chunk resume across network drops (Range requests),
+  /// and triggers Android's native installer dialog.
   static Future<void> downloadAndInstallApk({
     required String apkUrl,
     required void Function(double progress, int receivedBytes, int totalBytes)
@@ -484,60 +485,153 @@ class UpdateService {
     final tempFile = File('${tempDir.path}/myday_update.apk.tmp');
     final finalFile = File('${tempDir.path}/myday_update.apk');
 
+    int totalBytes = -1;
+    int receivedBytes = 0;
+
     if (await tempFile.exists()) {
-      await tempFile.delete();
+      receivedBytes = await tempFile.length();
     }
 
-    final client = HttpClient();
-    client.autoUncompress = true;
-    client.connectionTimeout = const Duration(seconds: 15);
+    int retryCount = 0;
+    const maxRetries = 5;
 
-    var currentUri = Uri.parse(apkUrl);
-    HttpClientResponse? response;
-    int redirectCount = 0;
+    while (retryCount < maxRetries) {
+      HttpClient? client;
+      IOSink? sink;
+      try {
+        client = HttpClient()
+          ..autoUncompress = false
+          ..connectionTimeout = const Duration(seconds: 25)
+          ..idleTimeout = const Duration(seconds: 45);
 
-    while (redirectCount < 6) {
-      final request = await client.getUrl(currentUri);
-      request.headers.set('User-Agent', 'MyDay-App');
-      request.followRedirects = false;
-      response = await request.close();
+        // Resolve redirects
+        var currentUri = Uri.parse(apkUrl);
+        HttpClientResponse? response;
+        int redirectCount = 0;
 
-      if (response.isRedirect) {
-        final location = response.headers.value(HttpHeaders.locationHeader);
-        if (location == null) {
-          throw Exception('Received redirect without Location header');
+        while (redirectCount < 6) {
+          final request = await client.getUrl(currentUri);
+          request.headers.set('User-Agent', 'MyDay-App');
+          request.headers.set('Connection', 'keep-alive');
+          request.headers.set('Accept-Encoding', 'identity');
+          request.followRedirects = false;
+
+          // Request range if we already have partial data
+          if (receivedBytes > 0 && redirectCount == 0) {
+            request.headers.set(
+              HttpHeaders.rangeHeader,
+              'bytes=$receivedBytes-',
+            );
+          }
+
+          response = await request.close();
+
+          if (response.isRedirect) {
+            final location = response.headers.value(HttpHeaders.locationHeader);
+            if (location == null) {
+              throw Exception('Received redirect without Location header');
+            }
+            currentUri = Uri.parse(location);
+            redirectCount++;
+          } else {
+            break;
+          }
         }
-        currentUri = Uri.parse(location);
-        redirectCount++;
-      } else {
-        break;
+
+        if (response == null) {
+          throw Exception('Unable to establish connection to update server.');
+        }
+
+        // If server accepted range (206 Partial Content)
+        if (response.statusCode == 206) {
+          final contentRange = response.headers.value(
+            HttpHeaders.contentRangeHeader,
+          );
+          if (contentRange != null && contentRange.contains('/')) {
+            final fullLength = int.tryParse(contentRange.split('/').last);
+            if (fullLength != null && fullLength > 0) {
+              totalBytes = fullLength;
+            }
+          }
+          if (totalBytes <= 0 && response.contentLength > 0) {
+            totalBytes = receivedBytes + response.contentLength;
+          }
+          sink = tempFile.openWrite(mode: FileMode.append);
+        } else if (response.statusCode == 200) {
+          // Full file download
+          receivedBytes = 0;
+          totalBytes = response.contentLength;
+          sink = tempFile.openWrite(mode: FileMode.write);
+        } else if (response.statusCode == 416) {
+          // Range Not Satisfiable: file might already be complete
+          if (receivedBytes > 10 * 1024 * 1024) {
+            break;
+          } else {
+            receivedBytes = 0;
+            if (await tempFile.exists()) await tempFile.delete();
+            retryCount++;
+            continue;
+          }
+        } else {
+          throw Exception(
+            'Download server returned HTTP ${response.statusCode}',
+          );
+        }
+
+        await for (final chunk in response) {
+          sink.add(chunk);
+          receivedBytes += chunk.length;
+          final progress = totalBytes > 0
+              ? (receivedBytes / totalBytes).clamp(0.0, 1.0)
+              : 0.0;
+          onProgress(progress, receivedBytes, totalBytes);
+        }
+
+        await sink.flush();
+        await sink.close();
+        sink = null;
+        client.close();
+        client = null;
+
+        // Verify download finished if totalBytes was known
+        if (totalBytes > 0 && receivedBytes < totalBytes) {
+          throw HttpException(
+            'Connection closed prematurely ($receivedBytes of $totalBytes bytes)',
+          );
+        }
+
+        break; // Successfully finished
+      } catch (e) {
+        try {
+          await sink?.flush();
+          await sink?.close();
+        } catch (_) {}
+        try {
+          client?.close(force: true);
+        } catch (_) {}
+
+        retryCount++;
+        if (await tempFile.exists()) {
+          receivedBytes = await tempFile.length();
+        }
+
+        if (retryCount >= maxRetries) {
+          rethrow;
+        }
+
+        await Future.delayed(Duration(milliseconds: 900 * retryCount));
       }
     }
 
-    if (response == null || response.statusCode != 200) {
-      throw Exception(
-        'Failed to download APK (HTTP ${response?.statusCode ?? 0})',
-      );
+    if (await tempFile.exists() &&
+        (await tempFile.length()) > 5 * 1024 * 1024) {
+      if (await finalFile.exists()) {
+        await finalFile.delete();
+      }
+      await tempFile.rename(finalFile.path);
+    } else {
+      throw Exception('Downloaded update is incomplete or corrupted.');
     }
-
-    final totalBytes = response.contentLength;
-    int receivedBytes = 0;
-
-    final sink = tempFile.openWrite();
-    await for (final chunk in response) {
-      sink.add(chunk);
-      receivedBytes += chunk.length;
-      final progress = totalBytes > 0 ? receivedBytes / totalBytes : 0.0;
-      onProgress(progress, receivedBytes, totalBytes);
-    }
-    await sink.flush();
-    await sink.close();
-
-    // Move complete download to final destination
-    if (await finalFile.exists()) {
-      await finalFile.delete();
-    }
-    await tempFile.rename(finalFile.path);
 
     // Trigger Native Android Package Installer
     final installed = await triggerNativeInstall(finalFile.path);
@@ -699,10 +793,27 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
         setState(() {
           _isDownloading = false;
           _isDownloaded = existing != null;
-          _errorMessage = '$e'.replaceFirst('Exception: ', '');
+          _errorMessage = _formatErrorMessage(e);
         });
       }
     }
+  }
+
+  String _formatErrorMessage(Object error) {
+    final str = error.toString().replaceFirst('Exception: ', '');
+    if (str.contains('Connection closed') ||
+        str.contains('SocketException') ||
+        str.contains('HandshakeException') ||
+        str.contains('Network is unreachable')) {
+      return 'Network connection was interrupted. Tap "Resume Download" to continue.';
+    }
+    if (str.contains('Install unknown apps') || str.contains('permission')) {
+      return 'Please allow "Install unknown apps" for MyDay in Settings, then tap Install.';
+    }
+    if (str.contains('404')) {
+      return 'Release file is currently being synced. Please try again shortly.';
+    }
+    return str.split(', uri =').first;
   }
 
   @override
@@ -722,9 +833,11 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
 
     final currentDisplayVersion =
         widget.installedVersion ?? AppVersion.versionName;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+      constraints: BoxConstraints(maxHeight: screenHeight * 0.88),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -740,7 +853,7 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
               child: Container(
                 width: 44,
                 height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
+                margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
                   color: secondaryTextColor.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
@@ -799,7 +912,7 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'Installed: v$currentDisplayVersion • Size: ${widget.info.fileSize ?? "28 MB"}',
+                        'Installed: v$currentDisplayVersion • Size: ${widget.info.fileSize ?? "85 MB"}',
                         style: TextStyle(
                           color: secondaryTextColor,
                           fontSize: 12,
@@ -810,157 +923,195 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                 ),
               ],
             ),
-            const SizedBox(height: 18),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF0F1524)
-                    : const Color(0xFFF8FAFC),
-                borderRadius: AppRadius.cardRadius,
-                border: Border.all(color: borderColor),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "What's New in this Update:",
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  if (widget.info.releaseNotes.isEmpty)
-                    Text(
-                      '• Performance improvements and bug fixes.',
-                      style: TextStyle(
-                        color: primaryTextColor,
-                        fontSize: 13,
-                        height: 1.4,
+            const SizedBox(height: 14),
+
+            // Scrollable Middle Section (Guarantees zero overflow on any device)
+            Flexible(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF0F1524)
+                            : const Color(0xFFF8FAFC),
+                        borderRadius: AppRadius.cardRadius,
+                        border: Border.all(color: borderColor),
                       ),
-                    )
-                  else
-                    ...widget.info.releaseNotes.map(
-                      (note) => Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '✓  ',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "What's New in this Update:",
+                            style: TextStyle(
+                              color: secondaryTextColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (widget.info.releaseNotes.isEmpty)
+                            Text(
+                              '• Performance improvements and bug fixes.',
                               style: TextStyle(
-                                color: AppColors.successMint,
-                                fontWeight: FontWeight.bold,
+                                color: primaryTextColor,
+                                fontSize: 13,
+                                height: 1.4,
+                              ),
+                            )
+                          else
+                            ...widget.info.releaseNotes.map(
+                              (note) => Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '✓  ',
+                                      style: TextStyle(
+                                        color: AppColors.successMint,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        note,
+                                        style: TextStyle(
+                                          color: primaryTextColor,
+                                          fontSize: 13,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.amber.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.amber,
+                            size: 18,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Your data is 100% safe. Android will install the update directly on top of your current app without touching your records.',
+                              style: TextStyle(
+                                color: Colors.amber,
+                                fontSize: 11.5,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Live In-App Download Progress Indicator
+                    if (_isDownloading) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _statusText,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w600,
+                                color: primaryTextColor,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${(_progress * 100).toInt()}%',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryIndigo,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: _progress > 0 ? _progress : null,
+                          backgroundColor: borderColor,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppColors.primaryIndigo,
+                          ),
+                          minHeight: 8,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorCoral.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.errorCoral.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: AppColors.errorCoral,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                note,
-                                style: TextStyle(
-                                  color: primaryTextColor,
-                                  fontSize: 13,
-                                  height: 1.3,
+                                _errorMessage!,
+                                style: const TextStyle(
+                                  color: AppColors.errorCoral,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
-              ),
-              child: const Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    color: Colors.amber,
-                    size: 18,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Your data is 100% safe. Android will install the update directly on top of your current app without touching your records.',
-                      style: TextStyle(
-                        color: Colors.amber,
-                        fontSize: 11.5,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            // Live In-App Download Progress Indicator
-            if (_isDownloading) ...[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _statusText,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w600,
-                            color: primaryTextColor,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        '${(_progress * 100).toInt()}%',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryIndigo,
-                        ),
-                      ),
+                      const SizedBox(height: 12),
                     ],
-                  ),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: _progress > 0 ? _progress : null,
-                      backgroundColor: borderColor,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.primaryIndigo,
-                      ),
-                      minHeight: 8,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ],
-
-            if (_errorMessage != null) ...[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(
-                    color: AppColors.errorCoral,
-                    fontSize: 12,
-                  ),
+                  ],
                 ),
               ),
-            ],
+            ),
+            const SizedBox(height: 12),
 
+            // Fixed Bottom Actions
             Row(
               children: [
                 Expanded(
@@ -978,7 +1129,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                         : Icon(
                             _isDownloaded
                                 ? Icons.install_mobile_rounded
-                                : Icons.download_rounded,
+                                : (_errorMessage != null
+                                      ? Icons.replay_rounded
+                                      : Icons.download_rounded),
                             size: 18,
                           ),
                     label: Text(
@@ -986,7 +1139,9 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                           ? 'Downloading APK...'
                           : (_isDownloaded
                                 ? 'Install APK Now'
-                                : 'Direct Install APK'),
+                                : (_errorMessage != null
+                                      ? 'Resume Download'
+                                      : 'Direct Install APK')),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryIndigo,
