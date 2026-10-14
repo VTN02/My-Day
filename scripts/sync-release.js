@@ -81,8 +81,29 @@ async function run() {
   const tagName = release.tag_name || 'v1.1.1';
   const cleanVersion = tagName.replace(/^[vV]/, '');
 
+  // Try reading existing version.json or pubspec.yaml for the canonical versionCode
   let versionCode = 0;
-  if (tagName.includes('+')) {
+  if (fs.existsSync(VERSION_FILE)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(VERSION_FILE, 'utf8'));
+      if (existing.latest_version === cleanVersion && existing.version_code) {
+        versionCode = existing.version_code;
+      }
+    } catch (_) {}
+  }
+
+  const pubspecPath = path.resolve(__dirname, '..', 'apps', 'mobile', 'pubspec.yaml');
+  if (!versionCode && fs.existsSync(pubspecPath)) {
+    try {
+      const pubspec = fs.readFileSync(pubspecPath, 'utf8');
+      const match = pubspec.match(/version:\s*([^\s+]+)\+(\d+)/);
+      if (match && match[1] === cleanVersion) {
+        versionCode = parseInt(match[2], 10);
+      }
+    } catch (_) {}
+  }
+
+  if (!versionCode && tagName.includes('+')) {
     versionCode = parseInt(tagName.split('+').pop(), 10) || 0;
   }
   if (!versionCode) {

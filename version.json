@@ -7,12 +7,14 @@
   "file_size": "85 MB",
   "is_mandatory": false,
   "release_notes": [
-    "🔄 In-App Updater Fix: Fixed modal bottom sheet layout overflow across all screen sizes.",
-    "⚡ Resilient OTA Downloads: Added automatic HTTP Range resume across intermittent network drops.",
-    "🎨 Brand Identity Refresh: Clean transparent ribbon logo without background applied across app and admin console.",
-    "📝 MyDay Notes Experience: Samsung Notes–inspired editor with vector sketching, rich text formatting, checklist blocks, and audio/file attachments.",
-    "🔔 Smart Reminder Escalation: Configurable repetitive reminder escalation intervals and customizable reminder audio tunes.",
-    "📅 Calendar Integration: Unified view linking daily tasks, schedules, and reminders with monthly dot distribution.",
-    "📄 In-App Document Viewer: High-performance viewer supporting PDF documents and images with Android 'Open with' system integration."
+    "Responsive Update Sheet: Fixed the modal bottom sheet overflow on all mobile screen heights; action buttons are now permanently visible.",
+    "Resilient Chunked OTA Downloads: Added automatic HTTP Range resume across network hiccups and connection drops (up to 5 automatic retries).",
+    "Dynamic Version Resolution: Device packages query Android's package manager dynamically for reliable update checks.",
+    "Transparent Brand Logo: Applied clean ribbon logo without background across the app and admin console.",
+    "Multi-Modal Notes Editor: Vector canvas sketch drawing, rich text formatting, checklist blocks, and audio/file attachments.",
+    "Folder Organization & Safe Trash: Hierarchical folders with soft deletion and restore.",
+    "Escalating Alerts: Configurable repetitive reminder intervals for critical tasks.",
+    "Customizable Tunes: Super Admin–managed audio tunes catalog.",
+    "Unified Task & Schedule View: Monthly dot indicators linked to tasks and daily habits."
   ]
 }

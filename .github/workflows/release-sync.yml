@@ -16,6 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          ref: main
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
@@ -38,7 +39,7 @@ jobs:
           if [ -n "$(git status --porcelain version.json)" ]; then
             git add version.json
             git commit -m "chore(release): auto-sync version.json with latest release [skip ci]"
-            git push origin main
+            git push origin HEAD:main
           else
             echo "version.json is already up to date!"
           fi
