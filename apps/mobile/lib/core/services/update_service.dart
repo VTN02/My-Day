@@ -11,8 +11,8 @@ import 'notification_service.dart';
 
 /// App Version constants (fallback when dynamic PackageInfo is unavailable)
 class AppVersion {
-  static const String versionName = '1.1.1';
-  static const int versionCode = 4;
+  static const String versionName = '1.2.0';
+  static const int versionCode = 5;
   static const String releaseDate = 'October 2026';
 
   /// Primary GitHub latest release endpoint for automatic release discovery:
@@ -79,7 +79,9 @@ class AppUpdateInfo {
       versionCode = int.tryParse(parts.last) ?? 0;
     }
     if (versionCode == 0) {
-      if (cleanVersion == '1.1.1') {
+      if (cleanVersion == '1.2.0') {
+        versionCode = 5;
+      } else if (cleanVersion == '1.1.1') {
         versionCode = 4;
       } else if (cleanVersion == '1.1.0') {
         versionCode = 3;
@@ -87,6 +89,15 @@ class AppUpdateInfo {
         versionCode = 2;
       } else if (cleanVersion == '1.0.0') {
         versionCode = 1;
+      } else {
+        final p = cleanVersion
+            .split('.')
+            .map((e) => int.tryParse(e) ?? 0)
+            .toList();
+        versionCode =
+            (p.isNotEmpty ? p[0] : 1) * 10000 +
+            (p.length > 1 ? p[1] : 0) * 100 +
+            (p.length > 2 ? p[2] : 0);
       }
     }
 
@@ -264,9 +275,26 @@ class UpdateService {
     String? customUrl,
     bool triggerNotification = false,
   }) async {
-    // 1. Resolve currently installed app version
-    const currentVersion = AppVersion.versionName;
-    const currentBuildCode = AppVersion.versionCode;
+    // 1. Resolve currently installed app version dynamically from platform package manager
+    String currentVersion = AppVersion.versionName;
+    int currentBuildCode = AppVersion.versionCode;
+
+    try {
+      final dynamicVersion = await _installerChannel
+          .invokeMapMethod<String, dynamic>('getAppVersion');
+      if (dynamicVersion != null) {
+        final dynName = dynamicVersion['versionName'] as String?;
+        final dynCode = dynamicVersion['versionCode'] as int?;
+        if (dynName != null && dynName.isNotEmpty) {
+          currentVersion = dynName;
+        }
+        if (dynCode != null && dynCode > 0) {
+          currentBuildCode = dynCode;
+        }
+      }
+    } catch (_) {
+      // Fallback to AppVersion constants
+    }
 
     _currentInstalledVersion = currentVersion;
     _currentInstalledBuildCode = currentBuildCode;
@@ -277,10 +305,31 @@ class UpdateService {
     if (customUrl != null) {
       updateInfo = await _fetchFromUrl(customUrl);
     } else {
-      // Primary: GitHub Releases API (Instant detection of new releases)
-      updateInfo = await _fetchFromGitHubRelease();
-      // Fallback: Raw version.json
-      updateInfo ??= await _fetchFromVersionJson();
+      // Query both GitHub Releases API and raw version.json concurrently for maximum reliability
+      final ghFuture = _fetchFromGitHubRelease();
+      final jsonFuture = _fetchFromVersionJson();
+
+      final results = await Future.wait([ghFuture, jsonFuture]);
+      final ghInfo = results[0];
+      final jsonInfo = results[1];
+
+      if (ghInfo != null && jsonInfo != null) {
+        final comp = compareVersions(
+          ghInfo.latestVersion,
+          jsonInfo.latestVersion,
+        );
+        if (comp > 0) {
+          updateInfo = ghInfo;
+        } else if (comp < 0) {
+          updateInfo = jsonInfo;
+        } else {
+          updateInfo = ghInfo.versionCode >= jsonInfo.versionCode
+              ? ghInfo
+              : jsonInfo;
+        }
+      } else {
+        updateInfo = ghInfo ?? jsonInfo;
+      }
     }
 
     if (updateInfo == null) {
@@ -377,29 +426,104 @@ class UpdateService {
 
   /// Downloads the APK directly inside the app with byte-level progress,
   /// and directly launches Android's native installer dialog without opening any browser.
+  /// Checks whether Android has granted permission to install unknown apps
+  static Future<bool> canInstallUnknownPackages() async {
+    try {
+      final allowed = await _installerChannel.invokeMethod<bool>(
+        'canInstallUnknownPackages',
+      );
+      return allowed ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Opens the system Unknown App Sources settings screen for MyDay
+  static Future<void> openInstallPermissionSettings() async {
+    try {
+      await _installerChannel.invokeMethod('openInstallPermissionSettings');
+    } catch (_) {}
+  }
+
+  /// Directly requests Android PackageInstaller to install an APK file
+  static Future<bool> triggerNativeInstall(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) return false;
+      final success = await _installerChannel.invokeMethod<bool>('installApk', {
+        'filePath': file.path,
+      });
+      return success == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Checks if a downloaded APK already exists in cache and is valid
+  static Future<File?> getExistingDownloadedApk() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/myday_update.apk');
+      if (await file.exists() && (await file.length()) > 5 * 1024 * 1024) {
+        return file;
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Downloads the APK directly inside the app with byte-level progress,
+  /// following redirects cleanly and launching Android's native installer dialog.
   static Future<void> downloadAndInstallApk({
     required String apkUrl,
     required void Function(double progress, int receivedBytes, int totalBytes)
     onProgress,
   }) async {
     final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/myday_update.apk');
-    if (await file.exists()) {
-      await file.delete();
+    final tempFile = File('${tempDir.path}/myday_update.apk.tmp');
+    final finalFile = File('${tempDir.path}/myday_update.apk');
+
+    if (await tempFile.exists()) {
+      await tempFile.delete();
     }
 
     final client = HttpClient();
-    final request = await client.getUrl(Uri.parse(apkUrl));
-    final response = await request.close();
+    client.autoUncompress = true;
+    client.connectionTimeout = const Duration(seconds: 15);
 
-    if (response.statusCode != 200 && response.statusCode != 302) {
-      throw Exception('Failed to download APK (HTTP ${response.statusCode})');
+    var currentUri = Uri.parse(apkUrl);
+    HttpClientResponse? response;
+    int redirectCount = 0;
+
+    while (redirectCount < 6) {
+      final request = await client.getUrl(currentUri);
+      request.headers.set('User-Agent', 'MyDay-App');
+      request.followRedirects = false;
+      response = await request.close();
+
+      if (response.isRedirect) {
+        final location = response.headers.value(HttpHeaders.locationHeader);
+        if (location == null) {
+          throw Exception('Received redirect without Location header');
+        }
+        currentUri = Uri.parse(location);
+        redirectCount++;
+      } else {
+        break;
+      }
+    }
+
+    if (response == null || response.statusCode != 200) {
+      throw Exception(
+        'Failed to download APK (HTTP ${response?.statusCode ?? 0})',
+      );
     }
 
     final totalBytes = response.contentLength;
     int receivedBytes = 0;
 
-    final sink = file.openWrite();
+    final sink = tempFile.openWrite();
     await for (final chunk in response) {
       sink.add(chunk);
       receivedBytes += chunk.length;
@@ -409,23 +533,22 @@ class UpdateService {
     await sink.flush();
     await sink.close();
 
+    // Move complete download to final destination
+    if (await finalFile.exists()) {
+      await finalFile.delete();
+    }
+    await tempFile.rename(finalFile.path);
+
     // Trigger Native Android Package Installer
-    try {
-      final success = await _installerChannel.invokeMethod<bool>('installApk', {
-        'filePath': file.path,
-      });
-      if (success != true) {
-        // Fallback: Launch intent directly via url_launcher file URI
-        await launchUrl(
-          Uri.file(file.path),
-          mode: LaunchMode.externalApplication,
+    final installed = await triggerNativeInstall(finalFile.path);
+    if (!installed) {
+      final canInstall = await canInstallUnknownPackages();
+      if (!canInstall) {
+        await openInstallPermissionSettings();
+        throw Exception(
+          'Please allow "Install unknown apps" for MyDay in Settings, then tap Install.',
         );
       }
-    } catch (_) {
-      await launchUrl(
-        Uri.file(file.path),
-        mode: LaunchMode.externalApplication,
-      );
     }
   }
 
@@ -476,14 +599,64 @@ class _UpdateModalContent extends StatefulWidget {
 
 class _UpdateModalContentState extends State<_UpdateModalContent> {
   bool _isDownloading = false;
+  bool _isDownloaded = false;
   double _progress = 0.0;
   String _statusText = '';
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkExistingApk();
+  }
+
+  Future<void> _checkExistingApk() async {
+    final existing = await UpdateService.getExistingDownloadedApk();
+    if (existing != null && mounted) {
+      setState(() {
+        _isDownloaded = true;
+        _progress = 1.0;
+        _statusText = 'Update package ready to install.';
+      });
+    }
+  }
 
   String _formatBytes(int bytes) {
     if (bytes <= 0) return '0 MB';
     final mb = bytes / (1024 * 1024);
     return '${mb.toStringAsFixed(1)} MB';
+  }
+
+  Future<void> _handleInstallAction() async {
+    if (_isDownloaded) {
+      final existing = await UpdateService.getExistingDownloadedApk();
+      if (existing != null) {
+        setState(() {
+          _statusText = 'Opening Android installer...';
+          _errorMessage = null;
+        });
+        final installed = await UpdateService.triggerNativeInstall(
+          existing.path,
+        );
+        if (!installed) {
+          final canInstall = await UpdateService.canInstallUnknownPackages();
+          if (!canInstall) {
+            await UpdateService.openInstallPermissionSettings();
+            if (mounted) {
+              setState(() {
+                _errorMessage =
+                    'Please enable "Allow from this source" in Settings, then tap Install.';
+              });
+            }
+            return;
+          }
+        } else {
+          return;
+        }
+      }
+    }
+
+    await _startDownload();
   }
 
   Future<void> _startDownload() async {
@@ -514,15 +687,19 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
 
       if (mounted) {
         setState(() {
+          _isDownloading = false;
+          _isDownloaded = true;
           _statusText = 'Opening Android installer...';
           _progress = 1.0;
         });
       }
     } catch (e) {
       if (mounted) {
+        final existing = await UpdateService.getExistingDownloadedApk();
         setState(() {
           _isDownloading = false;
-          _errorMessage = 'Download failed: $e';
+          _isDownloaded = existing != null;
+          _errorMessage = '$e'.replaceFirst('Exception: ', '');
         });
       }
     }
@@ -788,7 +965,7 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: _isDownloading ? null : _startDownload,
+                    onPressed: _isDownloading ? null : _handleInstallAction,
                     icon: _isDownloading
                         ? const SizedBox(
                             width: 16,
@@ -798,11 +975,18 @@ class _UpdateModalContentState extends State<_UpdateModalContent> {
                               color: Colors.white,
                             ),
                           )
-                        : const Icon(Icons.download_rounded, size: 18),
+                        : Icon(
+                            _isDownloaded
+                                ? Icons.install_mobile_rounded
+                                : Icons.download_rounded,
+                            size: 18,
+                          ),
                     label: Text(
                       _isDownloading
                           ? 'Downloading APK...'
-                          : 'Direct Install APK',
+                          : (_isDownloaded
+                                ? 'Install APK Now'
+                                : 'Direct Install APK'),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryIndigo,

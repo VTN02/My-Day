@@ -1,6 +1,7 @@
 package com.myday.app.mobile
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
@@ -41,6 +42,28 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
+                "getAppVersion" -> {
+                    try {
+                        val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+                        } else {
+                            @Suppress("DEPRECATION")
+                            packageManager.getPackageInfo(packageName, 0)
+                        }
+                        val longVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            pInfo.longVersionCode
+                        } else {
+                            @Suppress("DEPRECATION")
+                            pInfo.versionCode.toLong()
+                        }
+                        result.success(mapOf(
+                            "versionName" to (pInfo.versionName ?: "1.2.0"),
+                            "versionCode" to longVersionCode.toInt()
+                        ))
+                    } catch (e: Exception) {
+                        result.error("VERSION_ERROR", e.message, null)
+                    }
+                }
                 "installApk" -> {
                     val filePath = call.argument<String>("filePath")
                     if (filePath != null) {
