@@ -252,8 +252,10 @@ class _SliverGradientHeaderDelegate extends SliverPersistentHeaderDelegate {
     final expandedOpacity = (1.0 - shrinkProgress * 1.8).clamp(0.0, 1.0);
     final bottomOpacity = (1.0 - shrinkProgress * 2.4).clamp(0.0, 1.0);
     // Collapsed header heading fades in as header shrinks
-    final collapsedTitleOpacity =
-        ((shrinkProgress - 0.4) / 0.6).clamp(0.0, 1.0);
+    final collapsedTitleOpacity = ((shrinkProgress - 0.4) / 0.6).clamp(
+      0.0,
+      1.0,
+    );
 
     // Corner radius flattens as it becomes a pinned top navigation bar
     final cornerRadius = 24.0 * (1.0 - shrinkProgress);
@@ -357,10 +359,7 @@ class _SliverGradientHeaderDelegate extends SliverPersistentHeaderDelegate {
                       ],
                       if (bottomChild != null && bottomOpacity > 0.01) ...[
                         const Spacer(),
-                        Opacity(
-                          opacity: bottomOpacity,
-                          child: bottomChild!,
-                        ),
+                        Opacity(opacity: bottomOpacity, child: bottomChild!),
                       ],
                     ],
                   ),
@@ -375,10 +374,7 @@ class _SliverGradientHeaderDelegate extends SliverPersistentHeaderDelegate {
               height: minExtent - topInset,
               child: Row(
                 children: [
-                  if (leading != null)
-                    leading!
-                  else
-                    const SizedBox(width: 8),
+                  if (leading != null) leading! else const SizedBox(width: 8),
 
                   // Header Heading - Only visible when scrolling down
                   Expanded(

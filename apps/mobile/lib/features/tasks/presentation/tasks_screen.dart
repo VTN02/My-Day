@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../core/database/app_database.dart';
 import '../../../core/providers/database_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radius.dart';
+import '../../../core/services/smart_reminder_service.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/gradient_header.dart';
@@ -12,6 +12,8 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/status_chip.dart';
 import '../../../core/widgets/task_card.dart';
+import '../domain/models/task_status.dart';
+import 'task_analytics_screen.dart';
 import 'task_edit_sheet.dart';
 
 /// Task Management Screen connected to Drift database.
@@ -57,20 +59,6 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     final minute = time.minute.toString().padLeft(2, '0');
     final period = time.period == DayPeriod.am ? 'AM' : 'PM';
     return '$hour:$minute $period';
-  }
-
-  bool _isTaskOverdue(TaskEntry task) {
-    if (task.dueDate == null || task.isCompleted) return false;
-    final now = DateTime.now();
-    final endOfDueDay = DateTime(
-      task.dueDate!.year,
-      task.dueDate!.month,
-      task.dueDate!.day,
-      23,
-      59,
-      59,
-    );
-    return now.isAfter(endOfDueDay);
   }
 
   Widget _buildQuickDateChip({
@@ -122,6 +110,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     String selectedPriority = 'medium';
     DateTime? selectedDate = DateTime.now();
     TimeOfDay? selectedTime;
+    bool followUpEnabled = true;
+    int followUpDelayMinutes = 10;
+    int maxRepeats = 2;
 
     showModalBottomSheet(
       context: context,
@@ -480,6 +471,69 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    // Smart Reminder Follow-up Section
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSoftIndigo
+                            : AppColors.lightSoftIndigo,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: followUpEnabled
+                              ? AppColors.primaryIndigo.withValues(alpha: 0.3)
+                              : borderColor,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.notification_important_rounded,
+                                size: 18,
+                                color: followUpEnabled
+                                    ? AppColors.primaryIndigo
+                                    : secondaryTextColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Smart Follow-up Reminders: ${followUpEnabled ? "ON" : "OFF"}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark
+                                        ? AppColors.darkPrimaryText
+                                        : AppColors.lightPrimaryText,
+                                  ),
+                                ),
+                              ),
+                              Switch.adaptive(
+                                value: followUpEnabled,
+                                activeTrackColor: AppColors.primaryIndigo,
+                                onChanged: (v) =>
+                                    setModalState(() => followUpEnabled = v),
+                              ),
+                            ],
+                          ),
+                          if (followUpEnabled) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              'Sends persistent escalation reminders every $followUpDelayMinutes mins (up to $maxRepeats times) if task remains incomplete after deadline.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isDark
+                                    ? AppColors.darkSecondaryText
+                                    : AppColors.lightSecondaryText,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     PrimaryButton(
                       text: 'Save Task',
@@ -506,7 +560,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           finalDueTime = _formatTimeLabel(selectedTime!);
                         }
 
-                        await ref
+                        final newTaskId = await ref
                             .read(tasksRepositoryProvider)
                             .createTask(
                               title: title,
@@ -515,7 +569,21 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               priority: selectedPriority,
                               dueDate: finalDueDate,
                               dueTime: finalDueTime,
+                              followUpEnabled: followUpEnabled,
+                              followUpDelayMinutes: followUpDelayMinutes,
+                              maxRepeats: maxRepeats,
                             );
+
+                        if (finalDueDate != null) {
+                          final createdTask = await ref
+                              .read(tasksRepositoryProvider)
+                              .getTask(newTaskId);
+                          if (createdTask != null) {
+                            await ref
+                                .read(smartReminderServiceProvider)
+                                .scheduleTaskWithEscalation(createdTask);
+                          }
+                        }
 
                         if (ctx.mounted) Navigator.of(ctx).pop();
                       },
@@ -537,122 +605,159 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          const SliverGradientHeader(
+          SliverGradientHeader(
             eyebrow: 'To-Dos & Habits',
             title: 'Tasks',
             subtitle: 'Organize and execute your priorities effortlessly',
-          ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Search Bar
-                        AppTextField(
-                          hint: 'Search tasks...',
-                          controller: _searchController,
-                          prefixIcon: const Icon(Icons.search, size: 20),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        const SizedBox(height: 12),
-                        // Category Filter Chips
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _categories.map((cat) {
-                              final isSelected = _selectedCategory == cat;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: StatusChip(
-                                  label: cat,
-                                  isSelected: isSelected,
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedCategory = cat;
-                                    });
-                                  },
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
+            trailing: IconButton(
+              tooltip: 'Task Analytics',
+              icon: const Icon(
+                Icons.analytics_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const TaskAnalyticsScreen(),
                   ),
-                ),
-                tasksAsync.when(
-                  loading: () => const SliverFillRemaining(
-                    child: Center(
-                      child: LoadingState(
-                        message: 'Loading tasks from database...',
-                      ),
-                    ),
-                  ),
-                  error: (err, _) => SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        'Error loading tasks: $err',
-                        style: const TextStyle(color: AppColors.errorCoral),
-                      ),
-                    ),
-                  ),
-                  data: (tasks) {
-                    final query = _searchController.text.toLowerCase().trim();
-                    final filteredTasks = tasks.where((t) {
-                      final matchesCategory =
-                          _selectedCategory == 'All' ||
-                          t.category.toLowerCase() ==
-                              _selectedCategory.toLowerCase();
-                      final matchesSearch =
-                          query.isEmpty ||
-                          t.title.toLowerCase().contains(query);
-                      return matchesCategory && matchesSearch;
-                    }).toList();
-
-                    if (filteredTasks.isEmpty) {
-                      return SliverToBoxAdapter(
-                        child: EmptyState(
-                          icon: Icons.check_circle_outline,
-                          title: 'No tasks found',
-                          message: _selectedCategory == 'All'
-                              ? 'Stay organized by adding your first task.'
-                              : 'No tasks found in category "$_selectedCategory".',
-                          actionLabel: 'Add Task',
-                          onActionPressed: _showAddTaskSheet,
-                        ),
-                      );
-                    }
-
-                    return SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          final task = filteredTasks[index];
-                          return TaskCard(
-                            key: ValueKey(task.id),
-                            title: task.title,
-                            category: task.category,
-                            dueDate: _formatDateLabel(task.dueDate),
-                            dueTime: task.dueTime,
-                            priority: task.priority,
-                            isCompleted: task.isCompleted,
-                            isOverdue: _isTaskOverdue(task),
-                            onTap: () => showTaskEditSheet(context, ref, task),
-                            onToggle: (_) => ref
-                                .read(tasksRepositoryProvider)
-                                .toggleTaskCompletion(task.id),
-                            onDelete: () => ref
-                                .read(tasksRepositoryProvider)
-                                .deleteTask(task.id),
-                          );
-                        }, childCount: filteredTasks.length),
-                      ),
-                    );
-                  },
-                ),
-              ],
+                );
+              },
             ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Search Bar
+                  AppTextField(
+                    hint: 'Search tasks...',
+                    controller: _searchController,
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+                  // Category Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _categories.map((cat) {
+                        final isSelected = _selectedCategory == cat;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: StatusChip(
+                            label: cat,
+                            isSelected: isSelected,
+                            onTap: () {
+                              setState(() {
+                                _selectedCategory = cat;
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          tasksAsync.when(
+            loading: () => const SliverFillRemaining(
+              child: Center(
+                child: LoadingState(message: 'Loading tasks from database...'),
+              ),
+            ),
+            error: (err, _) => SliverFillRemaining(
+              child: Center(
+                child: Text(
+                  'Error loading tasks: $err',
+                  style: const TextStyle(color: AppColors.errorCoral),
+                ),
+              ),
+            ),
+            data: (tasks) {
+              final query = _searchController.text.toLowerCase().trim();
+              final filteredTasks = tasks.where((t) {
+                final matchesCategory =
+                    _selectedCategory == 'All' ||
+                    t.category.toLowerCase() == _selectedCategory.toLowerCase();
+                final matchesSearch =
+                    query.isEmpty || t.title.toLowerCase().contains(query);
+                return matchesCategory && matchesSearch;
+              }).toList();
+
+              if (filteredTasks.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: EmptyState(
+                    icon: Icons.check_circle_outline,
+                    title: 'No tasks found',
+                    message: _selectedCategory == 'All'
+                        ? 'Stay organized by adding your first task.'
+                        : 'No tasks found in category "$_selectedCategory".',
+                    actionLabel: 'Add Task',
+                    onActionPressed: _showAddTaskSheet,
+                  ),
+                );
+              }
+
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final task = filteredTasks[index];
+                    final status = task.computeStatus();
+                    return TaskCard(
+                      key: ValueKey(task.id),
+                      title: task.title,
+                      category: task.category,
+                      dueDate: _formatDateLabel(task.dueDate),
+                      dueTime: task.dueTime,
+                      priority: task.priority,
+                      isCompleted: task.isCompleted,
+                      isOverdue: status == TaskStatus.overdue,
+                      status: status,
+                      onTap: () => showTaskEditSheet(context, ref, task),
+                      onToggle: (_) async {
+                        final willBeCompleted = !task.isCompleted;
+                        await ref
+                            .read(tasksRepositoryProvider)
+                            .toggleTaskCompletion(task.id);
+
+                        final smartService = ref.read(
+                          smartReminderServiceProvider,
+                        );
+                        if (willBeCompleted) {
+                          await smartService.cancelTaskReminders(task.id);
+                        } else {
+                          final updated = await ref
+                              .read(tasksRepositoryProvider)
+                              .getTask(task.id);
+                          if (updated != null) {
+                            await smartService.scheduleTaskWithEscalation(
+                              updated,
+                            );
+                          }
+                        }
+                      },
+                      onDelete: () async {
+                        await ref
+                            .read(smartReminderServiceProvider)
+                            .cancelTaskReminders(task.id);
+                        await ref
+                            .read(tasksRepositoryProvider)
+                            .deleteTask(task.id);
+                      },
+                    );
+                  }, childCount: filteredTasks.length),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

@@ -3,13 +3,16 @@ import 'package:go_router/go_router.dart';
 import '../features/calendar/presentation/calendar_screen.dart';
 import '../features/document_viewer/presentation/document_viewer_screen.dart';
 import '../features/finance/presentation/finance_screen.dart';
+import '../features/money_tracker/presentation/money_tracker_screen.dart';
 import '../features/notes/presentation/notes_screen.dart';
 import '../features/notes/presentation/screens/note_editor_screen.dart';
+import '../features/notes/presentation/screens/note_reader_screen.dart';
 import '../features/notes/presentation/screens/notes_trash_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/settings/presentation/smart_reminder_settings_screen.dart';
 import '../features/shell/app_shell.dart';
+import '../features/tasks/presentation/task_analytics_screen.dart';
 import '../features/tasks/presentation/tasks_screen.dart';
 import '../features/today/presentation/today_screen.dart';
 import '../features/group_expenses/presentation/screens/add_edit_expense_screen.dart';
@@ -91,6 +94,20 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
+    // Task Analytics Route
+    GoRoute(
+      path: '/tasks/analytics',
+      name: 'tasks_analytics',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const TaskAnalyticsScreen(),
+    ),
+    // Money Tracker Route (Borrowed & Lent)
+    GoRoute(
+      path: '/money-tracker',
+      name: 'money_tracker',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const MoneyTrackerScreen(),
+    ),
     // Profile Route (Pushed on top of root navigator)
     GoRoute(
       path: '/profile',
@@ -126,9 +143,19 @@ final GoRouter appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const NotesTrashScreen(),
     ),
-    // Notes: Edit Note Route
+    // Notes: Reading Mode Route (Default when tapping a note)
     GoRoute(
       path: '/notes/:id',
+      name: 'notes_view',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return NoteReaderScreen(noteId: id);
+      },
+    ),
+    // Notes: Edit Note Route (Explicit editing mode)
+    GoRoute(
+      path: '/notes/:id/edit',
       name: 'notes_edit',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) {

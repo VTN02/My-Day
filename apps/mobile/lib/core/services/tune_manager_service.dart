@@ -232,8 +232,10 @@ class TuneManagerService {
     required String? tuneId,
     required FlutterLocalNotificationsPlugin plugin,
   }) async {
-    final androidImpl = plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final androidImpl = plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImpl == null) return 'myday_tasks_channel';
 

@@ -28,6 +28,16 @@ class NotificationService {
   static const String updateChannelDescription =
       'Notifications when a new version of MyDay is available to download';
 
+  static const String financeChannelId = 'myday_finance_channel';
+  static const String financeChannelName = 'Budget & Spending Alerts';
+  static const String financeChannelDescription =
+      'Notifications when spending approaches or exceeds budget limits';
+
+  static const String debtChannelId = 'myday_debt_channel';
+  static const String debtChannelName = 'Debt & Repayment Reminders';
+  static const String debtChannelDescription =
+      'Notifications for borrowed and lent money repayment deadlines';
+
   /// Initializes local notifications, Android channels, and requests permissions
   Future<void> initialize() async {
     if (_isInitialized) return;
@@ -74,6 +84,32 @@ class NotificationService {
           updateChannelId,
           updateChannelName,
           description: updateChannelDescription,
+          importance: Importance.high,
+          enableVibration: true,
+          playSound: true,
+          showBadge: true,
+        ),
+      );
+
+      // 3. Finance & Budget Alerts Channel
+      await androidImplementation.createNotificationChannel(
+        const AndroidNotificationChannel(
+          financeChannelId,
+          financeChannelName,
+          description: financeChannelDescription,
+          importance: Importance.high,
+          enableVibration: true,
+          playSound: true,
+          showBadge: true,
+        ),
+      );
+
+      // 4. Debt & Repayment Reminders Channel
+      await androidImplementation.createNotificationChannel(
+        const AndroidNotificationChannel(
+          debtChannelId,
+          debtChannelName,
+          description: debtChannelDescription,
           importance: Importance.high,
           enableVibration: true,
           playSound: true,
@@ -234,6 +270,175 @@ class NotificationService {
       scheduledDate: tzDateTime,
       notificationDetails: notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  /// Sends an immediate system notification alerting the user to a budget threshold or overrun
+  Future<void> showBudgetAlertNotification({
+    int id = 500,
+    required String budgetName,
+    required int spentCents,
+    required int totalBudgetCents,
+    required double percentUsed,
+    required bool isOverBudget,
+    String? periodType,
+  }) async {
+    await initialize();
+
+    final spentFormatted = (spentCents / 100.0).toStringAsFixed(
+      spentCents % 100 == 0 ? 0 : 2,
+    );
+    final totalFormatted = (totalBudgetCents / 100.0).toStringAsFixed(
+      totalBudgetCents % 100 == 0 ? 0 : 2,
+    );
+    final periodLabel = periodType != null ? '${periodType.toUpperCase()} ' : '';
+    final title = isOverBudget
+        ? '⚠️ Budget Exceeded: $budgetName'
+        : '⚡ Budget Alert: $budgetName (${percentUsed.toStringAsFixed(0)}% used)';
+    final body = isOverBudget
+        ? 'You have spent Rs. $spentFormatted of your Rs. $totalFormatted ${periodLabel}budget.'
+        : 'You have reached ${percentUsed.toStringAsFixed(0)}% of your Rs. $totalFormatted ${periodLabel}budget limit.';
+
+    final androidDetails = AndroidNotificationDetails(
+      financeChannelId,
+      financeChannelName,
+      channelDescription: financeChannelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      color: const Color(0xFFE53935),
+      styleInformation: BigTextStyleInformation(
+        body,
+        contentTitle: title,
+        summaryText: 'MyDay Budget Alert',
+        htmlFormatContentTitle: false,
+        htmlFormatBigText: false,
+      ),
+      ticker: title,
+      visibility: NotificationVisibility.public,
+      category: AndroidNotificationCategory.alarm,
+    );
+
+    final notificationDetails = NotificationDetails(android: androidDetails);
+
+    await _notificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
+      payload: 'budget_alert_$id',
+    );
+  }
+
+  /// Schedules a future reminder for a money repayment due date
+  Future<void> scheduleDebtReminder({
+    required int id,
+    required String personName,
+    required int amountCents,
+    required bool isLent,
+    required DateTime scheduledDate,
+    String? description,
+  }) async {
+    await initialize();
+
+    final now = DateTime.now();
+    if (scheduledDate.isBefore(now)) return;
+
+    final formatted = (amountCents / 100.0).toStringAsFixed(
+      amountCents % 100 == 0 ? 0 : 2,
+    );
+    final title = isLent
+        ? '💸 Repayment Due: $personName'
+        : '💰 Repayment Reminder: Pay $personName';
+    final body = isLent
+        ? '$personName owes you Rs. $formatted. Tap to check details.'
+        : 'You have a repayment of Rs. $formatted due to $personName.';
+
+    final androidDetails = AndroidNotificationDetails(
+      debtChannelId,
+      debtChannelName,
+      channelDescription: debtChannelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      color: const Color(0xFF10B981),
+      styleInformation: BigTextStyleInformation(
+        body,
+        contentTitle: title,
+        summaryText: 'Money Tracker Reminder',
+        htmlFormatContentTitle: false,
+        htmlFormatBigText: false,
+      ),
+      visibility: NotificationVisibility.public,
+      category: AndroidNotificationCategory.reminder,
+    );
+
+    final notificationDetails = NotificationDetails(android: androidDetails);
+    final tzDateTime = tz.TZDateTime.from(scheduledDate, tz.local);
+
+    await _notificationsPlugin.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tzDateTime,
+      notificationDetails: notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
+  }
+
+  /// Sends an immediate confirmation notification when a repayment is logged
+  Future<void> showDebtRepaymentNotification({
+    int id = 600,
+    required String personName,
+    required int amountCents,
+    required int remainingCents,
+    required bool isLent,
+    required bool isSettled,
+  }) async {
+    await initialize();
+
+    final paidFormatted = (amountCents / 100.0).toStringAsFixed(
+      amountCents % 100 == 0 ? 0 : 2,
+    );
+    final remainingFormatted = (remainingCents / 100.0).toStringAsFixed(
+      remainingCents % 100 == 0 ? 0 : 2,
+    );
+
+    final title = isSettled
+        ? '🎉 Debt Fully Settled with $personName!'
+        : '✅ Repayment Recorded for $personName';
+    final body = isSettled
+        ? 'Rs. $paidFormatted was logged. The balance is completely settled.'
+        : 'Rs. $paidFormatted was logged. Remaining balance: Rs. $remainingFormatted.';
+
+    final androidDetails = AndroidNotificationDetails(
+      debtChannelId,
+      debtChannelName,
+      channelDescription: debtChannelDescription,
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      color: const Color(0xFF10B981),
+      styleInformation: BigTextStyleInformation(
+        body,
+        contentTitle: title,
+        summaryText: 'Money Tracker Update',
+        htmlFormatContentTitle: false,
+        htmlFormatBigText: false,
+      ),
+      ticker: title,
+      visibility: NotificationVisibility.public,
+      category: AndroidNotificationCategory.status,
+    );
+
+    final notificationDetails = NotificationDetails(android: androidDetails);
+
+    await _notificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
+      payload: 'debt_repayment_$id',
     );
   }
 

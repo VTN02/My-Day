@@ -70,7 +70,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
               final name = nameCtrl.text.trim();
               if (name.isNotEmpty) {
                 Navigator.of(ctx).pop();
-                await ref.read(notesRepositoryProvider).createFolder(name: name);
+                await ref
+                    .read(notesRepositoryProvider)
+                    .createFolder(name: name);
               }
             },
             child: const Text('Create'),
@@ -101,7 +103,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText,
                 ),
               ),
               const SizedBox(height: 12),
@@ -109,7 +113,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 final isSel = _sortOrder == order;
                 return ListTile(
                   title: Text(order.label),
-                  trailing: isSel ? const Icon(Icons.check, color: AppColors.primaryIndigo) : null,
+                  trailing: isSel
+                      ? const Icon(Icons.check, color: AppColors.primaryIndigo)
+                      : null,
                   onTap: () {
                     setState(() => _sortOrder = order);
                     Navigator.of(ctx).pop();
@@ -132,7 +138,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
       notes = notes.where((n) {
         final titleMatch = n.title.toLowerCase().contains(query);
         final bodyMatch = n.body.toLowerCase().contains(query);
-        final blockMatch = n.blocks.any((b) => b.text.toLowerCase().contains(query));
+        final blockMatch = n.blocks.any(
+          (b) => b.text.toLowerCase().contains(query),
+        );
         return titleMatch || bodyMatch || blockMatch;
       }).toList();
     }
@@ -182,7 +190,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
     );
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text(
           'Notes',
@@ -225,10 +235,17 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                       color: AppColors.errorCoral,
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                    constraints: const BoxConstraints(
+                      minWidth: 14,
+                      minHeight: 14,
+                    ),
                     child: Text(
                       '$trashCount',
-                      style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 9,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -248,7 +265,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 // Search Input
                 Container(
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
@@ -267,7 +286,10 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
                       isDense: true,
                     ),
                   ),
@@ -292,7 +314,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
           if (_activeTab == 'folders')
             Container(
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              color: isDark ? AppColors.darkBackground : const Color(0xFFF1F5F9),
+              color: isDark
+                  ? AppColors.darkBackground
+                  : const Color(0xFFF1F5F9),
               child: foldersAsync.when(
                 data: (folders) {
                   return SingleChildScrollView(
@@ -313,7 +337,11 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                               avatar: Icon(
                                 Icons.folder_rounded,
                                 size: 16,
-                                color: Color(int.parse(f.colorHex.replaceFirst('#', '0xFF'))),
+                                color: Color(
+                                  int.parse(
+                                    f.colorHex.replaceFirst('#', '0xFF'),
+                                  ),
+                                ),
                               ),
                               label: Text('${f.name} (${f.noteCount})'),
                               selected: isSel,
@@ -355,12 +383,13 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 if (_isGridView) {
                   return GridView.builder(
                     padding: const EdgeInsets.all(16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: 0.85,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.85,
+                        ),
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
                       return _buildNoteGridCard(notes[index], isDark);
@@ -405,7 +434,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
           color: isSel ? AppColors.primaryIndigo : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSel ? AppColors.primaryIndigo : Colors.grey.withValues(alpha: 0.3),
+            color: isSel
+                ? AppColors.primaryIndigo
+                : Colors.grey.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
@@ -479,7 +510,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                color: isDark
+                    ? AppColors.darkPrimaryText
+                    : AppColors.lightPrimaryText,
               ),
             ),
             const SizedBox(height: 6),
@@ -487,13 +520,17 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
             // Body preview
             Expanded(
               child: Text(
-                note.body.isEmpty ? (note.hasDrawings ? 'Contains drawing' : 'Empty note') : note.body,
+                note.body.isEmpty
+                    ? (note.hasDrawings ? 'Contains drawing' : 'Empty note')
+                    : note.body,
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   height: 1.4,
-                  color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                  color: isDark
+                      ? AppColors.darkSecondaryText
+                      : AppColors.lightSecondaryText,
                 ),
               ),
             ),
@@ -504,24 +541,38 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 if (note.hasDrawings)
                   const Padding(
                     padding: EdgeInsets.only(right: 6),
-                    child: Icon(Icons.draw_rounded, size: 14, color: AppColors.primaryIndigo),
+                    child: Icon(
+                      Icons.draw_rounded,
+                      size: 14,
+                      color: AppColors.primaryIndigo,
+                    ),
                   ),
                 if (note.hasChecklists)
                   const Padding(
                     padding: EdgeInsets.only(right: 6),
-                    child: Icon(Icons.check_box_outlined, size: 14, color: AppColors.successMint),
+                    child: Icon(
+                      Icons.check_box_outlined,
+                      size: 14,
+                      color: AppColors.successMint,
+                    ),
                   ),
                 if (note.attachmentCount > 0)
                   const Padding(
                     padding: EdgeInsets.only(right: 6),
-                    child: Icon(Icons.attach_file, size: 14, color: Colors.grey),
+                    child: Icon(
+                      Icons.attach_file,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
                   ),
                 const Spacer(),
                 Text(
                   dateFormat.format(note.updatedAt),
                   style: TextStyle(
                     fontSize: 10.5,
-                    color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                    color: isDark
+                        ? AppColors.darkSecondaryText
+                        : AppColors.lightSecondaryText,
                   ),
                 ),
               ],
@@ -560,8 +611,8 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                 note.hasDrawings
                     ? Icons.draw_rounded
                     : note.hasChecklists
-                        ? Icons.checklist_rounded
-                        : Icons.description_rounded,
+                    ? Icons.checklist_rounded
+                    : Icons.description_rounded,
                 size: 20,
                 color: AppColors.primaryIndigo,
               ),
@@ -581,12 +632,18 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                            color: isDark
+                                ? AppColors.darkPrimaryText
+                                : AppColors.lightPrimaryText,
                           ),
                         ),
                       ),
                       if (note.isPinned)
-                        const Icon(Icons.push_pin_rounded, size: 16, color: AppColors.primaryIndigo),
+                        const Icon(
+                          Icons.push_pin_rounded,
+                          size: 16,
+                          color: AppColors.primaryIndigo,
+                        ),
                     ],
                   ),
                   if (note.body.isNotEmpty) ...[
@@ -597,7 +654,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                        color: isDark
+                            ? AppColors.darkSecondaryText
+                            : AppColors.lightSecondaryText,
                       ),
                     ),
                   ],
@@ -609,7 +668,9 @@ class _NotesLibraryScreenState extends ConsumerState<NotesLibraryScreen> {
               dateFormat.format(note.updatedAt),
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                color: isDark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.lightSecondaryText,
               ),
             ),
           ],

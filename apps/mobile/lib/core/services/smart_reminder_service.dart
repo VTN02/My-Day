@@ -59,11 +59,11 @@ class SmartReminderService {
     final now = DateTime.now();
 
     // Determine the dedicated notification channel for the selected tune
-    final channelId =
-        await _tuneManagerService.ensureNotificationChannelForTune(
-      tuneId: task.selectedTuneId,
-      plugin: _notificationsPlugin,
-    );
+    final channelId = await _tuneManagerService
+        .ensureNotificationChannelForTune(
+          tuneId: task.selectedTuneId,
+          plugin: _notificationsPlugin,
+        );
 
     // 2. Schedule Base Reminder (Attempt 0)
     if (scheduledBase.isAfter(now)) {
@@ -100,7 +100,9 @@ class SmartReminderService {
 
         if (escalationTime.isAfter(now)) {
           final notifId = getNotificationId(task.id, i);
-          final attemptLabel = i == 1 ? '1st Follow-up' : '$i${i == 2 ? "nd" : "rd"} Follow-up';
+          final attemptLabel = i == 1
+              ? '1st Follow-up'
+              : '$i${i == 2 ? "nd" : "rd"} Follow-up';
 
           await _scheduleLocalNotification(
             id: notifId,
@@ -126,9 +128,11 @@ class SmartReminderService {
   /// Cancels all pending notifications and records for a given task ID.
   Future<void> cancelTaskReminders(String taskId) async {
     // 1. Fetch pending reminders from SQLite
-    final pendingReminders = await (_db.select(_db.scheduledRemindersTable)
-          ..where((r) => r.taskId.equals(taskId) & r.status.equals('pending')))
-        .get();
+    final pendingReminders =
+        await (_db.select(_db.scheduledRemindersTable)..where(
+              (r) => r.taskId.equals(taskId) & r.status.equals('pending'),
+            ))
+            .get();
 
     for (final rem in pendingReminders) {
       await _notificationService.cancelNotification(rem.notificationId);
@@ -144,35 +148,36 @@ class SmartReminderService {
     await (_db.update(_db.scheduledRemindersTable)
           ..where((r) => r.taskId.equals(taskId) & r.status.equals('pending')))
         .write(
-      const ScheduledRemindersTableCompanion(
-        status: drift.Value('cancelled'),
-      ),
-    );
+          const ScheduledRemindersTableCompanion(
+            status: drift.Value('cancelled'),
+          ),
+        );
   }
 
   /// Snoozes a task reminder by rescheduling it [minutes] from now.
   Future<void> snoozeTask(String taskId, {int minutes = 10}) async {
     await cancelTaskReminders(taskId);
 
-    final task = await (_db.select(_db.tasksTable)
-          ..where((t) => t.id.equals(taskId)))
-        .getSingleOrNull();
+    final task = await (_db.select(
+      _db.tasksTable,
+    )..where((t) => t.id.equals(taskId))).getSingleOrNull();
 
     if (task == null || task.isCompleted) return;
 
     final snoozedTime = DateTime.now().add(Duration(minutes: minutes));
     final notifId = getNotificationId(taskId, 0);
 
-    final channelId =
-        await _tuneManagerService.ensureNotificationChannelForTune(
-      tuneId: task.selectedTuneId,
-      plugin: _notificationsPlugin,
-    );
+    final channelId = await _tuneManagerService
+        .ensureNotificationChannelForTune(
+          tuneId: task.selectedTuneId,
+          plugin: _notificationsPlugin,
+        );
 
     await _scheduleLocalNotification(
       id: notifId,
       title: '⏰ Snoozed: ${task.title}',
-      body: 'Snoozed for $minutes mins • Priority: ${task.priority.toUpperCase()}',
+      body:
+          'Snoozed for $minutes mins • Priority: ${task.priority.toUpperCase()}',
       scheduledDate: snoozedTime,
       channelId: channelId,
       taskId: taskId,
@@ -232,7 +237,9 @@ class SmartReminderService {
     required DateTime scheduledAt,
     required int notificationId,
   }) async {
-    await _db.into(_db.scheduledRemindersTable).insert(
+    await _db
+        .into(_db.scheduledRemindersTable)
+        .insert(
           ScheduledRemindersTableCompanion.insert(
             id: _uuid.v4(),
             taskId: taskId,

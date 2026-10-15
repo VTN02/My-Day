@@ -10,6 +10,8 @@ import 'tables/scheduled_reminders_table.dart';
 import 'tables/task_categories_table.dart';
 import 'tables/tasks_table.dart';
 import 'tables/user_profile_table.dart';
+import 'tables/finance_categories_table.dart';
+import 'tables/money_debts_table.dart';
 import '../../features/group_expenses/data/tables/group_outings_table.dart';
 import '../../features/group_expenses/data/tables/outing_members_table.dart';
 import '../../features/group_expenses/data/tables/outing_expenses_table.dart';
@@ -27,6 +29,10 @@ part 'app_database.g.dart';
     FinancialTransactionsTable,
     MonthlyBudgetsTable,
     BudgetAllocationsTable,
+    BudgetsTable,
+    FinanceCategoriesTable,
+    MoneyDebtsTable,
+    MoneyDebtRepaymentsTable,
     NoteFoldersTable,
     NotesTable,
     NoteAttachmentsTable,
@@ -46,7 +52,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? e]) : super(e ?? openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +81,16 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(tasksTable, tasksTable.followUpDelayMinutes);
         await m.addColumn(tasksTable, tasksTable.maxRepeats);
         await m.addColumn(tasksTable, tasksTable.selectedTuneId);
+      }
+      if (from < 4) {
+        await m.addColumn(tasksTable, tasksTable.completedAt);
+      }
+      if (from < 5) {
+        await m.createTable(budgetsTable);
+        await m.createTable(financeCategoriesTable);
+        await m.createTable(moneyDebtsTable);
+        await m.createTable(moneyDebtRepaymentsTable);
+        await _seedFinanceCategories();
       }
     },
   );
@@ -194,6 +210,51 @@ class AppDatabase extends _$AppDatabase {
           description: Value(h.$5),
           createdAt: Value(now),
           updatedAt: Value(now),
+        ),
+      );
+    }
+
+    // 6. Seed Default Finance Categories
+    await _seedFinanceCategories();
+  }
+
+  Future<void> _seedFinanceCategories() async {
+    final now = DateTime.now();
+    final categories = [
+      // Expense categories
+      ('fcat_food', 'Food', 'expense', 'restaurant', '#EF4444'),
+      ('fcat_travel', 'Travel / Transport', 'expense', 'directions_car', '#F59E0B'),
+      ('fcat_education', 'Education / Study', 'expense', 'school', '#8B5CF6'),
+      ('fcat_shopping', 'Shopping', 'expense', 'shopping_bag', '#EC4899'),
+      ('fcat_bills', 'Bills', 'expense', 'receipt_long', '#6366F1'),
+      ('fcat_rent', 'Rent / Accommodation', 'expense', 'home', '#14B8A6'),
+      ('fcat_health', 'Health', 'expense', 'local_hospital', '#10B981'),
+      ('fcat_entertainment', 'Entertainment', 'expense', 'movie', '#F97316'),
+      ('fcat_mobile', 'Mobile / Internet', 'expense', 'wifi', '#06B6D4'),
+      ('fcat_family', 'Family', 'expense', 'family_restroom', '#A855F7'),
+      ('fcat_personal', 'Personal', 'expense', 'person', '#3B82F6'),
+      ('fcat_other_exp', 'Other', 'expense', 'category', '#6B7280'),
+      // Income categories
+      ('fcat_salary', 'Salary', 'income', 'payments', '#10B981'),
+      ('fcat_allowance', 'Allowance from Family', 'income', 'volunteer_activism', '#06B6D4'),
+      ('fcat_freelance', 'Freelance', 'income', 'laptop_mac', '#6366F1'),
+      ('fcat_business', 'Business', 'income', 'storefront', '#F59E0B'),
+      ('fcat_scholarship', 'Scholarship', 'income', 'school', '#8B5CF6'),
+      ('fcat_gift', 'Gift', 'income', 'card_giftcard', '#EC4899'),
+      ('fcat_refund', 'Refund', 'income', 'replay', '#14B8A6'),
+      ('fcat_other_inc', 'Other', 'income', 'attach_money', '#6B7280'),
+    ];
+
+    for (final c in categories) {
+      await into(financeCategoriesTable).insertOnConflictUpdate(
+        FinanceCategoriesTableCompanion.insert(
+          id: c.$1,
+          name: c.$2,
+          type: c.$3,
+          iconName: Value(c.$4),
+          colorHex: Value(c.$5),
+          isCustom: const Value(false),
+          createdAt: Value(now),
         ),
       );
     }

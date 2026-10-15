@@ -5,7 +5,9 @@ import '../../features/document_viewer/presentation/document_viewer_screen.dart'
 /// Service that listens to incoming native Android ACTION_VIEW intents
 /// when a user chooses "Open with MyDay" on a PDF, image, or text file.
 class ExternalDocumentService {
-  static const MethodChannel _channel = MethodChannel('com.myday.app/document_viewer');
+  static const MethodChannel _channel = MethodChannel(
+    'com.myday.app/document_viewer',
+  );
   static bool _initialized = false;
 
   static void initialize() {
@@ -29,7 +31,9 @@ class ExternalDocumentService {
 
   static Future<void> _checkInitialDocument() async {
     try {
-      final res = await _channel.invokeMapMethod<String, String>('getInitialDocument');
+      final res = await _channel.invokeMapMethod<String, String>(
+        'getInitialDocument',
+      );
       if (res != null) {
         _navigateToDocument(res);
       }

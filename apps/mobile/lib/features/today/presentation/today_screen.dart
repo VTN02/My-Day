@@ -14,6 +14,7 @@ import '../../../core/widgets/summary_card.dart';
 import '../../../core/widgets/task_card.dart';
 import '../../../core/widgets/user_avatar.dart';
 import '../../habits/presentation/daily_habits_section.dart';
+import '../../tasks/domain/models/task_status.dart';
 import '../../tasks/presentation/task_edit_sheet.dart';
 import '../../group_expenses/presentation/widgets/outing_gradient_card.dart';
 
@@ -33,6 +34,7 @@ class TodayScreen extends ConsumerWidget {
     final profileAsync = ref.watch(userProfileStreamProvider);
     final todayTasksAsync = ref.watch(todayTasksStreamProvider);
     final accountsAsync = ref.watch(financialAccountsStreamProvider);
+    final debtsSummaryAsync = ref.watch(moneyTrackerSummaryStreamProvider);
 
     final displayName = profileAsync.value?.displayName ?? 'MyDay User';
 
@@ -156,212 +158,299 @@ class TodayScreen extends ConsumerWidget {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
             sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      // Quick Metric Summary
-                      todayTasksAsync.when(
-                        data: (tasks) {
-                          final total = tasks.length;
-                          final completed = tasks
-                              .where((t) => t.isCompleted)
-                              .length;
-                          final pending = total - completed;
+              delegate: SliverChildListDelegate([
+                // Quick Metric Summary
+                todayTasksAsync.when(
+                  data: (tasks) {
+                    final total = tasks.length;
+                    final completed = tasks.where((t) => t.isCompleted).length;
+                    final pending = total - completed;
 
-                          return Row(
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: SummaryCard(
+                            title: 'Tasks Done',
+                            value: '$completed / $total',
+                            subtitle: '$pending pending',
+                            icon: Icons.check_circle_rounded,
+                            iconColor: AppColors.successMint,
+                            iconBackgroundColor: isDark
+                                ? AppColors.darkSoftMint
+                                : AppColors.lightSoftMint,
+                            onTap: () => context.go('/tasks'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SummaryCard(
+                            title: 'Daily Status',
+                            value: pending == 0 && total > 0
+                                ? 'All Done! 🎉'
+                                : '$pending Left',
+                            subtitle: 'Keep moving forward',
+                            icon: Icons.flag_outlined,
+                            iconColor: AppColors.primaryIndigo,
+                            iconBackgroundColor: isDark
+                                ? AppColors.darkSoftIndigo
+                                : AppColors.lightSoftIndigo,
+                            onTap: () => context.go('/tasks'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (error, stackTrace) => const SizedBox.shrink(),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Finance Snapshot
+                SectionHeader(
+                  title: 'Financial Balances',
+                  actionLabel: 'View details',
+                  onActionTap: () => context.go('/finance'),
+                ),
+                accountsAsync.when(
+                  data: (accounts) {
+                    if (accounts.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    final cash = accounts
+                        .cast<FinancialAccountEntry?>()
+                        .firstWhere(
+                          (a) => a?.id == 'account_cash',
+                          orElse: () => accounts.first,
+                        );
+                    final card = accounts
+                        .cast<FinancialAccountEntry?>()
+                        .firstWhere(
+                          (a) => a?.id == 'account_card',
+                          orElse: () => accounts.last,
+                        );
+                    final cashBalance = cash?.currentBalanceCents ?? 0;
+                    final cardBalance = card?.currentBalanceCents ?? 0;
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: BalanceCard(
+                            title: 'Cash Wallet',
+                            amount: _formatCents(cashBalance),
+                            subtitle: 'Liquid Cash',
+                            icon: Icons.payments_outlined,
+                            onTap: () => context.go('/finance'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: BalanceCard(
+                            title: 'Card Balance',
+                            amount: _formatCents(cardBalance),
+                            subtitle: 'Card / Bank',
+                            icon: Icons.credit_card_outlined,
+                            onTap: () => context.go('/finance'),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (error, stackTrace) => const SizedBox.shrink(),
+                ),
+
+                // Money Tracker summary if debts exist
+                debtsSummaryAsync.when(
+                  data: (summary) {
+                    if (summary.activeLentCount == 0 &&
+                        summary.activeBorrowedCount == 0 &&
+                        summary.settledCount == 0) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: InkWell(
+                        borderRadius: AppRadius.cardRadius,
+                        onTap: () => context.push('/money-tracker'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.darkCardSurface
+                                : Colors.white,
+                            borderRadius: AppRadius.cardRadius,
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                            ),
+                          ),
+                          child: Row(
                             children: [
-                              Expanded(
-                                child: SummaryCard(
-                                  title: 'Tasks Done',
-                                  value: '$completed / $total',
-                                  subtitle: '$pending pending',
-                                  icon: Icons.check_circle_rounded,
-                                  iconColor: AppColors.successMint,
-                                  iconBackgroundColor: isDark
-                                      ? AppColors.darkSoftMint
-                                      : AppColors.lightSoftMint,
-                                  onTap: () => context.go('/tasks'),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryIndigo
+                                      .withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.handshake_outlined,
+                                  color: AppColors.primaryIndigo,
+                                  size: 20,
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: SummaryCard(
-                                  title: 'Daily Status',
-                                  value: pending == 0 && total > 0
-                                      ? 'All Done! 🎉'
-                                      : '$pending Left',
-                                  subtitle: 'Keep moving forward',
-                                  icon: Icons.flag_outlined,
-                                  iconColor: AppColors.primaryIndigo,
-                                  iconBackgroundColor: isDark
-                                      ? AppColors.darkSoftIndigo
-                                      : AppColors.lightSoftIndigo,
-                                  onTap: () => context.go('/tasks'),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Money Tracker (Borrowed & Lent)',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'To Receive: ${_formatCents(summary.totalLentRemainingCents)} • To Repay: ${_formatCents(summary.totalBorrowedRemainingCents)}',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: isDark
+                                            ? AppColors.darkSecondaryText
+                                            : AppColors.lightSecondaryText,
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right,
+                                size: 20,
+                                color: Colors.grey,
                               ),
                             ],
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (error, stackTrace) => const SizedBox.shrink(),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Finance Snapshot
-                      SectionHeader(
-                        title: 'Financial Balances',
-                        actionLabel: 'View details',
-                        onActionTap: () => context.go('/finance'),
-                      ),
-                      accountsAsync.when(
-                        data: (accounts) {
-                          if (accounts.isEmpty) {
-                            return const SizedBox.shrink();
-                          }
-                          final cash = accounts
-                              .cast<FinancialAccountEntry?>()
-                              .firstWhere(
-                                (a) => a?.id == 'account_cash',
-                                orElse: () => accounts.first,
-                              );
-                          final card = accounts
-                              .cast<FinancialAccountEntry?>()
-                              .firstWhere(
-                                (a) => a?.id == 'account_card',
-                                orElse: () => accounts.last,
-                              );
-                          final cashBalance = cash?.currentBalanceCents ?? 0;
-                          final cardBalance = card?.currentBalanceCents ?? 0;
-
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: BalanceCard(
-                                  title: 'Cash Wallet',
-                                  amount: _formatCents(cashBalance),
-                                  subtitle: 'Liquid Cash',
-                                  icon: Icons.payments_outlined,
-                                  onTap: () => context.go('/finance'),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: BalanceCard(
-                                  title: 'Card Balance',
-                                  amount: _formatCents(cardBalance),
-                                  subtitle: 'Card / Bank',
-                                  icon: Icons.credit_card_outlined,
-                                  onTap: () => context.go('/finance'),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (error, stackTrace) => const SizedBox.shrink(),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Quick Action Bar
-                      SectionHeader(title: 'Quick Actions'),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            StatusChip(
-                              label: 'Tasks',
-                              icon: Icons.add_task_rounded,
-                              isSelected: true,
-                              onTap: () => context.go('/tasks'),
-                            ),
-                            const SizedBox(width: 8),
-                            StatusChip(
-                              label: 'Finance',
-                              icon: Icons.account_balance_wallet_outlined,
-                              onTap: () => context.go('/finance'),
-                            ),
-                            const SizedBox(width: 8),
-                            StatusChip(
-                              label: 'Notes',
-                              icon: Icons.note_add_outlined,
-                              onTap: () => context.go('/notes'),
-                            ),
-                            const SizedBox(width: 8),
-                            StatusChip(
-                              label: 'Split',
-                              icon: Icons.groups_outlined,
-                              onTap: () => context.push('/split'),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
+                    );
+                  },
+                  loading: () => const SizedBox.shrink(),
+                  error: (error, stackTrace) => const SizedBox.shrink(),
+                ),
 
-                      const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                      // MyDay Split Outings Section
-                      const OutingGradientCard(),
-
-                      const SizedBox(height: 16),
-
-                      // Today's Scheduled Tasks
-                      SectionHeader(
-                        title: "Today's Tasks",
-                        subtitle: 'Real-time SQLite database tasks',
-                        actionLabel: 'All tasks',
-                        onActionTap: () => context.go('/tasks'),
+                // Quick Action Bar
+                SectionHeader(title: 'Quick Actions'),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      StatusChip(
+                        label: 'Tasks',
+                        icon: Icons.add_task_rounded,
+                        isSelected: true,
+                        onTap: () => context.go('/tasks'),
                       ),
-
-                      todayTasksAsync.when(
-                        data: (tasks) {
-                          if (tasks.isEmpty) {
-                            return EmptyState(
-                              icon: Icons.event_available_outlined,
-                              title: 'No tasks scheduled for today',
-                              message:
-                                  'Add a task to organize your day and track your progress.',
-                              actionLabel: 'Add Task',
-                              onActionPressed: () => context.go('/tasks'),
-                            );
-                          }
-
-                          return Column(
-                            children: tasks.map((task) {
-                              return TaskCard(
-                                key: ValueKey(task.id),
-                                title: task.title,
-                                category: task.category,
-                                dueDate: 'Today',
-                                dueTime: task.dueTime,
-                                priority: task.priority,
-                                isCompleted: task.isCompleted,
-                                onTap: () =>
-                                    showTaskEditSheet(context, ref, task),
-                                onToggle: (_) => ref
-                                    .read(tasksRepositoryProvider)
-                                    .toggleTaskCompletion(task.id),
-                                onDelete: () => ref
-                                    .read(tasksRepositoryProvider)
-                                    .deleteTask(task.id),
-                              );
-                            }).toList(),
-                          );
-                        },
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (err, _) => Center(
-                          child: Text('Error loading today tasks: $err'),
-                        ),
+                      const SizedBox(width: 8),
+                      StatusChip(
+                        label: 'Finance',
+                        icon: Icons.account_balance_wallet_outlined,
+                        onTap: () => context.go('/finance'),
                       ),
-
-                      const SizedBox(height: 16),
-
-                      // Daily Habits & Streaks (in last position)
-                      const DailyHabitsSection(),
-                    ]),
+                      const SizedBox(width: 8),
+                      StatusChip(
+                        label: 'Debts',
+                        icon: Icons.handshake_outlined,
+                        onTap: () => context.push('/money-tracker'),
+                      ),
+                      const SizedBox(width: 8),
+                      StatusChip(
+                        label: 'Notes',
+                        icon: Icons.note_add_outlined,
+                        onTap: () => context.go('/notes'),
+                      ),
+                      const SizedBox(width: 8),
+                      StatusChip(
+                        label: 'Split',
+                        icon: Icons.groups_outlined,
+                        onTap: () => context.push('/split'),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+
+                const SizedBox(height: 16),
+
+                // MyDay Split Outings Section
+                const OutingGradientCard(),
+
+                const SizedBox(height: 16),
+
+                // Today's Scheduled Tasks
+                SectionHeader(
+                  title: "Today's Tasks",
+                  subtitle: 'Real-time SQLite database tasks',
+                  actionLabel: 'All tasks',
+                  onActionTap: () => context.go('/tasks'),
+                ),
+
+                todayTasksAsync.when(
+                  data: (tasks) {
+                    if (tasks.isEmpty) {
+                      return EmptyState(
+                        icon: Icons.event_available_outlined,
+                        title: 'No tasks scheduled for today',
+                        message:
+                            'Add a task to organize your day and track your progress.',
+                        actionLabel: 'Add Task',
+                        onActionPressed: () => context.go('/tasks'),
+                      );
+                    }
+
+                    return Column(
+                      children: tasks.map((task) {
+                        return TaskCard(
+                          key: ValueKey(task.id),
+                          title: task.title,
+                          category: task.category,
+                          dueDate: 'Today',
+                          dueTime: task.dueTime,
+                          priority: task.priority,
+                          isCompleted: task.isCompleted,
+                          status: task.computeStatus(),
+                          onTap: () => showTaskEditSheet(context, ref, task),
+                          onToggle: (_) => ref
+                              .read(tasksRepositoryProvider)
+                              .toggleTaskCompletion(task.id),
+                          onDelete: () => ref
+                              .read(tasksRepositoryProvider)
+                              .deleteTask(task.id),
+                        );
+                      }).toList(),
+                    );
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (err, _) =>
+                      Center(child: Text('Error loading today tasks: $err')),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Daily Habits & Streaks (in last position)
+                const DailyHabitsSection(),
+              ]),
             ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

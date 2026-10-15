@@ -131,6 +131,7 @@ void main() {
               (ref) => Stream.value([]),
             ),
             activeOutingsStreamProvider.overrideWith((ref) => Stream.value([])),
+            allDebtsStreamProvider.overrideWith((ref) => Stream.value([])),
           ],
           child: const MyDayApp(),
         ),
@@ -143,6 +144,7 @@ void main() {
 
       // Cleanly dispose tree and cancel timers
       await tester.pumpWidget(const SizedBox());
+      await tester.pump();
     });
   });
 }

@@ -72,10 +72,12 @@ class _AppShellState extends ConsumerState<AppShell> {
         final todayKey =
             '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-        final lastPromptDate =
-            await settingsRepo.getSetting('last_update_prompt_date');
-        final lastPromptVersion =
-            await settingsRepo.getSetting('last_update_prompt_version');
+        final lastPromptDate = await settingsRepo.getSetting(
+          'last_update_prompt_date',
+        );
+        final lastPromptVersion = await settingsRepo.getSetting(
+          'last_update_prompt_version',
+        );
 
         final updateService = ref.read(updateServiceProvider);
         final result = await updateService.checkForUpdates();

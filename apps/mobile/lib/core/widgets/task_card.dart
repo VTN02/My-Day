@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
+import '../../features/tasks/domain/models/task_status.dart';
 
 /// Interactive task list item card.
 class TaskCard extends StatelessWidget {
@@ -12,6 +13,7 @@ class TaskCard extends StatelessWidget {
   final String priority; // 'low', 'medium', 'high'
   final bool isCompleted;
   final bool isOverdue;
+  final TaskStatus? status;
   final ValueChanged<bool?>? onToggle;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
@@ -25,6 +27,7 @@ class TaskCard extends StatelessWidget {
     this.priority = 'medium',
     this.isCompleted = false,
     this.isOverdue = false,
+    this.status,
     this.onToggle,
     this.onTap,
     this.onDelete,
@@ -122,6 +125,36 @@ class TaskCard extends StatelessWidget {
                         runSpacing: 4,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
+                          if (status != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: status!.color.withValues(alpha: 0.12),
+                                borderRadius: AppRadius.pillRadius,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    status!.icon,
+                                    size: 11,
+                                    color: status!.color,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    status!.label,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: status!.color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           if (category != null)
                             Container(
                               padding: const EdgeInsets.symmetric(

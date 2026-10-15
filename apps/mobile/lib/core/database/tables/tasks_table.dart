@@ -18,10 +18,13 @@ class TasksTable extends Table {
     const Constant('none'),
   )(); // none, once, hourly, custom
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
-  
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
   // Smart Reminder Escalation Fields
-  BoolColumn get followUpEnabled => boolean().withDefault(const Constant(false))();
-  IntColumn get followUpDelayMinutes => integer().withDefault(const Constant(10))();
+  BoolColumn get followUpEnabled =>
+      boolean().withDefault(const Constant(false))();
+  IntColumn get followUpDelayMinutes =>
+      integer().withDefault(const Constant(10))();
   IntColumn get maxRepeats => integer().withDefault(const Constant(2))();
   TextColumn get selectedTuneId => text().nullable()();
 

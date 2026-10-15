@@ -16,6 +16,10 @@ abstract class TasksRepository {
     DateTime? dueDate,
     String? dueTime,
     String reminder = 'none',
+    bool followUpEnabled = false,
+    int followUpDelayMinutes = 10,
+    int maxRepeats = 2,
+    String? selectedTuneId,
   });
   Future<void> updateTask(TaskEntry task);
   Future<void> toggleTaskCompletion(String id);
@@ -99,6 +103,10 @@ class DriftTasksRepository implements TasksRepository {
     DateTime? dueDate,
     String? dueTime,
     String reminder = 'none',
+    bool followUpEnabled = false,
+    int followUpDelayMinutes = 10,
+    int maxRepeats = 2,
+    String? selectedTuneId,
   }) async {
     final id = _uuid.v4();
     final now = DateTime.now();
@@ -116,6 +124,11 @@ class DriftTasksRepository implements TasksRepository {
             dueTime: Value(dueTime),
             reminder: Value(reminder),
             isCompleted: const Value(false),
+            completedAt: const Value(null),
+            followUpEnabled: Value(followUpEnabled),
+            followUpDelayMinutes: Value(followUpDelayMinutes),
+            maxRepeats: Value(maxRepeats),
+            selectedTuneId: Value(selectedTuneId),
             createdAt: Value(now),
             updatedAt: Value(now),
           ),
@@ -137,6 +150,11 @@ class DriftTasksRepository implements TasksRepository {
         dueTime: Value(task.dueTime),
         reminder: Value(task.reminder),
         isCompleted: Value(task.isCompleted),
+        completedAt: Value(task.completedAt),
+        followUpEnabled: Value(task.followUpEnabled),
+        followUpDelayMinutes: Value(task.followUpDelayMinutes),
+        maxRepeats: Value(task.maxRepeats),
+        selectedTuneId: Value(task.selectedTuneId),
         updatedAt: Value(DateTime.now()),
       ),
     );
@@ -147,10 +165,14 @@ class DriftTasksRepository implements TasksRepository {
     final task = await getTask(id);
     if (task == null) return;
 
+    final willBeCompleted = !task.isCompleted;
+    final now = DateTime.now();
+
     await (_db.update(_db.tasksTable)..where((t) => t.id.equals(id))).write(
       TasksTableCompanion(
-        isCompleted: Value(!task.isCompleted),
-        updatedAt: Value(DateTime.now()),
+        isCompleted: Value(willBeCompleted),
+        completedAt: Value(willBeCompleted ? now : null),
+        updatedAt: Value(now),
       ),
     );
   }

@@ -29,6 +29,36 @@ abstract class FinanceRepository {
 
   Stream<MonthlyBudgetEntry?> watchBudgetForMonth(int year, int month);
   Future<void> setMonthlyBudget(int year, int month, int totalBudgetCents);
+
+  // Multi-period Budgets (Daily, Weekly, Monthly)
+  Stream<List<BudgetEntry>> watchBudgets();
+  Future<List<BudgetEntry>> getAllBudgets();
+  Future<String> createBudget({
+    required String name,
+    required int amountCents,
+    String currency = 'LKR',
+    required String periodType, // 'daily', 'weekly', 'monthly'
+    required DateTime startDate,
+    DateTime? endDate,
+    String? category,
+    int alertThresholdPercent = 80,
+  });
+  Future<void> updateBudget(BudgetEntry budget);
+  Future<void> deleteBudget(String id);
+  Future<void> togglePauseBudget(String id);
+
+  // Categories (Predefined & Custom)
+  Stream<List<FinanceCategoryEntry>> watchCategories({String? type});
+  Future<List<FinanceCategoryEntry>> getCategories({String? type});
+  Future<String> createCategory({
+    required String name,
+    required String type, // 'expense' or 'income'
+    String iconName = 'category',
+    String colorHex = '#4F46E5',
+    bool isCustom = true,
+  });
+  Future<void> updateCategory(FinanceCategoryEntry category);
+  Future<void> deleteCategory(String id);
 }
 
 class DriftFinanceRepository implements FinanceRepository {
@@ -261,5 +291,163 @@ class DriftFinanceRepository implements FinanceRepository {
             ),
           );
     }
+  }
+
+  @override
+  Stream<List<BudgetEntry>> watchBudgets() {
+    final query = _db.select(_db.budgetsTable)
+      ..orderBy([
+        (b) => OrderingTerm(expression: b.createdAt, mode: OrderingMode.desc),
+      ]);
+    return query.watch();
+  }
+
+  @override
+  Future<List<BudgetEntry>> getAllBudgets() {
+    return (_db.select(_db.budgetsTable)
+          ..orderBy([
+            (b) => OrderingTerm(expression: b.createdAt, mode: OrderingMode.desc),
+          ]))
+        .get();
+  }
+
+  @override
+  Future<String> createBudget({
+    required String name,
+    required int amountCents,
+    String currency = 'LKR',
+    required String periodType,
+    required DateTime startDate,
+    DateTime? endDate,
+    String? category,
+    int alertThresholdPercent = 80,
+  }) async {
+    final id = _uuid.v4();
+    final now = DateTime.now();
+
+    await _db.into(_db.budgetsTable).insert(
+      BudgetsTableCompanion.insert(
+        id: id,
+        name: name,
+        amountCents: amountCents,
+        currency: Value(currency),
+        periodType: periodType,
+        startDate: startDate,
+        endDate: Value(endDate),
+        category: Value(category),
+        alertThresholdPercent: Value(alertThresholdPercent),
+        isPaused: const Value(false),
+        createdAt: Value(now),
+        updatedAt: Value(now),
+      ),
+    );
+    return id;
+  }
+
+  @override
+  Future<void> updateBudget(BudgetEntry budget) async {
+    await (_db.update(_db.budgetsTable)..where((b) => b.id.equals(budget.id)))
+        .write(
+      BudgetsTableCompanion(
+        name: Value(budget.name),
+        amountCents: Value(budget.amountCents),
+        currency: Value(budget.currency),
+        periodType: Value(budget.periodType),
+        startDate: Value(budget.startDate),
+        endDate: Value(budget.endDate),
+        category: Value(budget.category),
+        alertThresholdPercent: Value(budget.alertThresholdPercent),
+        isPaused: Value(budget.isPaused),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  @override
+  Future<void> deleteBudget(String id) async {
+    await (_db.delete(_db.budgetsTable)..where((b) => b.id.equals(id))).go();
+  }
+
+  @override
+  Future<void> togglePauseBudget(String id) async {
+    final budget = await (_db.select(_db.budgetsTable)
+          ..where((b) => b.id.equals(id)))
+        .getSingleOrNull();
+    if (budget == null) return;
+
+    await (_db.update(_db.budgetsTable)..where((b) => b.id.equals(id))).write(
+      BudgetsTableCompanion(
+        isPaused: Value(!budget.isPaused),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  @override
+  Stream<List<FinanceCategoryEntry>> watchCategories({String? type}) {
+    final query = _db.select(_db.financeCategoriesTable);
+    if (type != null) {
+      query.where((c) => c.type.equals(type));
+    }
+    query.orderBy([
+      (c) => OrderingTerm(expression: c.isCustom, mode: OrderingMode.asc),
+      (c) => OrderingTerm(expression: c.name, mode: OrderingMode.asc),
+    ]);
+    return query.watch();
+  }
+
+  @override
+  Future<List<FinanceCategoryEntry>> getCategories({String? type}) {
+    final query = _db.select(_db.financeCategoriesTable);
+    if (type != null) {
+      query.where((c) => c.type.equals(type));
+    }
+    query.orderBy([
+      (c) => OrderingTerm(expression: c.isCustom, mode: OrderingMode.asc),
+      (c) => OrderingTerm(expression: c.name, mode: OrderingMode.asc),
+    ]);
+    return query.get();
+  }
+
+  @override
+  Future<String> createCategory({
+    required String name,
+    required String type,
+    String iconName = 'category',
+    String colorHex = '#4F46E5',
+    bool isCustom = true,
+  }) async {
+    final id = _uuid.v4();
+    await _db.into(_db.financeCategoriesTable).insert(
+      FinanceCategoriesTableCompanion.insert(
+        id: id,
+        name: name,
+        type: type,
+        iconName: Value(iconName),
+        colorHex: Value(colorHex),
+        isCustom: Value(isCustom),
+        createdAt: Value(DateTime.now()),
+      ),
+    );
+    return id;
+  }
+
+  @override
+  Future<void> updateCategory(FinanceCategoryEntry category) async {
+    await (_db.update(_db.financeCategoriesTable)
+          ..where((c) => c.id.equals(category.id)))
+        .write(
+      FinanceCategoriesTableCompanion(
+        name: Value(category.name),
+        iconName: Value(category.iconName),
+        colorHex: Value(category.colorHex),
+      ),
+    );
+  }
+
+  @override
+  Future<void> deleteCategory(String id) async {
+    await (_db.delete(_db.financeCategoriesTable)..where((c) => c.id.equals(id)))
+        .go();
   }
 }

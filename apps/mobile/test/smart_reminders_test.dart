@@ -89,11 +89,26 @@ void main() {
     });
 
     test('NoteTemplateType parses from string correctly', () {
-      expect(NoteTemplateType.fromString('lined'), equals(NoteTemplateType.lined));
-      expect(NoteTemplateType.fromString('grid'), equals(NoteTemplateType.grid));
-      expect(NoteTemplateType.fromString('dotted'), equals(NoteTemplateType.dotted));
-      expect(NoteTemplateType.fromString('blank'), equals(NoteTemplateType.blank));
-      expect(NoteTemplateType.fromString('unknown'), equals(NoteTemplateType.blank));
+      expect(
+        NoteTemplateType.fromString('lined'),
+        equals(NoteTemplateType.lined),
+      );
+      expect(
+        NoteTemplateType.fromString('grid'),
+        equals(NoteTemplateType.grid),
+      );
+      expect(
+        NoteTemplateType.fromString('dotted'),
+        equals(NoteTemplateType.dotted),
+      );
+      expect(
+        NoteTemplateType.fromString('blank'),
+        equals(NoteTemplateType.blank),
+      );
+      expect(
+        NoteTemplateType.fromString('unknown'),
+        equals(NoteTemplateType.blank),
+      );
     });
   });
 }

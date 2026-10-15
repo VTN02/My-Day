@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../database/app_database.dart';
 import '../repositories/finance_repository.dart';
 import '../repositories/habits_repository.dart';
+import '../repositories/money_tracker_repository.dart';
 import '../repositories/notes_repository.dart';
 import '../repositories/profile_repository.dart';
 import '../repositories/settings_repository.dart';
 import '../repositories/tasks_repository.dart';
+import '../../features/money_tracker/domain/models/money_debt_model.dart';
 import '../../features/notes/domain/models/note.dart';
 import '../../features/notes/domain/models/note_folder_model.dart';
 
@@ -25,6 +27,11 @@ final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
 /// Finance repository provider
 final financeRepositoryProvider = Provider<FinanceRepository>((ref) {
   return DriftFinanceRepository(ref.watch(appDatabaseProvider));
+});
+
+/// Money Tracker repository provider
+final moneyTrackerRepositoryProvider = Provider<MoneyTrackerRepository>((ref) {
+  return DriftMoneyTrackerRepository(ref.watch(appDatabaseProvider));
 });
 
 /// Notes repository provider
@@ -104,6 +111,53 @@ final currentMonthBudgetStreamProvider = StreamProvider<MonthlyBudgetEntry?>((
   return ref
       .watch(financeRepositoryProvider)
       .watchBudgetForMonth(now.year, now.month);
+});
+
+final allBudgetsStreamProvider = StreamProvider<List<BudgetEntry>>((ref) {
+  return ref.watch(financeRepositoryProvider).watchBudgets();
+});
+
+final expenseCategoriesStreamProvider =
+    StreamProvider<List<FinanceCategoryEntry>>((ref) {
+      return ref
+          .watch(financeRepositoryProvider)
+          .watchCategories(type: 'expense');
+    });
+
+final incomeCategoriesStreamProvider =
+    StreamProvider<List<FinanceCategoryEntry>>((ref) {
+      return ref
+          .watch(financeRepositoryProvider)
+          .watchCategories(type: 'income');
+    });
+
+final allCategoriesStreamProvider =
+    StreamProvider<List<FinanceCategoryEntry>>((ref) {
+      return ref.watch(financeRepositoryProvider).watchCategories();
+    });
+
+final allDebtsStreamProvider = StreamProvider<List<MoneyDebtEntry>>((ref) {
+  return ref.watch(moneyTrackerRepositoryProvider).watchAllDebts();
+});
+
+final lentDebtsStreamProvider = StreamProvider<List<MoneyDebtEntry>>((ref) {
+  return ref.watch(moneyTrackerRepositoryProvider).watchDebtsByType('lent');
+});
+
+final borrowedDebtsStreamProvider = StreamProvider<List<MoneyDebtEntry>>((ref) {
+  return ref.watch(moneyTrackerRepositoryProvider).watchDebtsByType('borrowed');
+});
+
+final debtRepaymentsStreamProvider =
+    StreamProvider.family<List<MoneyDebtRepaymentEntry>, String>((ref, debtId) {
+  return ref.watch(moneyTrackerRepositoryProvider).watchRepayments(debtId);
+});
+
+final moneyTrackerSummaryStreamProvider =
+    Provider<AsyncValue<MoneyTrackerSummary>>((ref) {
+  return ref.watch(allDebtsStreamProvider).whenData((debts) {
+    return MoneyTrackerSummary.compute(debts);
+  });
 });
 
 final allNotesStreamProvider = StreamProvider<List<NoteEntry>>((ref) {

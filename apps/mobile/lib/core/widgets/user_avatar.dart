@@ -68,10 +68,7 @@ class UserAvatar extends StatelessWidget {
       return SizedBox(
         width: size,
         height: size,
-        child: Image.asset(
-          'assets/images/app_logo.png',
-          fit: BoxFit.contain,
-        ),
+        child: Image.asset('assets/images/app_logo.png', fit: BoxFit.contain),
       );
     }
 

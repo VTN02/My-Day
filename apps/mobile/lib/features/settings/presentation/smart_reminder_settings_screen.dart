@@ -42,7 +42,7 @@ class _SmartReminderSettingsScreenState
         await settingsRepo.getSetting('smart_reminders_default_repeats') ?? '2';
     final tune =
         await settingsRepo.getSetting('smart_reminders_selected_tune') ??
-            'tune_system_default';
+        'tune_system_default';
     if (mounted) {
       setState(() {
         _escalationEnabled = enabled == 'true';
@@ -61,9 +61,7 @@ class _SmartReminderSettingsScreenState
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -71,8 +69,9 @@ class _SmartReminderSettingsScreenState
     final tuneManager = ref.watch(tuneManagerServiceProvider);
 
     return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Smart Reminders & Tunes'),
         backgroundColor: isDark ? AppColors.darkCardSurface : Colors.white,
@@ -101,7 +100,9 @@ class _SmartReminderSettingsScreenState
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryIndigo.withValues(alpha: 0.12),
+                          color: AppColors.primaryIndigo.withValues(
+                            alpha: 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -172,10 +173,22 @@ class _SmartReminderSettingsScreenState
                           value: _defaultDelayMinutes,
                           underline: const SizedBox.shrink(),
                           items: const [
-                            DropdownMenuItem(value: 5, child: Text('5 minutes')),
-                            DropdownMenuItem(value: 10, child: Text('10 minutes')),
-                            DropdownMenuItem(value: 15, child: Text('15 minutes')),
-                            DropdownMenuItem(value: 30, child: Text('30 minutes')),
+                            DropdownMenuItem(
+                              value: 5,
+                              child: Text('5 minutes'),
+                            ),
+                            DropdownMenuItem(
+                              value: 10,
+                              child: Text('10 minutes'),
+                            ),
+                            DropdownMenuItem(
+                              value: 15,
+                              child: Text('15 minutes'),
+                            ),
+                            DropdownMenuItem(
+                              value: 30,
+                              child: Text('30 minutes'),
+                            ),
                           ],
                           onChanged: (val) {
                             if (val != null) {
@@ -272,8 +285,9 @@ class _SmartReminderSettingsScreenState
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isDark ? AppColors.darkCardSurface : Colors.white,
+                        color: isDark
+                            ? AppColors.darkCardSurface
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: isSelected
@@ -298,12 +312,16 @@ class _SmartReminderSettingsScreenState
                                 await tuneManager.stopPreview();
                                 setState(() => _currentlyPlayingTuneId = null);
                               } else {
-                                setState(() => _currentlyPlayingTuneId = tune.id);
+                                setState(
+                                  () => _currentlyPlayingTuneId = tune.id,
+                                );
                                 await tuneManager.playPreview(
                                   tune,
                                   onComplete: () {
                                     if (mounted) {
-                                      setState(() => _currentlyPlayingTuneId = null);
+                                      setState(
+                                        () => _currentlyPlayingTuneId = null,
+                                      );
                                     }
                                   },
                                 );
@@ -339,8 +357,12 @@ class _SmartReminderSettingsScreenState
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.amber.withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(6),
+                                          color: Colors.amber.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: const Text(
                                           'Default',
@@ -429,7 +451,9 @@ class _SmartReminderSettingsScreenState
                           title: 'Test Smart Reminder Escalation',
                           category: 'Work',
                           priority: 'high',
-                          dueDate: DateTime.now().add(const Duration(seconds: 4)),
+                          dueDate: DateTime.now().add(
+                            const Duration(seconds: 4),
+                          ),
                           dueTime: null,
                           reminder: 'once',
                           isCompleted: false,

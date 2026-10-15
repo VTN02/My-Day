@@ -30,6 +30,17 @@ class MainActivity : FlutterActivity() {
                     pendingDocumentMap = null
                     result.success(map)
                 }
+                "openFile" -> {
+                    val filePath = call.argument<String>("filePath")
+                    val mimeType = call.argument<String>("mimeType") ?: "*/*"
+                    val title = call.argument<String>("title") ?: "Open Document"
+                    if (filePath != null) {
+                        val res = openFileExternally(filePath, mimeType, title)
+                        result.success(res)
+                    } else {
+                        result.error("INVALID_PATH", "File path was null", null)
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -146,15 +157,34 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-    private fun shareFile(filePath: String, mimeType: String, title: String): Boolean {
+    private fun getAccessibleFile(filePath: String): File? {
         val file = File(filePath)
-        if (!file.exists()) return false
+        if (!file.exists()) return null
+
+        return try {
+            if (filePath.startsWith(cacheDir.absolutePath)) {
+                file
+            } else {
+                val cacheDocsDir = File(cacheDir, "shared_documents")
+                if (!cacheDocsDir.exists()) cacheDocsDir.mkdirs()
+                val destFile = File(cacheDocsDir, file.name)
+                file.copyTo(destFile, overwrite = true)
+                destFile
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            file
+        }
+    }
+
+    private fun shareFile(filePath: String, mimeType: String, title: String): Boolean {
+        val targetFile = getAccessibleFile(filePath) ?: return false
 
         return try {
             val uri = FileProvider.getUriForFile(
                 applicationContext,
                 "$packageName.fileprovider",
-                file
+                targetFile
             )
 
             val intent = Intent(Intent.ACTION_SEND).apply {
@@ -172,6 +202,36 @@ class MainActivity : FlutterActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    private fun openFileExternally(filePath: String, mimeType: String, title: String): Map<String, Any> {
+        val targetFile = getAccessibleFile(filePath)
+            ?: return mapOf("success" to false, "error" to "FILE_NOT_FOUND")
+
+        return try {
+            val uri = FileProvider.getUriForFile(
+                applicationContext,
+                "$packageName.fileprovider",
+                targetFile
+            )
+
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            val chooser = Intent.createChooser(viewIntent, title).apply {
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            startActivity(chooser)
+            mapOf("success" to true)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            mapOf("success" to false, "error" to (e.message ?: "UNKNOWN_ERROR"))
         }
     }
 

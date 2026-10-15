@@ -14,9 +14,13 @@ class NotesTable extends Table {
   BoolColumn get isPinned => boolean().withDefault(const Constant(false))();
   BoolColumn get isTrashed => boolean().withDefault(const Constant(false))();
   DateTimeColumn get trashedAt => dateTime().nullable()();
-  TextColumn get templateType => text().withDefault(const Constant('blank'))(); // blank, lined, grid, dotted
-  TextColumn get contentBlocksJson => text().nullable()(); // JSON-serialized structured blocks
-  TextColumn get drawingStrokesJson => text().nullable()(); // JSON-serialized editable vector strokes
+  TextColumn get templateType => text().withDefault(
+    const Constant('blank'),
+  )(); // blank, lined, grid, dotted
+  TextColumn get contentBlocksJson =>
+      text().nullable()(); // JSON-serialized structured blocks
+  TextColumn get drawingStrokesJson =>
+      text().nullable()(); // JSON-serialized editable vector strokes
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 

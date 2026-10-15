@@ -49,7 +49,9 @@ class NotesTrashScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Delete "${note.title.isEmpty ? "Untitled Note" : note.title}"?'),
+        title: Text(
+          'Delete "${note.title.isEmpty ? "Untitled Note" : note.title}"?',
+        ),
         content: const Text(
           'This note and its attachments will be permanently removed from your device storage.',
         ),
@@ -62,7 +64,9 @@ class NotesTrashScreen extends ConsumerWidget {
             style: TextButton.styleFrom(foregroundColor: AppColors.errorCoral),
             onPressed: () async {
               Navigator.of(ctx).pop();
-              await ref.read(notesRepositoryProvider).permanentlyDeleteNote(note.id);
+              await ref
+                  .read(notesRepositoryProvider)
+                  .permanentlyDeleteNote(note.id);
             },
             child: const Text('Delete Forever'),
           ),
@@ -77,7 +81,9 @@ class NotesTrashScreen extends ConsumerWidget {
     final trashedAsync = ref.watch(trashedNotesStreamProvider);
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Trash'),
         backgroundColor: isDark ? AppColors.darkCardSurface : Colors.white,
@@ -87,7 +93,9 @@ class NotesTrashScreen extends ConsumerWidget {
             data: (notes) => notes.isNotEmpty
                 ? TextButton(
                     onPressed: () => _confirmEmptyTrash(context, ref),
-                    style: TextButton.styleFrom(foregroundColor: AppColors.errorCoral),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.errorCoral,
+                    ),
                     child: const Text('Empty Trash'),
                   )
                 : const SizedBox.shrink(),
@@ -101,7 +109,8 @@ class NotesTrashScreen extends ConsumerWidget {
             return const EmptyState(
               icon: Icons.delete_outline_rounded,
               title: 'Trash is empty',
-              message: 'Notes moved to trash will appear here for safe keeping.',
+              message:
+                  'Notes moved to trash will appear here for safe keeping.',
             );
           }
 
@@ -137,7 +146,9 @@ class NotesTrashScreen extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                              color: isDark
+                                  ? AppColors.darkPrimaryText
+                                  : AppColors.lightPrimaryText,
                             ),
                           ),
                         ),
@@ -145,7 +156,9 @@ class NotesTrashScreen extends ConsumerWidget {
                           trashedDateStr,
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                            color: isDark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.lightSecondaryText,
                           ),
                         ),
                       ],
@@ -158,7 +171,9 @@ class NotesTrashScreen extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                          color: isDark
+                              ? AppColors.darkSecondaryText
+                              : AppColors.lightSecondaryText,
                         ),
                       ),
                     ],
@@ -168,18 +183,28 @@ class NotesTrashScreen extends ConsumerWidget {
                       children: [
                         // Restore Button
                         TextButton.icon(
-                          icon: const Icon(Icons.restore_from_trash_rounded, size: 16),
+                          icon: const Icon(
+                            Icons.restore_from_trash_rounded,
+                            size: 16,
+                          ),
                           label: const Text('Restore'),
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.successMint,
-                            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                           ),
                           onPressed: () async {
-                            await ref.read(notesRepositoryProvider).restoreFromTrash(note.id);
+                            await ref
+                                .read(notesRepositoryProvider)
+                                .restoreFromTrash(note.id);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Restored "${note.title.isEmpty ? "Note" : note.title}".'),
+                                  content: Text(
+                                    'Restored "${note.title.isEmpty ? "Note" : note.title}".',
+                                  ),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -189,13 +214,20 @@ class NotesTrashScreen extends ConsumerWidget {
                         const SizedBox(width: 8),
                         // Permanent Delete Button
                         TextButton.icon(
-                          icon: const Icon(Icons.delete_forever_rounded, size: 16),
+                          icon: const Icon(
+                            Icons.delete_forever_rounded,
+                            size: 16,
+                          ),
                           label: const Text('Delete Forever'),
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.errorCoral,
-                            textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                           ),
-                          onPressed: () => _confirmPermanentDelete(context, ref, note),
+                          onPressed: () =>
+                              _confirmPermanentDelete(context, ref, note),
                         ),
                       ],
                     ),

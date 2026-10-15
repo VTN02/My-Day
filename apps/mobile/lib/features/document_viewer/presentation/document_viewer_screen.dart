@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:uuid/uuid.dart';
@@ -13,6 +12,7 @@ import '../../../core/theme/app_radius.dart';
 import '../../notes/domain/models/note.dart';
 import '../../notes/domain/models/note_block.dart';
 import '../../notes/domain/models/note_template.dart';
+import '../../../core/services/document_launcher_service.dart';
 
 /// Arguments passed to the DocumentViewerScreen
 class DocumentViewerArgs {
@@ -38,7 +38,8 @@ class DocumentViewerScreen extends ConsumerStatefulWidget {
   const DocumentViewerScreen({super.key, required this.args});
 
   @override
-  ConsumerState<DocumentViewerScreen> createState() => _DocumentViewerScreenState();
+  ConsumerState<DocumentViewerScreen> createState() =>
+      _DocumentViewerScreenState();
 }
 
 class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
@@ -154,32 +155,20 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to share document: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to share document: $e')));
       }
     }
   }
 
   Future<void> _openExternally() async {
-    try {
-      final result = await OpenFilex.open(widget.args.filePath);
-      if (result.type != ResultType.done && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message.isNotEmpty
-                ? result.message
-                : 'No compatible app found to open this document.'),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not open externally: $e')),
-        );
-      }
-    }
+    await DocumentLauncherService.openExternally(
+      context: context,
+      filePath: widget.args.filePath,
+      fileName: widget.args.fileName,
+      mimeType: widget.args.mimeType,
+    );
   }
 
   Future<void> _showAddToNotesSheet() async {
@@ -218,7 +207,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                       color: AppColors.primaryIndigo.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.note_add_rounded, color: AppColors.primaryIndigo),
+                    child: const Icon(
+                      Icons.note_add_rounded,
+                      color: AppColors.primaryIndigo,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -230,14 +222,18 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                            color: isDark
+                                ? AppColors.darkPrimaryText
+                                : AppColors.lightPrimaryText,
                           ),
                         ),
                         Text(
                           widget.args.fileName,
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppColors.darkSecondaryText : AppColors.lightSecondaryText,
+                            color: isDark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.lightSecondaryText,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -258,9 +254,16 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                   ),
                   child: const Icon(Icons.add, color: AppColors.primaryIndigo),
                 ),
-                title: const Text('Create New Note', style: TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: const Text('Create a new note with this document attached'),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                title: const Text(
+                  'Create New Note',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: const Text(
+                  'Create a new note with this document attached',
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await _importToNewNote();
@@ -275,11 +278,21 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                     color: AppColors.secondaryOcean.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.library_books_rounded, color: AppColors.secondaryOcean),
+                  child: const Icon(
+                    Icons.library_books_rounded,
+                    color: AppColors.secondaryOcean,
+                  ),
                 ),
-                title: const Text('Add to Existing Note', style: TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: const Text('Choose an existing note to attach this file to'),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                title: const Text(
+                  'Add to Existing Note',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: const Text(
+                  'Choose an existing note to attach this file to',
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   _showExistingNotesPicker();
@@ -296,7 +309,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     try {
       final newNoteId = const Uuid().v4();
       final docsDir = await getApplicationDocumentsDirectory();
-      final notesAttachmentDir = Directory('${docsDir.path}/notes_attachments/$newNoteId');
+      final notesAttachmentDir = Directory(
+        '${docsDir.path}/notes_attachments/$newNoteId',
+      );
       if (!await notesAttachmentDir.exists()) {
         await notesAttachmentDir.create(recursive: true);
       }
@@ -306,7 +321,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       await srcFile.copy(targetPath);
 
       // Create new Note record
-      final title = widget.args.fileName.replaceAll(RegExp(r'\.[a-zA-Z0-9]+$'), '');
+      final title = widget.args.fileName.replaceAll(
+        RegExp(r'\.[a-zA-Z0-9]+$'),
+        '',
+      );
       final newNote = Note(
         id: newNoteId,
         title: title,
@@ -328,7 +346,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       await ref.read(notesRepositoryProvider).saveNote(newNote);
 
       final ext = widget.args.fileName.split('.').last.toLowerCase();
-      await ref.read(notesRepositoryProvider).addAttachment(
+      await ref
+          .read(notesRepositoryProvider)
+          .addAttachment(
             noteId: newNoteId,
             fileName: widget.args.fileName,
             filePath: targetPath,
@@ -364,7 +384,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
 
     if (notes.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No existing notes found. Please create a note first.')),
+        const SnackBar(
+          content: Text('No existing notes found. Please create a note first.'),
+        ),
       );
       return;
     }
@@ -376,7 +398,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       builder: (ctx) {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.7,
+          ),
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkCardSurface : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -390,7 +414,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.lightPrimaryText,
                 ),
               ),
               const SizedBox(height: 12),
@@ -410,7 +436,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                      ),
                       onTap: () async {
                         Navigator.pop(ctx);
                         await _attachToExistingNote(note);
@@ -429,7 +458,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
   Future<void> _attachToExistingNote(Note note) async {
     try {
       final docsDir = await getApplicationDocumentsDirectory();
-      final notesAttachmentDir = Directory('${docsDir.path}/notes_attachments/${note.id}');
+      final notesAttachmentDir = Directory(
+        '${docsDir.path}/notes_attachments/${note.id}',
+      );
       if (!await notesAttachmentDir.exists()) {
         await notesAttachmentDir.create(recursive: true);
       }
@@ -439,7 +470,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       await srcFile.copy(targetPath);
 
       final ext = widget.args.fileName.split('.').last.toLowerCase();
-      await ref.read(notesRepositoryProvider).addAttachment(
+      await ref
+          .read(notesRepositoryProvider)
+          .addAttachment(
             noteId: note.id,
             fileName: widget.args.fileName,
             filePath: targetPath,
@@ -479,7 +512,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           children: const [
             Icon(Icons.info_outline_rounded, color: AppColors.primaryIndigo),
             SizedBox(width: 8),
-            Text('Document Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Document Information',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         content: Column(
@@ -511,7 +547,14 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
         const SizedBox(height: 2),
         SelectableText(value, style: const TextStyle(fontSize: 13)),
       ],
@@ -523,7 +566,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.darkBackground : const Color(0xFFF0F4F8),
+      backgroundColor: isDark
+          ? AppColors.darkBackground
+          : const Color(0xFFF0F4F8),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -537,12 +582,18 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             if (_totalPages > 0)
               Text(
                 'Page $_currentPage of $_totalPages',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.normal,
+                ),
               )
             else if (_fileSizeBytes > 0)
               Text(
                 _formatFileSize(_fileSizeBytes),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
           ],
         ),
@@ -593,9 +644,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCardSurface : Colors.white,
           border: Border(
-            top: BorderSide(
-              color: isDark ? Colors.white10 : Colors.black12,
-            ),
+            top: BorderSide(color: isDark ? Colors.white10 : Colors.black12),
           ),
         ),
         child: SafeArea(
@@ -609,7 +658,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                     backgroundColor: AppColors.primaryIndigo,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: _showAddToNotesSheet,
                 ),
@@ -629,12 +680,19 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.errorCoral),
+              const Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: AppColors.errorCoral,
+              ),
               const SizedBox(height: 12),
               Text(
                 _errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: AppColors.errorCoral),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.errorCoral,
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -676,10 +734,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
               setState(() => _errorMessage = error.toString());
             },
           ),
-          if (!_isPdfReady)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
+          if (!_isPdfReady) const Center(child: CircularProgressIndicator()),
         ],
       );
     }
@@ -697,7 +752,11 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.broken_image_rounded, size: 56, color: Colors.grey),
+                    const Icon(
+                      Icons.broken_image_rounded,
+                      size: 56,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(height: 8),
                     Text('Could not load image: $error'),
                   ],
@@ -721,7 +780,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             fontSize: 14,
             height: 1.6,
             fontFamily: 'monospace',
-            color: isDark ? AppColors.darkPrimaryText : AppColors.lightPrimaryText,
+            color: isDark
+                ? AppColors.darkPrimaryText
+                : AppColors.lightPrimaryText,
           ),
         ),
       );
@@ -747,7 +808,9 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                _isOfficeDoc ? Icons.description_rounded : Icons.insert_drive_file_rounded,
+                _isOfficeDoc
+                    ? Icons.description_rounded
+                    : Icons.insert_drive_file_rounded,
                 size: 64,
                 color: AppColors.primaryIndigo,
               ),
@@ -755,7 +818,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
               Text(
                 widget.args.fileName,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
@@ -769,8 +835,13 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryIndigo,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 onPressed: _openExternally,
               ),

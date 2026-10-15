@@ -532,18 +532,26 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.alarm_add_rounded, size: 18, color: AppColors.primaryIndigo),
+                          Icon(
+                            Icons.alarm_add_rounded,
+                            size: 18,
+                            color: AppColors.primaryIndigo,
+                          ),
                           SizedBox(width: 8),
                           Text(
                             'Smart Follow-up Reminders',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ],
                       ),
                       Switch(
                         value: _followUpEnabled,
                         activeThumbColor: AppColors.primaryIndigo,
-                        onChanged: (val) => setState(() => _followUpEnabled = val),
+                        onChanged: (val) =>
+                            setState(() => _followUpEnabled = val),
                       ),
                     ],
                   ),
@@ -552,19 +560,48 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Follow-up Interval', style: TextStyle(fontSize: 12)),
+                        const Text(
+                          'Follow-up Interval',
+                          style: TextStyle(fontSize: 12),
+                        ),
                         DropdownButton<int>(
                           value: _followUpDelayMinutes,
                           isDense: true,
                           underline: const SizedBox.shrink(),
                           items: const [
-                            DropdownMenuItem(value: 5, child: Text('Every 5 mins', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 10, child: Text('Every 10 mins', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 15, child: Text('Every 15 mins', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 30, child: Text('Every 30 mins', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(
+                              value: 5,
+                              child: Text(
+                                'Every 5 mins',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 10,
+                              child: Text(
+                                'Every 10 mins',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 15,
+                              child: Text(
+                                'Every 15 mins',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 30,
+                              child: Text(
+                                'Every 30 mins',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ],
                           onChanged: (val) {
-                            if (val != null) setState(() => _followUpDelayMinutes = val);
+                            if (val != null) {
+                              setState(() => _followUpDelayMinutes = val);
+                            }
                           },
                         ),
                       ],
@@ -573,15 +610,36 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Maximum Follow-ups', style: TextStyle(fontSize: 12)),
+                        const Text(
+                          'Maximum Follow-ups',
+                          style: TextStyle(fontSize: 12),
+                        ),
                         DropdownButton<int>(
                           value: _maxRepeats,
                           isDense: true,
                           underline: const SizedBox.shrink(),
                           items: const [
-                            DropdownMenuItem(value: 1, child: Text('1 time', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 2, child: Text('2 times', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 3, child: Text('3 times', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text(
+                                '1 time',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text(
+                                '2 times',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text(
+                                '3 times',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ],
                           onChanged: (val) {
                             if (val != null) setState(() => _maxRepeats = val);
@@ -654,6 +712,13 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                         dueDate: Value(finalDueDate),
                         dueTime: Value(finalDueTime),
                         isCompleted: _isCompleted,
+                        completedAt: Value(
+                          _isCompleted
+                              ? (widget.task.isCompleted
+                                    ? widget.task.completedAt ?? DateTime.now()
+                                    : DateTime.now())
+                              : null,
+                        ),
                         followUpEnabled: _followUpEnabled,
                         followUpDelayMinutes: _followUpDelayMinutes,
                         maxRepeats: _maxRepeats,
@@ -666,12 +731,17 @@ class _TaskEditSheetContentState extends State<_TaskEditSheetContent> {
                           .updateTask(updated);
 
                       // Smart Reminder Escalation Scheduling
-                      final smartReminderService =
-                          widget.ref.read(smartReminderServiceProvider);
+                      final smartReminderService = widget.ref.read(
+                        smartReminderServiceProvider,
+                      );
                       if (_isCompleted) {
-                        await smartReminderService.cancelTaskReminders(updated.id);
+                        await smartReminderService.cancelTaskReminders(
+                          updated.id,
+                        );
                       } else {
-                        await smartReminderService.scheduleTaskWithEscalation(updated);
+                        await smartReminderService.scheduleTaskWithEscalation(
+                          updated,
+                        );
                       }
 
                       if (context.mounted) Navigator.of(context).pop();

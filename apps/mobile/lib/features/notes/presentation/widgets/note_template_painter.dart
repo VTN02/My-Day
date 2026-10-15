@@ -6,10 +6,7 @@ class NoteTemplatePainter extends CustomPainter {
   final NoteTemplateType templateType;
   final bool isDark;
 
-  const NoteTemplatePainter({
-    required this.templateType,
-    required this.isDark,
-  });
+  const NoteTemplatePainter({required this.templateType, required this.isDark});
 
   @override
   void paint(Canvas canvas, Size size) {

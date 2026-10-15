@@ -26,7 +26,8 @@ void main() {
       const docxArgs = DocumentViewerArgs(
         filePath: '/storage/emulated/0/Download/Report.docx',
         fileName: 'Report.docx',
-        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        mimeType:
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       );
 
       expect(imageArgs.fileName.toLowerCase().endsWith('.jpg'), isTrue);
@@ -35,19 +36,26 @@ void main() {
   });
 
   group('Calendar Month Calculations & Task Distribution', () {
-    test('Calculates first day and days in month correctly across leap years', () {
-      final febLeap = DateTime(2028, 2, 1);
-      final daysInFebLeap = DateTime(febLeap.year, febLeap.month + 1, 0).day;
-      expect(daysInFebLeap, equals(29));
+    test(
+      'Calculates first day and days in month correctly across leap years',
+      () {
+        final febLeap = DateTime(2028, 2, 1);
+        final daysInFebLeap = DateTime(febLeap.year, febLeap.month + 1, 0).day;
+        expect(daysInFebLeap, equals(29));
 
-      final febNormal = DateTime(2026, 2, 1);
-      final daysInFebNormal = DateTime(febNormal.year, febNormal.month + 1, 0).day;
-      expect(daysInFebNormal, equals(28));
+        final febNormal = DateTime(2026, 2, 1);
+        final daysInFebNormal = DateTime(
+          febNormal.year,
+          febNormal.month + 1,
+          0,
+        ).day;
+        expect(daysInFebNormal, equals(28));
 
-      final oct2026 = DateTime(2026, 10, 1);
-      final daysInOct2026 = DateTime(oct2026.year, oct2026.month + 1, 0).day;
-      expect(daysInOct2026, equals(31));
-    });
+        final oct2026 = DateTime(2026, 10, 1);
+        final daysInOct2026 = DateTime(oct2026.year, oct2026.month + 1, 0).day;
+        expect(daysInOct2026, equals(31));
+      },
+    );
 
     test('Groups tasks by day number for calendar dot indicators', () {
       final sampleDueDates = [

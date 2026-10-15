@@ -26,7 +26,8 @@ class AnalyticsService {
   final List<Map<String, dynamic>> _queue = [];
   Timer? _flushTimer;
 
-  static const String _defaultEndpoint = 'http://10.0.2.2:3000/api/analytics/collect';
+  static const String _defaultEndpoint =
+      'http://10.0.2.2:3000/api/analytics/collect';
 
   AnalyticsService(this._settingsRepo);
 
@@ -46,7 +47,9 @@ class AnalyticsService {
       }
 
       // 2. Load user consent state (default: true)
-      final consent = await _settingsRepo.getSetting('analytics_consent_enabled');
+      final consent = await _settingsRepo.getSetting(
+        'analytics_consent_enabled',
+      );
       _consentEnabled = consent != 'false';
 
       // 3. Start background periodic flush timer (every 60s)
@@ -63,7 +66,10 @@ class AnalyticsService {
   /// Toggles user analytics consent
   Future<void> setConsentEnabled(bool enabled) async {
     _consentEnabled = enabled;
-    await _settingsRepo.setSetting('analytics_consent_enabled', enabled ? 'true' : 'false');
+    await _settingsRepo.setSetting(
+      'analytics_consent_enabled',
+      enabled ? 'true' : 'false',
+    );
     if (!enabled) {
       _queue.clear(); // Immediately purge queue
     }
@@ -98,9 +104,7 @@ class AnalyticsService {
   Future<void> trackFeatureOpen(String feature) async {
     await _enqueueEvent(
       eventType: 'feature_open',
-      payload: {
-        'feature': feature,
-      },
+      payload: {'feature': feature},
     );
   }
 
@@ -108,10 +112,7 @@ class AnalyticsService {
   Future<void> trackFeatureAction(String feature, String action) async {
     await _enqueueEvent(
       eventType: 'feature_action',
-      payload: {
-        'feature': feature,
-        'action': action,
-      },
+      payload: {'feature': feature, 'action': action},
     );
   }
 

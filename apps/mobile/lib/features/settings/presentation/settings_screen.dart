@@ -767,8 +767,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         activeTrackColor: AppColors.primaryIndigo,
                         onChanged: (val) {
                           setState(() => _analyticsConsentEnabled = val);
-                          _updateSetting('analytics_consent_enabled', val.toString());
-                          ref.read(analyticsServiceProvider).setConsentEnabled(val);
+                          _updateSetting(
+                            'analytics_consent_enabled',
+                            val.toString(),
+                          );
+                          ref
+                              .read(analyticsServiceProvider)
+                              .setConsentEnabled(val);
                         },
                       ),
                     ],

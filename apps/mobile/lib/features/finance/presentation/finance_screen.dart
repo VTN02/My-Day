@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/providers/database_providers.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_gradients.dart';
 import '../../../core/theme/app_radius.dart';
@@ -13,6 +15,9 @@ import '../../../core/widgets/loading_state.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/summary_card.dart';
+import '../domain/models/budget_progress.dart';
+import 'budgets_tab.dart';
+import 'category_dialogs.dart';
 import 'finance_charts.dart';
 
 /// Finance Management Screen connected to Drift SQLite repository.
@@ -24,8 +29,9 @@ class FinanceScreen extends ConsumerStatefulWidget {
 }
 
 class _FinanceScreenState extends ConsumerState<FinanceScreen> {
-  int _currentTab = 0; // 0: Overview, 1: Plan, 2: Analytics, 3: Compare
-  final List<String> _tabs = ['Overview', 'Plan', 'Analytics', 'Compare'];
+  int _currentTab = 0; // 0: Overview, 1: Budgets, 2: Analytics, 3: Compare
+  final List<String> _tabs = ['Overview', 'Budgets', 'Analytics', 'Compare'];
+  String _analyticsPeriod = 'This Month'; // 'This Week', 'This Month', 'All Time'
 
   String _formatCents(int cents) {
     final val = cents / 100.0;
@@ -36,7 +42,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
     final titleController = TextEditingController();
     final amountController = TextEditingController();
     String selectedAccount = 'account_cash';
-    String selectedCategory = isIncome ? 'Salary' : 'Food';
+    String? selectedCategory;
 
     showModalBottomSheet(
       context: context,
@@ -46,6 +52,12 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
         final isDark = Theme.of(ctx).brightness == Brightness.dark;
         return StatefulBuilder(
           builder: (context, setModalState) {
+            final categoriesAsync = ref.watch(
+              isIncome
+                  ? incomeCategoriesStreamProvider
+                  : expenseCategoriesStreamProvider,
+            );
+
             return Container(
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkCardSurface : Colors.white,
@@ -59,133 +71,275 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                 20,
                 MediaQuery.of(ctx).viewInsets.bottom + 24,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        isIncome ? 'Add Income' : 'Record Expense',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: isDark
-                              ? AppColors.darkPrimaryText
-                              : AppColors.lightPrimaryText,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isIncome ? 'Add Income' : 'Record Expense',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.darkPrimaryText
+                                : AppColors.lightPrimaryText,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(ctx).pop(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    label: 'Description',
-                    hint: isIncome
-                        ? 'e.g. Monthly Salary, Freelance'
-                        : 'e.g. Groceries, Transport',
-                    controller: titleController,
-                  ),
-                  const SizedBox(height: 14),
-                  AppTextField(
-                    label: 'Amount (LKR)',
-                    hint: '0.00',
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.of(ctx).pop(),
+                        ),
+                      ],
                     ),
-                    controller: amountController,
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Account',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.darkPrimaryText
-                          : AppColors.lightPrimaryText,
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      label: 'Description',
+                      hint: isIncome
+                          ? 'e.g. Monthly Salary, Freelance'
+                          : 'e.g. Groceries, Transport',
+                      controller: titleController,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => setModalState(
-                            () => selectedAccount = 'account_cash',
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: selectedAccount == 'account_cash'
-                                ? (isDark
-                                      ? AppColors.darkSoftIndigo
-                                      : AppColors.lightSoftIndigo)
-                                : Colors.transparent,
-                            side: BorderSide(
-                              color: selectedAccount == 'account_cash'
-                                  ? AppColors.primaryIndigo
-                                  : AppColors.lightBorder,
-                            ),
-                          ),
-                          child: const Text('Cash'),
+                    const SizedBox(height: 14),
+                    AppTextField(
+                      label: 'Amount (LKR)',
+                      hint: '0.00',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      controller: amountController,
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Category',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkPrimaryText
+                            : AppColors.lightPrimaryText,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    categoriesAsync.when(
+                      loading: () => const SizedBox(
+                        height: 38,
+                        child: Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => setModalState(
-                            () => selectedAccount = 'account_card',
+                      error: (err, stack) => const SizedBox.shrink(),
+                      data: (cats) {
+                        if (selectedCategory == null && cats.isNotEmpty) {
+                          selectedCategory = cats.first.name;
+                        }
+                        return SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ...cats.map((c) {
+                                final isSel = selectedCategory == c.name;
+                                final catColor = parseCategoryColor(c.colorHex);
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: ChoiceChip(
+                                    avatar: Icon(
+                                      getFinanceCategoryIcon(c.iconName),
+                                      size: 16,
+                                      color: isSel ? Colors.white : catColor,
+                                    ),
+                                    label: Text(c.name),
+                                    selected: isSel,
+                                    selectedColor: isIncome
+                                        ? AppColors.successMint
+                                        : AppColors.primaryIndigo,
+                                    backgroundColor: isDark
+                                        ? AppColors.darkCardSurface
+                                        : const Color(0xFFEFF2FA),
+                                    labelStyle: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: isSel
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                      color: isSel
+                                          ? Colors.white
+                                          : (isDark
+                                                ? AppColors.darkPrimaryText
+                                                : AppColors.lightPrimaryText),
+                                    ),
+                                    onSelected: (_) => setModalState(
+                                      () => selectedCategory = c.name,
+                                    ),
+                                  ),
+                                );
+                              }),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 2),
+                                child: ActionChip(
+                                  avatar: const Icon(
+                                    Icons.add,
+                                    size: 16,
+                                    color: AppColors.primaryIndigo,
+                                  ),
+                                  label: const Text('Add Custom'),
+                                  backgroundColor: isDark
+                                      ? AppColors.darkCardSurface
+                                      : const Color(0xFFEFF2FA),
+                                  labelStyle: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryIndigo,
+                                  ),
+                                  onPressed: () {
+                                    showAddCategoryDialog(
+                                      context,
+                                      ref,
+                                      type: isIncome ? 'income' : 'expense',
+                                      onCategoryCreated: (newCat) {
+                                        setModalState(
+                                          () => selectedCategory = newCat,
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: selectedAccount == 'account_card'
-                                ? (isDark
-                                      ? AppColors.darkSoftIndigo
-                                      : AppColors.lightSoftIndigo)
-                                : Colors.transparent,
-                            side: BorderSide(
-                              color: selectedAccount == 'account_card'
-                                  ? AppColors.primaryIndigo
-                                  : AppColors.lightBorder,
-                            ),
-                          ),
-                          child: const Text('Card'),
-                        ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'Account',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkPrimaryText
+                            : AppColors.lightPrimaryText,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  PrimaryButton(
-                    text: isIncome ? 'Save Income' : 'Save Expense',
-                    backgroundColor: isIncome
-                        ? AppColors.successMint
-                        : AppColors.errorCoral,
-                    isFullWidth: true,
-                    onPressed: () async {
-                      final title = titleController.text.trim();
-                      final amountRaw =
-                          double.tryParse(amountController.text.trim()) ?? 0.0;
-                      if (title.isEmpty || amountRaw <= 0) return;
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => setModalState(
+                              () => selectedAccount = 'account_cash',
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selectedAccount == 'account_cash'
+                                  ? (isDark
+                                        ? AppColors.darkSoftIndigo
+                                        : AppColors.lightSoftIndigo)
+                                  : Colors.transparent,
+                              side: BorderSide(
+                                color: selectedAccount == 'account_cash'
+                                    ? AppColors.primaryIndigo
+                                    : AppColors.lightBorder,
+                              ),
+                            ),
+                            child: const Text('Cash'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => setModalState(
+                              () => selectedAccount = 'account_card',
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selectedAccount == 'account_card'
+                                  ? (isDark
+                                        ? AppColors.darkSoftIndigo
+                                        : AppColors.lightSoftIndigo)
+                                  : Colors.transparent,
+                              side: BorderSide(
+                                color: selectedAccount == 'account_card'
+                                    ? AppColors.primaryIndigo
+                                    : AppColors.lightBorder,
+                              ),
+                            ),
+                            child: const Text('Card'),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      text: isIncome ? 'Save Income' : 'Save Expense',
+                      backgroundColor: isIncome
+                          ? AppColors.successMint
+                          : AppColors.errorCoral,
+                      isFullWidth: true,
+                      onPressed: () async {
+                        final title = titleController.text.trim();
+                        final amountRaw =
+                            double.tryParse(amountController.text.trim()) ?? 0.0;
+                        if (title.isEmpty || amountRaw <= 0) return;
 
-                      final amountCents = (amountRaw * 100).round();
+                        final amountCents = (amountRaw * 100).round();
+                        final cat =
+                            selectedCategory ?? (isIncome ? 'Salary' : 'Food');
 
-                      await ref
-                          .read(financeRepositoryProvider)
-                          .recordTransaction(
-                            accountId: selectedAccount,
-                            type: isIncome ? 'income' : 'expense',
-                            amountCents: amountCents,
-                            category: selectedCategory,
-                            description: title,
-                            transactionDate: DateTime.now(),
-                          );
+                        await ref
+                            .read(financeRepositoryProvider)
+                            .recordTransaction(
+                              accountId: selectedAccount,
+                              type: isIncome ? 'income' : 'expense',
+                              amountCents: amountCents,
+                              category: cat,
+                              description: title,
+                              transactionDate: DateTime.now(),
+                            );
 
-                      if (ctx.mounted) Navigator.of(ctx).pop();
-                    },
-                  ),
-                ],
+                        if (!isIncome) {
+                          // Automatic Budget Threshold & Overrun Alert Check
+                          try {
+                            final budgets = await ref
+                                .read(financeRepositoryProvider)
+                                .getAllBudgets();
+                            final allTx = await ref
+                                .read(financeRepositoryProvider)
+                                .watchAllTransactions()
+                                .first;
+                            for (final b in budgets.where((b) => !b.isPaused)) {
+                              if (b.category == null ||
+                                  b.category == 'All' ||
+                                  b.category!.isEmpty ||
+                                  b.category!.toLowerCase() ==
+                                      cat.toLowerCase()) {
+                                final progress = BudgetProgress.compute(
+                                  budget: b,
+                                  transactions: allTx,
+                                );
+                                if (progress.hasReachedAlertThreshold ||
+                                    progress.isOverBudget) {
+                                  await NotificationService()
+                                      .showBudgetAlertNotification(
+                                        id: b.id.hashCode,
+                                        budgetName: b.name,
+                                        spentCents: progress.spentCents,
+                                        totalBudgetCents: b.amountCents,
+                                        percentUsed: progress.percentageUsed,
+                                        isOverBudget: progress.isOverBudget,
+                                        periodType: b.periodType,
+                                      );
+                                }
+                              }
+                            }
+                          } catch (_) {}
+                        }
+
+                        if (ctx.mounted) Navigator.of(ctx).pop();
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -309,6 +463,75 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
             ),
           ],
         ),
+        const SizedBox(height: 14),
+        GestureDetector(
+          onTap: () => context.push('/money-tracker'),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
+                    : [const Color(0xFFF1F5F9), const Color(0xFFE2E8F0)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: AppRadius.cardRadius,
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryIndigo.withValues(alpha: 0.15),
+                    borderRadius: AppRadius.mdRadius,
+                  ),
+                  child: const Icon(
+                    Icons.handshake_outlined,
+                    color: AppColors.primaryIndigo,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Money Tracker (Borrowed & Lent)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.lightPrimaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Manage debts, receivables & repayment schedules',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: isDark
+                              ? AppColors.darkSecondaryText
+                              : AppColors.lightSecondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: AppColors.primaryIndigo,
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 16),
         SectionHeader(
           title: 'Recent Transactions',
@@ -418,82 +641,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
     );
   }
 
-  void _showSetBudgetDialog(int currentBudgetCents) {
-    final controller = TextEditingController(
-      text: (currentBudgetCents / 100.0).toStringAsFixed(0),
-    );
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        final isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkCardSurface : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Set Monthly Budget Target',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? AppColors.darkPrimaryText
-                          : AppColors.lightPrimaryText,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              AppTextField(
-                label: 'Monthly Target (LKR)',
-                hint: 'e.g. 80000',
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: false,
-                ),
-                controller: controller,
-              ),
-              const SizedBox(height: 20),
-              PrimaryButton(
-                text: 'Save Budget Target',
-                icon: Icons.check,
-                isFullWidth: true,
-                onPressed: () async {
-                  final raw = double.tryParse(controller.text.trim()) ?? 0.0;
-                  if (raw <= 0) return;
-                  final now = DateTime.now();
-                  final targetCents = (raw * 100).round();
-                  await ref
-                      .read(financeRepositoryProvider)
-                      .setMonthlyBudget(now.year, now.month, targetCents);
-                  if (ctx.mounted) Navigator.of(ctx).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
@@ -542,259 +690,53 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
     return '';
   }
 
-  Widget _buildPlanTab(
-    bool isDark,
-    List<FinancialTransactionEntry> allTransactions,
-    MonthlyBudgetEntry? budgetEntry,
-  ) {
-    final now = DateTime.now();
-    final thisMonthTx = allTransactions
-        .where(
-          (t) =>
-              t.transactionDate.year == now.year &&
-              t.transactionDate.month == now.month,
-        )
-        .toList();
-    final monthExpensesCents = thisMonthTx
-        .where((t) => t.type == 'expense')
-        .fold<int>(0, (sum, t) => sum + t.amountCents);
-    final targetBudgetCents = budgetEntry?.totalBudgetCents ?? 8000000;
-    final ratio = targetBudgetCents > 0
-        ? (monthExpensesCents / targetBudgetCents)
-        : 0.0;
-    final isOverBudget = monthExpensesCents > targetBudgetCents;
-    final pctUsed = (ratio * 100).clamp(0, 999).toStringAsFixed(1);
 
-    // Group expenses by category
-    final categoryTotals = <String, int>{};
-    for (final tx in thisMonthTx.where((t) => t.type == 'expense')) {
-      categoryTotals[tx.category] =
-          (categoryTotals[tx.category] ?? 0) + tx.amountCents;
-    }
-    final sortedCategories = categoryTotals.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(
-          title: 'Monthly Budget Plan',
-          subtitle: '${_getMonthName(now.month)} ${now.year} Target',
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkCardSurface
-                : AppColors.lightCardSurface,
-            borderRadius: AppRadius.cardRadius,
-            border: Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-            ),
-          ),
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Budget Used ($pctUsed%)',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? AppColors.darkPrimaryText
-                              : AppColors.lightPrimaryText,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_formatCents(monthExpensesCents)} / ${_formatCents(targetBudgetCents)}',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
-                          color: isOverBudget
-                              ? AppColors.errorCoral
-                              : AppColors.primaryIndigo,
-                        ),
-                      ),
-                    ],
-                  ),
-                  OutlinedButton.icon(
-                    onPressed: () => _showSetBudgetDialog(targetBudgetCents),
-                    icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text(
-                      'Edit Target',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              ClipRRect(
-                borderRadius: AppRadius.pillRadius,
-                child: LinearProgressIndicator(
-                  value: ratio.clamp(0.0, 1.0),
-                  minHeight: 10,
-                  backgroundColor: isDark
-                      ? AppColors.darkBorder
-                      : AppColors.lightBorder,
-                  valueColor: AlwaysStoppedAnimation(
-                    isOverBudget
-                        ? AppColors.errorCoral
-                        : AppColors.primaryIndigo,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    isOverBudget
-                        ? 'Over budget by ${_formatCents(monthExpensesCents - targetBudgetCents)}'
-                        : 'Remaining: ${_formatCents(targetBudgetCents - monthExpensesCents)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isOverBudget
-                          ? AppColors.errorCoral
-                          : AppColors.successMint,
-                    ),
-                  ),
-                  Text(
-                    '${thisMonthTx.where((t) => t.type == 'expense').length} expense logs',
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      color: isDark
-                          ? AppColors.darkSecondaryText
-                          : AppColors.lightSecondaryText,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        SectionHeader(
-          title: 'Category Spending',
-          subtitle: 'Active month allocation breakdown',
-        ),
-        if (sortedCategories.isEmpty)
-          EmptyState(
-            icon: Icons.pie_chart_outline_rounded,
-            title: 'No expenses this month',
-            message:
-                'Record expenses to track your category budget consumption.',
-            actionLabel: 'Record Expense',
-            onActionPressed: () => _showAddTransactionDialog(isIncome: false),
-          )
-        else
-          ...sortedCategories.map((entry) {
-            final catCents = entry.value;
-            final catRatio = monthExpensesCents > 0
-                ? (catCents / monthExpensesCents)
-                : 0.0;
-            final catPct = (catRatio * 100).toStringAsFixed(1);
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkCardSurface
-                    : AppColors.lightCardSurface,
-                borderRadius: AppRadius.cardRadius,
-                border: Border.all(
-                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                ),
-              ),
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            _getCategoryIcon(entry.key),
-                            size: 18,
-                            color: AppColors.accentCyan,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            entry.key,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: isDark
-                                  ? AppColors.darkPrimaryText
-                                  : AppColors.lightPrimaryText,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        '${_formatCents(catCents)} ($catPct%)',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: isDark
-                              ? AppColors.darkPrimaryText
-                              : AppColors.lightPrimaryText,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: AppRadius.pillRadius,
-                    child: LinearProgressIndicator(
-                      value: catRatio.clamp(0.0, 1.0),
-                      minHeight: 6,
-                      backgroundColor: isDark
-                          ? AppColors.darkBorder
-                          : AppColors.lightBorder,
-                      valueColor: const AlwaysStoppedAnimation(
-                        AppColors.accentCyan,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-      ],
-    );
-  }
 
   Widget _buildAnalyticsTab(
     bool isDark,
     List<FinancialTransactionEntry> allTransactions,
   ) {
+    final now = DateTime.now();
+    List<FinancialTransactionEntry> filteredTx;
+
+    if (_analyticsPeriod == 'This Week') {
+      final monday = now.subtract(Duration(days: now.weekday - 1));
+      final start = DateTime(monday.year, monday.month, monday.day);
+      filteredTx = allTransactions
+          .where(
+            (t) => t.transactionDate.isAfter(
+              start.subtract(const Duration(milliseconds: 1)),
+            ),
+          )
+          .toList();
+    } else if (_analyticsPeriod == 'This Month') {
+      filteredTx = allTransactions
+          .where(
+            (t) =>
+                t.transactionDate.year == now.year &&
+                t.transactionDate.month == now.month,
+          )
+          .toList();
+    } else {
+      filteredTx = allTransactions;
+    }
+
     var totalInc = 0;
     var totalExp = 0;
-    final catTotals = <String, int>{};
-    final catCounts = <String, int>{};
+    final catExpTotals = <String, int>{};
+    final catExpCounts = <String, int>{};
+    final catIncTotals = <String, int>{};
 
-    for (final tx in allTransactions) {
+    for (final tx in filteredTx) {
       if (tx.type == 'income') {
         totalInc += tx.amountCents;
+        catIncTotals[tx.category] =
+            (catIncTotals[tx.category] ?? 0) + tx.amountCents;
       } else {
         totalExp += tx.amountCents;
-        catTotals[tx.category] = (catTotals[tx.category] ?? 0) + tx.amountCents;
-        catCounts[tx.category] = (catCounts[tx.category] ?? 0) + 1;
+        catExpTotals[tx.category] =
+            (catExpTotals[tx.category] ?? 0) + tx.amountCents;
+        catExpCounts[tx.category] = (catExpCounts[tx.category] ?? 0) + 1;
       }
     }
 
@@ -803,7 +745,18 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
         ? ((netSavings / totalInc) * 100).clamp(-100.0, 100.0)
         : 0.0;
 
-    final sortedCats = catTotals.entries.toList()
+    // Remaining capacity across all active budgets
+    final budgets = ref.watch(allBudgetsStreamProvider).value ?? [];
+    int totalBudgetRemaining = 0;
+    for (final b in budgets.where((b) => !b.isPaused)) {
+      final p = BudgetProgress.compute(
+        budget: b,
+        transactions: allTransactions,
+      );
+      totalBudgetRemaining += p.remainingCents;
+    }
+
+    final sortedCats = catExpTotals.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final topCat = sortedCats.isNotEmpty ? sortedCats.first : null;
     final topCatPct = topCat != null && totalExp > 0
@@ -817,11 +770,45 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           title: 'Financial Analytics',
           subtitle: 'Holistic income, expense & savings metrics',
         ),
+        const SizedBox(height: 8),
+
+        // Period filter chips
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: ['This Week', 'This Month', 'All Time'].map((p) {
+              final isSel = _analyticsPeriod == p;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(p),
+                  selected: isSel,
+                  selectedColor: isDark
+                      ? AppColors.darkSoftIndigo
+                      : AppColors.lightSoftIndigo,
+                  checkmarkColor: AppColors.primaryIndigo,
+                  labelStyle: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                    color: isSel
+                        ? AppColors.primaryIndigo
+                        : (isDark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.lightPrimaryText),
+                  ),
+                  onSelected: (_) => setState(() => _analyticsPeriod = p),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 16),
+
         Row(
           children: [
             Expanded(
               child: SummaryCard(
-                title: 'Net Savings',
+                title: 'Net Cash Flow',
                 value: _formatCents(netSavings),
                 subtitle: 'Savings Rate: ${savingsRate.toStringAsFixed(1)}%',
                 icon: Icons.savings_outlined,
@@ -835,6 +822,37 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
                     : (isDark
                           ? AppColors.darkSoftCoral
                           : AppColors.lightSoftCoral),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SummaryCard(
+                title: 'Budgets Remaining',
+                value: _formatCents(totalBudgetRemaining),
+                subtitle:
+                    '${budgets.where((b) => !b.isPaused).length} active budgets',
+                icon: Icons.account_balance_wallet_outlined,
+                iconColor: AppColors.primaryIndigo,
+                iconBackgroundColor: isDark
+                    ? AppColors.darkSoftIndigo
+                    : AppColors.lightSoftIndigo,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: SummaryCard(
+                title: 'Total Income',
+                value: _formatCents(totalInc),
+                subtitle: 'Period earnings',
+                icon: Icons.arrow_downward_rounded,
+                iconColor: AppColors.successMint,
+                iconBackgroundColor: isDark
+                    ? AppColors.darkSoftMint
+                    : AppColors.lightSoftMint,
               ),
             ),
             const SizedBox(width: 12),
@@ -859,7 +877,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
         // Interactive Finance Donut and Cash Flow Charts
         if (totalExp > 0 || totalInc > 0) ...[
           FinanceExpenseDonutChart(
-            categoryTotals: catTotals,
+            categoryTotals: catExpTotals,
             totalExpenseCents: totalExp,
             isDark: isDark,
           ),
@@ -867,20 +885,20 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           FinanceCashFlowBarChart(
             totalIncomeCents: totalInc,
             totalExpenseCents: totalExp,
-            recentTransactions: allTransactions,
+            recentTransactions: filteredTx,
             isDark: isDark,
           ),
           const SizedBox(height: 16),
         ],
 
         SectionHeader(
-          title: 'Historical Category Breakdown',
-          subtitle: 'Ranked by total expenditure',
+          title: 'Category Spending Breakdown',
+          subtitle: 'Ranked by total expenditure in $_analyticsPeriod',
         ),
         if (sortedCats.isEmpty)
           EmptyState(
             icon: Icons.analytics_outlined,
-            title: 'No analytics available',
+            title: 'No expenses in this period',
             message: 'Add transactions to generate financial breakdown charts.',
             actionLabel: 'Record Expense',
             onActionPressed: () => _showAddTransactionDialog(isIncome: false),
@@ -889,7 +907,7 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
           ...sortedCats.map((entry) {
             final shareRatio = totalExp > 0 ? (entry.value / totalExp) : 0.0;
             final sharePct = (shareRatio * 100).toStringAsFixed(1);
-            final count = catCounts[entry.key] ?? 1;
+            final count = catExpCounts[entry.key] ?? 1;
 
             return Container(
               margin: const EdgeInsets.symmetric(vertical: 4),
@@ -969,6 +987,83 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
               ),
             );
           }),
+
+        if (catIncTotals.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          SectionHeader(
+            title: 'Income Breakdown',
+            subtitle: 'Sources of revenue in $_analyticsPeriod',
+          ),
+          ...catIncTotals.entries.map((entry) {
+            final shareRatio = totalInc > 0 ? (entry.value / totalInc) : 0.0;
+            final sharePct = (shareRatio * 100).toStringAsFixed(1);
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.darkCardSurface
+                    : AppColors.lightCardSurface,
+                borderRadius: AppRadius.cardRadius,
+                border: Border.all(
+                  color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                ),
+              ),
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            _getCategoryIcon(entry.key),
+                            size: 18,
+                            color: AppColors.successMint,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            entry.key,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColors.darkPrimaryText
+                                  : AppColors.lightPrimaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${_formatCents(entry.value)} ($sharePct%)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.successMint,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: AppRadius.pillRadius,
+                    child: LinearProgressIndicator(
+                      value: shareRatio.clamp(0.0, 1.0),
+                      minHeight: 6,
+                      backgroundColor: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                      valueColor: const AlwaysStoppedAnimation(
+                        AppColors.successMint,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ],
     );
   }
@@ -1140,7 +1235,6 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accountsAsync = ref.watch(financialAccountsStreamProvider);
     final transactionsAsync = ref.watch(allTransactionsStreamProvider);
-    final budgetAsync = ref.watch(currentMonthBudgetStreamProvider);
 
     return Scaffold(
       body: CustomScrollView(
@@ -1151,107 +1245,95 @@ class _FinanceScreenState extends ConsumerState<FinanceScreen> {
             subtitle: 'Accurate minor currency unit arithmetic with Drift',
             gradient: AppGradients.finance,
           ),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List.generate(_tabs.length, (index) {
-                          final isSelected = _currentTab == index;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: ChoiceChip(
-                              label: Text(_tabs[index]),
-                              selected: isSelected,
-                              selectedColor: AppColors.accentCyan,
-                              backgroundColor: isDark
-                                  ? AppColors.darkCardSurface
-                                  : const Color(0xFFEFF2FA),
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : (isDark
-                                          ? AppColors.darkPrimaryText
-                                          : AppColors.lightPrimaryText),
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                              ),
-                              onSelected: (_) =>
-                                  setState(() => _currentTab = index),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
-                ),
-                accountsAsync.when(
-                  loading: () => const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.all(40),
-                      child: LoadingState(
-                        message: 'Loading financial records...',
-                      ),
-                    ),
-                  ),
-                  error: (err, _) => SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Center(
-                        child: Text('Error loading accounts: $err'),
-                      ),
-                    ),
-                  ),
-                  data: (accounts) {
-                    return transactionsAsync.when(
-                      loading: () => const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.all(40),
-                          child: LoadingState(
-                            message: 'Loading transactions...',
-                          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(_tabs.length, (index) {
+                    final isSelected = _currentTab == index;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(_tabs[index]),
+                        selected: isSelected,
+                        selectedColor: AppColors.accentCyan,
+                        backgroundColor: isDark
+                            ? AppColors.darkCardSurface
+                            : const Color(0xFFEFF2FA),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? Colors.white
+                              : (isDark
+                                    ? AppColors.darkPrimaryText
+                                    : AppColors.lightPrimaryText),
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
+                        onSelected: (_) => setState(() => _currentTab = index),
                       ),
-                      error: (err, _) => SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Center(
-                            child: Text('Error loading transactions: $err'),
-                          ),
-                        ),
-                      ),
-                      data: (transactions) {
-                        return SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-                          sliver: SliverList(
-                            delegate: SliverChildListDelegate([
-                              if (_currentTab == 0)
-                                _buildOverviewTab(
-                                  isDark,
-                                  accounts,
-                                  transactions,
-                                ),
-                              if (_currentTab == 1)
-                                _buildPlanTab(
-                                  isDark,
-                                  transactions,
-                                  budgetAsync.value,
-                                ),
-                              if (_currentTab == 2)
-                                _buildAnalyticsTab(isDark, transactions),
-                              if (_currentTab == 3)
-                                _buildCompareTab(isDark, transactions),
-                            ]),
-                          ),
-                        );
-                      },
                     );
-                  },
+                  }),
                 ),
-              ],
+              ),
             ),
+          ),
+          accountsAsync.when(
+            loading: () => const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(40),
+                child: LoadingState(message: 'Loading financial records...'),
+              ),
+            ),
+            error: (err, _) => SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Center(child: Text('Error loading accounts: $err')),
+              ),
+            ),
+            data: (accounts) {
+              return transactionsAsync.when(
+                loading: () => const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(40),
+                    child: LoadingState(message: 'Loading transactions...'),
+                  ),
+                ),
+                error: (err, _) => SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Center(
+                      child: Text('Error loading transactions: $err'),
+                    ),
+                  ),
+                ),
+                data: (transactions) {
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        if (_currentTab == 0)
+                          _buildOverviewTab(isDark, accounts, transactions),
+                        if (_currentTab == 1)
+                          BudgetsTab(
+                            allTransactions: transactions,
+                            isDark: isDark,
+                          ),
+                        if (_currentTab == 2)
+                          _buildAnalyticsTab(isDark, transactions),
+                        if (_currentTab == 3)
+                          _buildCompareTab(isDark, transactions),
+                      ]),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

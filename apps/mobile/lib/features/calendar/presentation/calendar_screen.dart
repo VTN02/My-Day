@@ -12,6 +12,7 @@ import '../../../core/widgets/gradient_header.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../core/widgets/task_card.dart';
+import '../../tasks/domain/models/task_status.dart';
 import '../../tasks/presentation/task_edit_sheet.dart';
 
 /// Monthly Calendar Screen connected to Drift database.
@@ -646,7 +647,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       _selectedDay,
     );
 
-    final monthTasksAsync = ref.watch(tasksForMonthStreamProvider(_currentMonth));
+    final monthTasksAsync = ref.watch(
+      tasksForMonthStreamProvider(_currentMonth),
+    );
     final Map<int, List<TaskEntry>> tasksByDay = {};
     monthTasksAsync.whenData((tasks) {
       for (final task in tasks) {
@@ -725,8 +728,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                           ),
                           style: TextButton.styleFrom(
                             foregroundColor: AppColors.primaryIndigo,
-                            backgroundColor:
-                                AppColors.primaryIndigo.withValues(alpha: 0.1),
+                            backgroundColor: AppColors.primaryIndigo.withValues(
+                              alpha: 0.1,
+                            ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
                               vertical: 4,
@@ -916,84 +920,102 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               ),
             ),
           ),
-                SliverToBoxAdapter(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SectionHeader(
+                title:
+                    'Tasks for ${_monthName(_currentMonth.month)} $_selectedDay',
+                subtitle: 'Scheduled events and to-dos for this day',
+              ),
+            ),
+          ),
+          ref
+              .watch(tasksForDateStreamProvider(selectedDate))
+              .when(
+                loading: () => const SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SectionHeader(
-                      title:
-                          'Tasks for ${_monthName(_currentMonth.month)} $_selectedDay',
-                      subtitle: 'Scheduled events and to-dos for this day',
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+                error: (err, _) => SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        'Error loading tasks: $err',
+                        style: const TextStyle(color: AppColors.errorCoral),
+                      ),
                     ),
                   ),
                 ),
-                ref
-                    .watch(tasksForDateStreamProvider(selectedDate))
-                    .when(
-                      loading: () => const SliverToBoxAdapter(
-                        child: Padding(
-                          padding: EdgeInsets.all(32),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
+                data: (tasks) {
+                  if (tasks.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: EmptyState(
+                        icon: Icons.event_note_outlined,
+                        title: 'No tasks scheduled',
+                        message:
+                            'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
+                        actionLabel: 'Schedule Task',
+                        onActionPressed: () => _showAddTaskSheet(selectedDate),
                       ),
-                      error: (err, _) => SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Center(
-                            child: Text(
-                              'Error loading tasks: $err',
-                              style: const TextStyle(
-                                color: AppColors.errorCoral,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      data: (tasks) {
-                        if (tasks.isEmpty) {
-                          return SliverToBoxAdapter(
-                            child: EmptyState(
-                              icon: Icons.event_note_outlined,
-                              title: 'No tasks scheduled',
-                              message:
-                                  'Nothing scheduled for ${_monthName(_currentMonth.month)} $_selectedDay.',
-                              actionLabel: 'Schedule Task',
-                              onActionPressed: () =>
-                                  _showAddTaskSheet(selectedDate),
-                            ),
-                          );
-                        }
+                    );
+                  }
 
-                        return SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-                          sliver: SliverList(
-                            delegate: SliverChildBuilderDelegate((
-                              context,
-                              index,
-                            ) {
-                              final task = tasks[index];
-                              return TaskCard(
-                                key: ValueKey(task.id),
-                                title: task.title,
-                                category: task.category,
-                                dueTime: task.dueTime,
-                                priority: task.priority,
-                                isCompleted: task.isCompleted,
-                                onTap: () =>
-                                    showTaskEditSheet(context, ref, task),
-                                onToggle: (_) => ref
-                                    .read(tasksRepositoryProvider)
-                                    .toggleTaskCompletion(task.id),
-                                onDelete: () => ref
-                                    .read(tasksRepositoryProvider)
-                                    .deleteTask(task.id),
-                              );
-                            }, childCount: tasks.length),
-                          ),
+                  return SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final task = tasks[index];
+                        return TaskCard(
+                          key: ValueKey(task.id),
+                          title: task.title,
+                          category: task.category,
+                          dueTime: task.dueTime,
+                          priority: task.priority,
+                          isCompleted: task.isCompleted,
+                          status: task.computeStatus(),
+                          onTap: () => showTaskEditSheet(context, ref, task),
+                          onToggle: (_) async {
+                            final willBeCompleted = !task.isCompleted;
+                            await ref
+                                .read(tasksRepositoryProvider)
+                                .toggleTaskCompletion(task.id);
+
+                            final smartService = ref.read(
+                              smartReminderServiceProvider,
+                            );
+                            if (willBeCompleted) {
+                              await smartService.cancelTaskReminders(task.id);
+                            } else {
+                              final updated = await ref
+                                  .read(tasksRepositoryProvider)
+                                  .getTask(task.id);
+                              if (updated != null) {
+                                await smartService.scheduleTaskWithEscalation(
+                                  updated,
+                                );
+                              }
+                            }
+                          },
+                          onDelete: () async {
+                            await ref
+                                .read(smartReminderServiceProvider)
+                                .cancelTaskReminders(task.id);
+                            await ref
+                                .read(tasksRepositoryProvider)
+                                .deleteTask(task.id);
+                          },
                         );
-                      },
+                      }, childCount: tasks.length),
                     ),
-              ],
-            ),
+                  );
+                },
+              ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryIndigo,
         foregroundColor: Colors.white,

@@ -32,3 +32,27 @@ class BudgetAllocationsTable extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Unified multi-period spending budgets table (Daily, Weekly, Monthly)
+@DataClassName('BudgetEntry')
+class BudgetsTable extends Table {
+  @override
+  String get tableName => 'budgets';
+
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get amountCents => integer()();
+  TextColumn get currency => text().withDefault(const Constant('LKR'))();
+  TextColumn get periodType => text()(); // 'daily', 'weekly', 'monthly'
+  DateTimeColumn get startDate => dateTime()();
+  DateTimeColumn get endDate => dateTime().nullable()();
+  TextColumn get category => text().nullable()(); // null or 'All' or specific category name
+  IntColumn get alertThresholdPercent =>
+      integer().withDefault(const Constant(80))();
+  BoolColumn get isPaused => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

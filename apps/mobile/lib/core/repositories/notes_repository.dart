@@ -124,15 +124,21 @@ class DriftNotesRepository implements INotesRepository {
 
   @override
   Future<Note?> getNoteById(String id) async {
-    final entry = await (_db.select(_db.notesTable)..where((n) => n.id.equals(id))).getSingleOrNull();
+    final entry = await (_db.select(
+      _db.notesTable,
+    )..where((n) => n.id.equals(id))).getSingleOrNull();
     if (entry == null) return null;
 
-    final attachments = await (_db.select(_db.noteAttachmentsTable)..where((a) => a.noteId.equals(id))).get();
+    final attachments = await (_db.select(
+      _db.noteAttachmentsTable,
+    )..where((a) => a.noteId.equals(id))).get();
     return _mapEntryToNote(entry, attachmentCount: attachments.length);
   }
 
   Future<NoteEntry?> getNote(String id) {
-    return (_db.select(_db.notesTable)..where((n) => n.id.equals(id))).getSingleOrNull();
+    return (_db.select(
+      _db.notesTable,
+    )..where((n) => n.id.equals(id))).getSingleOrNull();
   }
 
   @override
@@ -168,13 +174,13 @@ class DriftNotesRepository implements INotesRepository {
 
     final existing = await getNoteById(note.id);
     if (existing == null) {
-      await _db.into(_db.notesTable).insert(
-            companion.copyWith(
-              createdAt: Value(note.createdAt),
-            ),
-          );
+      await _db
+          .into(_db.notesTable)
+          .insert(companion.copyWith(createdAt: Value(note.createdAt)));
     } else {
-      await (_db.update(_db.notesTable)..where((n) => n.id.equals(note.id))).write(companion);
+      await (_db.update(
+        _db.notesTable,
+      )..where((n) => n.id.equals(note.id))).write(companion);
     }
   }
 
@@ -225,14 +231,18 @@ class DriftNotesRepository implements INotesRepository {
   @override
   Future<void> permanentlyDeleteNote(String id) async {
     await _db.transaction(() async {
-      await (_db.delete(_db.noteAttachmentsTable)..where((a) => a.noteId.equals(id))).go();
+      await (_db.delete(
+        _db.noteAttachmentsTable,
+      )..where((a) => a.noteId.equals(id))).go();
       await (_db.delete(_db.notesTable)..where((n) => n.id.equals(id))).go();
     });
   }
 
   @override
   Future<void> emptyTrash() async {
-    final trashed = await (_db.select(_db.notesTable)..where((n) => n.isTrashed.equals(true))).get();
+    final trashed = await (_db.select(
+      _db.notesTable,
+    )..where((n) => n.isTrashed.equals(true))).get();
     for (final note in trashed) {
       await permanentlyDeleteNote(note.id);
     }
@@ -266,8 +276,13 @@ class DriftNotesRepository implements INotesRepository {
       for (final e in entries) {
         final countQuery = _db.selectOnly(_db.notesTable)
           ..addColumns([_db.notesTable.id.count()])
-          ..where(_db.notesTable.folderId.equals(e.id) & _db.notesTable.isTrashed.equals(false));
-        final count = await countQuery.map((row) => row.read(_db.notesTable.id.count()) ?? 0).getSingle();
+          ..where(
+            _db.notesTable.folderId.equals(e.id) &
+                _db.notesTable.isTrashed.equals(false),
+          );
+        final count = await countQuery
+            .map((row) => row.read(_db.notesTable.id.count()) ?? 0)
+            .getSingle();
         list.add(_mapEntryToFolder(e, noteCount: count));
       }
       return list;
@@ -285,7 +300,9 @@ class DriftNotesRepository implements INotesRepository {
     String colorHex = '#1565C0',
   }) async {
     final now = DateTime.now();
-    await _db.into(_db.noteFoldersTable).insert(
+    await _db
+        .into(_db.noteFoldersTable)
+        .insert(
           NoteFoldersTableCompanion.insert(
             id: _uuid.v4(),
             name: name,
@@ -298,7 +315,9 @@ class DriftNotesRepository implements INotesRepository {
   }
 
   Future<void> renameFolder(String id, String newName) async {
-    await (_db.update(_db.noteFoldersTable)..where((f) => f.id.equals(id))).write(
+    await (_db.update(
+      _db.noteFoldersTable,
+    )..where((f) => f.id.equals(id))).write(
       NoteFoldersTableCompanion(
         name: Value(newName),
         updatedAt: Value(DateTime.now()),
@@ -309,24 +328,29 @@ class DriftNotesRepository implements INotesRepository {
   Future<void> deleteFolder(String id, {bool deleteNotes = false}) async {
     await _db.transaction(() async {
       if (deleteNotes) {
-        final notesInFolder = await (_db.select(_db.notesTable)..where((n) => n.folderId.equals(id))).get();
+        final notesInFolder = await (_db.select(
+          _db.notesTable,
+        )..where((n) => n.folderId.equals(id))).get();
         for (final n in notesInFolder) {
           await moveToTrash(n.id);
         }
       } else {
         // Move notes to root (unorganized)
-        await (_db.update(_db.notesTable)..where((n) => n.folderId.equals(id))).write(
-          const NotesTableCompanion(folderId: Value(null)),
-        );
+        await (_db.update(_db.notesTable)..where((n) => n.folderId.equals(id)))
+            .write(const NotesTableCompanion(folderId: Value(null)));
       }
-      await (_db.delete(_db.noteFoldersTable)..where((f) => f.id.equals(id))).go();
+      await (_db.delete(
+        _db.noteFoldersTable,
+      )..where((f) => f.id.equals(id))).go();
     });
   }
 
   // --- Attachments ---
 
   Stream<List<NoteAttachmentEntry>> watchAttachmentsForNote(String noteId) {
-    return (_db.select(_db.noteAttachmentsTable)..where((a) => a.noteId.equals(noteId))).watch();
+    return (_db.select(
+      _db.noteAttachmentsTable,
+    )..where((a) => a.noteId.equals(noteId))).watch();
   }
 
   Future<void> addAttachment({
@@ -337,7 +361,9 @@ class DriftNotesRepository implements INotesRepository {
     int? fileSizeBytes,
   }) async {
     final id = _uuid.v4();
-    await _db.into(_db.noteAttachmentsTable).insert(
+    await _db
+        .into(_db.noteAttachmentsTable)
+        .insert(
           NoteAttachmentsTableCompanion.insert(
             id: id,
             noteId: noteId,
@@ -351,6 +377,8 @@ class DriftNotesRepository implements INotesRepository {
   }
 
   Future<void> deleteAttachment(String attachmentId) async {
-    await (_db.delete(_db.noteAttachmentsTable)..where((a) => a.id.equals(attachmentId))).go();
+    await (_db.delete(
+      _db.noteAttachmentsTable,
+    )..where((a) => a.id.equals(attachmentId))).go();
   }
 }

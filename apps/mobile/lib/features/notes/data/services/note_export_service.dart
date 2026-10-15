@@ -198,7 +198,10 @@ class NoteExportService {
             pw.Center(
               child: pw.Text(
                 'Exported from MyDay — Offline-First Productivity',
-                style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
+                style: const pw.TextStyle(
+                  fontSize: 8,
+                  color: PdfColors.grey500,
+                ),
               ),
             ),
           ];
@@ -212,7 +215,8 @@ class NoteExportService {
         .replaceAll(RegExp(r'[^\w\s-]'), '')
         .trim()
         .replaceAll(RegExp(r'\s+'), '_');
-    final fileName = '${sanitizedTitle.isEmpty ? "MyDay_Note" : sanitizedTitle}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    final fileName =
+        '${sanitizedTitle.isEmpty ? "MyDay_Note" : sanitizedTitle}_${DateTime.now().millisecondsSinceEpoch}.pdf';
     final file = File('${outputDir.path}/$fileName');
     await file.writeAsBytes(await pdf.save());
 
