@@ -1,20 +1,21 @@
 {
-  "latest_version": "1.2.1",
-  "version_code": 6,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.2.1/myday-v1.2.1.apk",
+  "latest_version": "1.3.0",
+  "version_code": 7,
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/tag/v1.3.0",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
-  "file_size": "85 MB",
+  "file_size": "72 MB",
   "is_mandatory": false,
   "release_notes": [
-    "Responsive Update Sheet: Fixed the modal bottom sheet overflow on all mobile screen heights; action buttons are now permanently visible.",
-    "Resilient Chunked OTA Downloads: Added automatic HTTP Range resume across network hiccups and connection drops (up to 5 automatic retries).",
-    "Dynamic Version Resolution: Device packages query Android's package manager dynamically for reliable update checks.",
-    "Transparent Brand Logo: Applied clean ribbon logo without background across the app and admin console.",
-    "Multi-Modal Notes Editor: Vector canvas sketch drawing, rich text formatting, checklist blocks, and audio/file attachments.",
-    "Folder Organization & Safe Trash: Hierarchical folders with soft deletion and restore.",
-    "Escalating Alerts: Configurable repetitive reminder intervals for critical tasks.",
-    "Customizable Tunes: Super Admin–managed audio tunes catalog.",
-    "Unified Task & Schedule View: Monthly dot indicators linked to tasks and daily habits."
+    "Intelligent Cohorts: Automated dynamic task cohorts (Urgent, Due Soon, In Progress, Upcoming, Overdue, Completed).",
+    "Task Analytics Dashboard: Visual completion rates, priority distribution, and velocity metrics.",
+    "Notes Report Export: 1-tap export of productivity summaries directly into rich MyDay Notes blocks.",
+    "Flexible Horizons: Daily, weekly, and monthly expense budgets with real-time spend tracking.",
+    "Threshold Warnings: Proactive alert flags at 80% and 100% budget utilization.",
+    "Custom Categories: Add unlimited custom categories with color palettes and custom icons.",
+    "Track Receivables & Payables: Monitor who owes you and who you owe with due date alerts.",
+    "Partial Repayments: Record partial or full repayments with quick-fill chips.",
+    "Ledger Balance Sync: Atomically update liquid Cash and Card account balances upon lending or repaying.",
+    "Immediate real-time data sync across Today Dashboard, Calendar, Finance, and Money Tracker without manual refresh."
   ]
 }
