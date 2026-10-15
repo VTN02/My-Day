@@ -1,10 +1,10 @@
 {
   "latest_version": "1.3.0",
   "version_code": 7,
-  "apk_download_url": "https://github.com/VTN02/My-Day/releases/tag/v1.3.0",
+  "apk_download_url": "https://github.com/VTN02/My-Day/releases/download/v1.3.0/myday-v1.3.0.apk",
   "mirror_url": "https://whatsapp.com/channel/0029VbC9tOXGU3BRlJoxya3h",
   "release_date": "October 2026",
-  "file_size": "72 MB",
+  "file_size": "87 MB",
   "is_mandatory": false,
   "release_notes": [
     "Intelligent Cohorts: Automated dynamic task cohorts (Urgent, Due Soon, In Progress, Upcoming, Overdue, Completed).",
